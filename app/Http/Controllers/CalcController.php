@@ -58,7 +58,7 @@ class CalcController extends Controller
 
         $number = Str::uuid();
 
-        $mpdf->WriteHTML(view("pdf.order", [
+        $mpdf->WriteHTML(view("pdf.order-v2", [
             "name" => $name,
             "order_id" => $number,
             "current_date" => $current_date,

@@ -7,33 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Чек </title>
 </head>
-<style>
-    th:nth-child(1),
-    td:nth-child(1) {
-        width: 50px;
-    }
 
-    th:nth-child(2),
-    td:nth-child(2) {
-        width: 250px;
-    }
-
-    th:nth-child(3),
-    td:nth-child(3) {
-        width: 250px;
-    }
-
-    th:nth-child(4),
-    td:nth-child(4) {
-        width: 100px;
-    }
-
-    th:nth-child(5),
-    td:nth-child(5) {
-        width: 100px;
-    }
-
-</style>
 <body>
 
 <h1>Заказ на двери от {{$current_date}}</h1>
@@ -70,6 +44,7 @@
             <td><strong>Цвет отделки второй стороны</strong></td>
             <td><strong>Цвет уплотнения</strong></td>
             <td><strong>Цвет фурнитуры</strong></td>
+            <td style="width: 150px;"><strong>Дополнительно</strong></td>
             <td><strong>Расположение петель</strong></td>
             <td style="width: 50px;"><strong>Число петель</strong></td>
             <td><strong>Производитель петель</strong></td>
@@ -98,6 +73,17 @@
                 <td>{{$item->product->back_side_finish_color->title ?? 'не указано'}}</td>
                 <td>{{$item->product->seal_color->title ?? 'не указано'}}</td>
                 <td>{{$item->product->fittings_color->title ?? 'не указано'}}</td>
+                <td style="width: 150px;">
+                    <span>Дверная ручка: {{($item->product->need_handle_holes ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Верхняя перемычка: {{($item->product->need_upper_jumper ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Автоматический порог: {{($item->product->need_automatic_doorstep ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Скрытый стопор: {{($item->product->need_hidden_stopper ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Скрытый доводчик: {{($item->product->need_hidden_door_closer ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Плинтус: {{($item->product->need_hidden_skirting_board ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                    <span>Установка двери: {{($item->product->need_door_install ?? false) == "true" ? "Да":"Нет"}}</span><br>
+                </td>
+
+
                 <td>{{$item->product->loops->title ?? 'не указано'}}</td>
                 <td style="width: 50px;">{{$item->product->loops_count ?? 0}}</td>
                 <td>{{$item->product->hinge_manufacturer->title ?? 'не указано'}}</td>

@@ -120,32 +120,36 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
             </td>
             <td class="text-center">
 
-                <p v-if="!items[index].need_edit_price" @click="items[index].need_edit_price = true">{{ items[index].price || 0 }}</p>
+                <p v-if="!items[index].need_edit_price" @click="items[index].need_edit_price = true">
+                    {{ items[index].price || 0 }}</p>
                 <input
                     v-if="items[index].need_edit_price"
                     type="number"
-                       step="0.1"
-                       min="0"
-                       @change="saveParam('price', index)"
-                       v-model="items[index].price"
-                       class="form-control text-center"
-                       id="floatingInput"
-                       placeholder="name@example.com">
+                    step="0.1"
+                    min="0"
+                    @blur="blurParams('price_koef', index)"
+                    @change="saveParam('price', index)"
+                    v-model="items[index].price"
+                    class="form-control text-center"
+                    id="floatingInput"
+                    placeholder="name@example.com">
 
 
             </td>
             <td class="text-center">
-                <p v-if="!items[index].need_edit_koef" @click="items[index].need_edit_koef = true">{{ items[index].price_koef || 0 }}</p>
+                <p v-if="!items[index].need_edit_koef" @click="items[index].need_edit_koef = true">
+                    {{ items[index].price_koef || 0 }}</p>
                 <input
                     v-if="items[index].need_edit_koef"
                     type="number"
-                       step="0.1"
-                       min="0"
-                       @change="saveParam('price_koef', index)"
-                       v-model="items[index].price_koef"
-                       class="form-control text-center"
-                       id="floatingInput"
-                       placeholder="name@example.com">
+                    step="0.1"
+                    min="0"
+                    @blur="blurParams('price_koef', index)"
+                    @change="saveParam('price_koef', index)"
+                    v-model="items[index].price_koef"
+                    class="form-control text-center"
+                    id="floatingInput"
+                    placeholder="name@example.com">
 
             </td>
             <td class="text-center">
@@ -611,7 +615,12 @@ export default {
             })
         },
 
+        blurParams(param, index) {
+            this.items[index].need_edit_price = false
+            this.items[index].need_edit_koef = false
+        },
         saveParam(param, index) {
+
             this.$store.dispatch("updateSizeParam", {
                 dataObject: {
                     id: this.items[index].id,
