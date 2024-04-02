@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\HandleStoreRequest;
+use App\Http\Requests\HandleUpdateRequest;
+use App\Http\Resources\HandleCollection;
+use App\Http\Resources\HandleResource;
+use App\Http\Resources\MaterialCollection;
+use App\Http\Resources\MaterialResource;
+use App\Models\Handle;
+use App\Models\Material;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Inertia\Inertia;
+
+class HandleController extends Controller
+{
+    use Utility;
+
+    public function index(Request $request): \Inertia\Response
+    {
+        return Inertia::render('Admin/HandlesPage');
+    }
+
+    public function getHandleList(Request $request): HandleCollection
+    {
+
+        $search = $request->search ?? null;
+        $order = $request->order ?? "id";
+        $direction = $request->direction ?? "asc";
+
+        $size = $size ?? config('app.results_per_page');
+
+        $handles = Handle::query();
+
+        if (!is_null($search))
+            $handles = $handles
+                ->where("title", 'like', "%$search%")
+                ->orWhere("id", 'like', "%$search%");
+
+        $handles = $handles->orderBy($order, $direction);
+
+        return new HandleCollection($handles->paginate($size));
+    }
+
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            "title" => "required"
+        ]);
+
+        $variants = json_decode($request->variants ?? '[]');
+
+
+        $tmp = $this->uploadPhotos($request->hasFile('uploaded_variants_image') ? $request->file('uploaded_variants_image') : null);
+        $variants = [...$variants, ...$tmp];
+
+        $id = $request->id ?? null;
+
+        if (is_null($id))
+            $handle = Handle::query()
+                ->create([
+                    "title" => $request->title ?? null,
+                    'price' => $request->price ?? 0,
+                    'variants'=>$variants
+                ]);
+        else {
+            $handle = Handle::query()->find($id);
+
+            if (is_null($handle))
+                return response()->noContent(404);
+
+            $handle->update([
+                "title" => $request->title ?? null,
+                'price' => $request->price ?? 0,
+                'variants'=>$variants
+            ]);
+
+        }
+
+        return new HandleResource($handle);
+    }
+
+
+    public function destroy(Request $request, $id): \Illuminate\Http\Response
+    {
+        $handle = Handle::query()->find($id);
+
+        if (is_null($handle))
+            return response()->noContent(404);
+
+        $handle->delete();
+
+        return response()->noContent(200);
+    }
+}

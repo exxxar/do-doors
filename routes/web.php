@@ -29,9 +29,37 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/permissions', function () {
+    return Inertia::render('Permissions/Index');
+})->middleware(['auth', 'verified'])->name('permissions.index');
+
+Route::get('/permissions/create', function () {
+    return Inertia::render('Permissions/Create');
+})->middleware(['auth', 'verified'])->name('permissions.create');
+
+Route::get('/permissions/edit', function () {
+    return Inertia::render('Permissions/Edit');
+})->middleware(['auth', 'verified'])->name('permissions.edit');
+
 Route::get('/calc', function () {
     return Inertia::render('CalcPage');
 })->middleware(['auth', 'verified'])->name('calc');
+
+Route::get('/clients', function () {
+    return Inertia::render('Admin/ClientsPage');
+})->middleware(['auth', 'verified'])->name('clients');
+
+
+
+Route::get('/orders', function () {
+    return Inertia::render('Admin/OrdersPage');
+})->middleware(['auth', 'verified'])->name('orders');
+
+
+Route::get('/basket', function () {
+    return Inertia::render('CartPage');
+})->middleware(['auth', 'verified'])->name('basket');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -39,4 +67,60 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+Route::prefix("/calc")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\CalcController::class)
+    ->group(function(){
+        Route::post("/checkout","checkout")->name('checkout');
+    });
+
+
+Route::prefix("/materials")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\MaterialController::class)
+    ->group(function () {
+        Route::get("/","index")->name('materials');
+        Route::post("/","getMaterialList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
+Route::prefix("/handles")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\HandleController::class)
+    ->group(function () {
+        Route::get("/","index")->name('handles');
+        Route::post("/","getHandleList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
+Route::prefix("/sizes")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\SizeController::class)
+    ->group(function () {
+        Route::get("/","index")->name('sizes');
+        Route::post("/","getSizeList");
+        Route::post("/recount","recountPrice");
+        Route::post("/formatted","getFormatted");
+        Route::post("/generate","generateSizes");
+        Route::get("/duplicate/{id}","duplicate");
+        Route::post("/store","store");
+        Route::post("/update-param","updateParam");
+        Route::delete("/{id}","destroy");
+    });
+
+Route::prefix("/users")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\UsersController::class)
+    ->group(function () {
+        Route::get("/","index")->name('users');
+        Route::post("/","getUsersList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
+
+

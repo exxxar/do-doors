@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return [
 
@@ -110,6 +112,7 @@ return [
     */
 
     'faker_locale' => 'en_US',
+    'results_per_page' => 20,
 
     /*
     |--------------------------------------------------------------------------
@@ -169,6 +172,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
     ])->toArray(),
 
     /*
@@ -185,6 +189,10 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'role' => RoleMiddleware::class,
+        'permission' => \App\Http\Middleware\PermissionMiddleware::class,
+        'role_or_permission' => RoleOrPermissionMiddleware::class,
+        'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class
     ])->toArray(),
 
 ];

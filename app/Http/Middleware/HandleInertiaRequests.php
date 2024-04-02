@@ -29,11 +29,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
+       return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $request->user() ? $request->user()->roles->pluck('slug') : [],
+                'permissions' => $request->user() ? $request->user()->permissions->pluck('slug') : [],
             ],
         ];
+
+     /*   return array_merge(parent::share($request), [
+            //
+
+        ]);*/
     }
 }

@@ -6,12 +6,18 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
+import CalcCartSimple from '@/Components/Calc/CalcCartSimple.vue';
 
 const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
+
+
     <div>
+
+        <notifications position="top right"/>
+
         <div class="min-h-screen bg-gray-100">
             <nav class="bg-white border-b border-gray-100">
                 <!-- Primary Navigation Menu -->
@@ -32,8 +38,49 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Главная
                                 </NavLink>
-                                <NavLink :href="route('calc')" :active="route().current('calc')">
+                                <NavLink
+                                    v-if="can('manage-calc')"
+                                    :href="route('calc')" :active="route().current('calc')">
                                     Калькулятор
+                                </NavLink>
+
+                                <NavLink
+                                    v-if="cartTotalCount>0"
+                                    :href="route('basket')" :active="route().current('basket')">
+                                    Корзина <span class="badge bg-danger ml-1 rounded-full">{{cartTotalCount}}</span>
+                                </NavLink>
+
+                                <NavLink
+                                    v-if="can('manage-users')"
+                                    :href="route('users')" :active="route().current('users')">
+                                    Пользователи
+                                </NavLink>
+                                <NavLink
+                                    v-if="can('manage-clients')"
+                                    :href="route('clients')" :active="route().current('clients')">
+                                    Клиенты
+                                </NavLink>
+                                <NavLink
+                                    v-if="can('manage-orders')"
+                                    :href="route('orders')" :active="route().current('orders')">
+                                    Заказы
+                                </NavLink>
+
+
+                                <NavLink
+                                    v-if="can('manage-materials')"
+                                    :href="route('materials')" :active="route().current('materials')">
+                                    Материалы
+                                </NavLink>
+                                <NavLink
+                                    v-if="can('manage-handles')"
+                                    :href="route('handles')" :active="route().current('handles')">
+                                    Ручки
+                                </NavLink>
+                                <NavLink
+                                    v-if="can('manage-sizes')"
+                                    :href="route('sizes')" :active="route().current('sizes')">
+                                    Размеры
                                 </NavLink>
                             </div>
                         </div>
@@ -67,9 +114,9 @@ const showingNavigationDropdown = ref(false);
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                        <DropdownLink :href="route('profile.edit')"> Профиль </DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button">
-                                            Log Out
+                                            Выход
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
@@ -116,7 +163,7 @@ const showingNavigationDropdown = ref(false);
                 >
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                            Главная страница
                         </ResponsiveNavLink>
                     </div>
 
@@ -130,9 +177,9 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('profile.edit')"> Профиль </ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
-                                Log Out
+                                Выход
                             </ResponsiveNavLink>
                         </div>
                     </div>
@@ -152,69 +199,36 @@ const showingNavigationDropdown = ref(false);
             </main>
         </div>
     </div>
-    <div class="cart-fixed-btn">
+
+
+    <div class="cart-fixed-btn" v-if="cartTotalCount>0">
         <a class="btn btn-outline-primary rounded-5 shadow-lg"
                 data-bs-toggle="offcanvas"
                 href="#cart" role="button"
            aria-controls="cart">
             <i class="fa-solid fa-basket-shopping text-primary"></i>
-            <span class="badge text-primary font-bold">3</span>
+            <span class="badge text-primary font-bold">{{cartTotalCount}} шт.</span>
         </a>
     </div>
 
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="cart" aria-labelledby="cart">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title font-bold">Вы выбрали</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div class="card mb-2">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="/images/logo.jpg" alt="" class="w-100 object-fit-cover" >
-                        </div>
-                        <div class="col-md-8">Комплект 2200х800х57 (черный) лицо зеркало /зеркало петли L стандарт 5 шт (черный), НА СЕБЯ , отв. под ручку</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="/images/logo.jpg" alt="" class="w-100 object-fit-cover" >
-                        </div>
-                        <div class="col-md-8">Комплект 2200х800х57 (черный) лицо зеркало /зеркало петли L стандарт 5 шт (черный), НА СЕБЯ , отв. под ручку</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="/images/logo.jpg" alt="" class="w-100 object-fit-cover" >
-                        </div>
-                        <div class="col-md-8">Комплект 2200х800х57 (черный) лицо зеркало /зеркало петли L стандарт 5 шт (черный), НА СЕБЯ , отв. под ручку</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="offcanvas-footer p-3">
-           <div class="card">
-               <div class="card-body">
-                    <h6 class="font-bold">Итого цена 78000 ₽</h6>
-                   <p class="mb-2"><small>Возможно в рассрочку!</small></p>
-                   <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не зависит, просто уточните эти детали в бесседе с менеджером</small></p>
-                    <button class="btn btn-outline-primary rounded-5 w-100 mb-2">Обсудить заказ с менеджером</button>
-                    <button class="btn btn-outline-primary rounded-5 w-100 mb-2">Получить цену на почту</button>
-                    <button class="btn btn-outline-primary rounded-5 w-100 mb-2">Получить цену в Telegram</button>
-               </div>
-           </div>
-        </div>
-    </div>
+    <CalcCartSimple></CalcCartSimple>
 </template>
+
+<script>
+import {mapGetters} from "vuex";
+
+export default {
+    computed: {
+        ...mapGetters(['getErrors', 'cartTotalCount', 'cartProducts']),
+
+    },
+    methods:{
+        can(permission){
+            return (this.$page.props.auth.permissions||[]).includes(permission)
+        }
+    }
+}
+</script>
 <style lang="scss">
 .cart-fixed-btn {
     position: fixed;
@@ -222,6 +236,17 @@ const showingNavigationDropdown = ref(false);
     right: 20px;
     padding: 10px;
     z-index: 10;
+    box-sizing: border-box;
+
+    @media (max-width: 767.98px) {
+        bottom: 10px;
+        right: 0px;
+        width: 100%;
+        .btn {
+            width: 100%;
+        }
+    }
+
     .btn {
         background-color: white;
     }

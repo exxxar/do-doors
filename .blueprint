@@ -1,0 +1,4 @@
+models:
+    Material: { title: 'string:255 nullable', wrapper_variants: 'json nullable', door_variants: 'json nullable', relationships: { hasMany: Size } }
+    Handle: { title: 'string:255 nullable', price: 'double default:0', variants: json }
+    Size: { width: 'integer default:0', height: 'integer default:0', material_id: 'id foreign:users', price: 'double default:0', price_koef: 'double default:0', loops_count: 'integer default:0', relationships: { belongsTo: Material } }

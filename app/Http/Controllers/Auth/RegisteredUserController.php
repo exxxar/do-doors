@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
@@ -42,6 +44,12 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $manageCalc = Permission::where('slug','manage-calc')->first();
+        $client = Role::where('slug','client')->first();
+
+        $user->roles()->attach($client);
+        $user->permissions()->attach($manageCalc);
 
         event(new Registered($user));
 
