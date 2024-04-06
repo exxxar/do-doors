@@ -20,10 +20,31 @@ class MaterialFactory extends Factory
      */
     public function definition(): array
     {
+        $wrapper_variants = [];
+
+        for ($i = 0; $i < random_int(5, 15); $i++)
+            $wrapper_variants[] = (object)[
+                "uuid"=>Str::uuid(),
+                "image" => $this->faker->imageUrl(),
+                "title" => $this->faker->text(50),
+                "description" => $this->faker->text(50),
+            ];
+
+        $door_variants = [];
+
+        for ($i = 0; $i < random_int(5, 15); $i++)
+            $door_variants[] = (object)[
+                "uuid"=>Str::uuid(),
+                "image" => $this->faker->imageUrl(),
+                "title" => $this->faker->text(50),
+                "description" => $this->faker->text(50),
+            ];
+
+
         return [
             'title' => $this->faker->sentence(4),
-            'wrapper_variants' => '{}',
-            'door_variants' => '{}',
+            'wrapper_variants' => $wrapper_variants,
+            'door_variants' => $door_variants,
         ];
     }
 }

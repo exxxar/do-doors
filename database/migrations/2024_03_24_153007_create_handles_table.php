@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('handles', function (Blueprint $table) {
             $table->id();
             $table->string('title', 255)->nullable();
+            $table->string('color', 50)->nullable();
             $table->double('price')->default('0');
             $table->json('variants');
             $table->timestamps();

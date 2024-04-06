@@ -53,7 +53,7 @@ class CalcController extends Controller
         $telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
         $telegram->sendMessage($tmp);
 
-        $mpdf = new Mpdf(['format' => 'A4-L']);
+        $mpdf = new Mpdf(['format' => 'A4-P']);
         $current_date = Carbon::now("+3:00")->format("Y-m-d H:i:s");
 
         $number = Str::uuid();

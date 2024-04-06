@@ -48,6 +48,13 @@ import Pagination from "@/Components/Pagination.vue";
                     class="fa-solid fa-caret-up"></i></span>
 
             </th>
+            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('color')">Цвет
+                <span v-if="sort.direction === 'desc'&&sort.column === 'color'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'color'"><i
+                    class="fa-solid fa-caret-up"></i></span>
+
+            </th>
             <th scope="col" class="text-center">Варианты ручек</th>
 
             <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
@@ -69,10 +76,20 @@ import Pagination from "@/Components/Pagination.vue";
             <td class="text-center" >
                 {{ item.price || 0 }}
             </td>
+            <td class="text-center d-flex justify-center">
+                <span
+                    v-if="item.color"
+                    class="d-block shadow-md"
+                    v-bind:style="{'background-color': item.color}"
+                    style="width: 50px; height: 50px;"></span>
+                <span v-else>Цвет не указан</span>
+            </td>
             <td class="text-center">
                 {{ item.variants.length }}
 
             </td>
+
+
 
             <td class="text-center">
                 {{ item.updated_at || '-' }}

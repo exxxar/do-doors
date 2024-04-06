@@ -165,6 +165,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
         <div class="col-md-6 col-12">
             <div class="form-floating mb-3">
                 <select class="form-select"
+                        @change="selectFrontSideFinish"
                         @invalid="alert('Вы не выбрали отделку первой стороны двери!')"
                         v-model="doorForm.front_side_finish"
                         id="floatingSelect" aria-label="Floating label select example" required>
@@ -182,6 +183,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
         <div class="col-md-6 col-12">
             <div class="form-floating mb-3">
                 <select class="form-select"
+                        @change="selectBackSideFinish"
                         @invalid="alert('Вы не выбрали отделку второй стороны двери!')"
                         v-model="doorForm.back_side_finish"
                         id="floatingSelect" aria-label="Floating label select example" required>
@@ -411,9 +413,33 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 
         <div class="col-12" v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes">
             <div class="row">
-                <div class="col-md-4" v-for="item in doorForm.handle_holes_type.variants">
-                    <img :src="'/images/'+item" alt="">
+
+                <div class="col-12">
+                    <p class="mb-2">Цвет ручки {{doorForm.handle_holes_type.color || 'не указан'}}
+                        <span
+                            class="d-inline-block"
+                            v-bind:style="{'background-color': doorForm.handle_holes_type.color }"
+                            style="width:50px; height: 10px;"
+                            v-if="doorForm.handle_holes_type.color"
+                            >
+                        </span>
+                    </p>
+
                 </div>
+                <div class="col-lg-2 col-md-4 col-12 mb-2"
+                     v-for="(item, index) in doorForm.handle_holes_type.variants">
+                    <div class="card cursor-pointer"
+                         v-bind:class="{'border-secondary shadow-lg':item.selected}"
+                         @click="selectSideFinish('handle_holes_type','variants',index)">
+                        <img v-lazy="item.image" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h6 class="font-bold">{{ item.title || 'не указано' }}</h6>
+                            <p class="card-text">{{ item.description || 'не указано' }}</p>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -661,9 +687,121 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" :id="'finish-front-variant-modal-'+doorForm.id" tabindex="-1"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор типа материала для первый стороны</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 class="font-bold my-2">Выбранный материал
+                        "{{ doorForm.front_side_finish.title || 'не указан' }}"</h3>
 
-    <div class="fixed-price " v-if="summaryPrice>0">
-        <p class="text-center">{{ summaryPrice }}₽</p>
+
+                    <div class="row mb-2" v-if="doorForm.front_side_finish.door_variants">
+                        <div class="col-12">
+                            <p>Перечень вариантов дверей</p>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-12 mb-2"
+                             v-for="(door, index) in doorForm.front_side_finish.door_variants">
+                            <div class="card cursor-pointer"
+                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
+                                 @click="selectSideFinish('front_side_finish','door_variants',index)">
+                                <img v-lazy="door.image" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
+                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2" v-if="doorForm.front_side_finish.wrapper_variants">
+                        <div class="col-12">
+                            <p>Перечень вариантов материала вокруг дверей</p>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-12 mb-2"
+                             v-for="(door, index) in doorForm.front_side_finish.wrapper_variants">
+                            <div class="card cursor-pointer"
+                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
+                                 @click="selectSideFinish('front_side_finish','wrapper_variants',index)">
+                                <img v-lazy="door.image" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
+                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" :id="'finish-back-variant-modal-'+doorForm.id" tabindex="-1"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор типа материала для второй стороны</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 class="font-bold my-2">Выбранный материал
+                        "{{ doorForm.back_side_finish.title || 'не указан' }}"</h3>
+
+
+                    <div class="row mb-2" v-if="doorForm.back_side_finish.door_variants">
+                        <div class="col-12">
+                            <p>Перечень вариантов дверей</p>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-12 mb-2"
+                             v-for="(door, index) in doorForm.back_side_finish.door_variants">
+                            <div class="card cursor-pointer"
+                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
+                                 @click="selectSideFinish('back_side_finish','door_variants',index)">
+                                <img v-lazy="door.image" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
+                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2" v-if="doorForm.back_side_finish.wrapper_variants">
+                        <div class="col-12">
+                            <p>Перечень вариантов материала вокруг дверей</p>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-12 mb-2"
+                             v-for="(door, index) in doorForm.back_side_finish.wrapper_variants">
+                            <div class="card cursor-pointer"
+                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
+                                 @click="selectSideFinish('back_side_finish','wrapper_variants',index)">
+                                <img v-lazy="door.image" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
+                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="fixed-price btn btn-outline-primary rounded-5 shadow-lg" v-if="summaryPrice>0">
+        <span class="text-center badge text-primary font-bold">{{ summaryPrice }}₽</span>
     </div>
 
     <!-- Modal -->
@@ -704,6 +842,8 @@ export default {
             filterWidth: null,
             selectedColorParam: null,
             colorModal: null,
+            finishFrontVariantModal: null,
+            finishBackVariantModal: null,
 
             doorForm: {
                 id: null,
@@ -893,6 +1033,19 @@ export default {
 
     },
     methods: {
+        selectSideFinish(section, param, index) {
+
+            let isSelected = this.doorForm[section][param][index].selected || false
+
+            if (!isSelected)
+                this.doorForm[section][param].forEach(item => {
+                    if (item.selected)
+                        delete item.selected
+                })
+            this.doorForm[section][param][index].selected =
+                !(this.doorForm[section][param][index].selected)
+
+        },
         isHex(num) {
             return /^#[0-9A-F]{6}$/i.test(num)
         },
@@ -997,6 +1150,24 @@ export default {
             if (direction === 'sub' && this.doorForm.count > 0)
                 this.doorForm.count--;
         },
+        selectFrontSideFinish() {
+            if ((this.doorForm.front_side_finish.door_variants || []).length === 0)
+                return
+
+            this.finishFrontVariantModal = new bootstrap.Modal(document.getElementById('finish-front-variant-modal-' + this.doorForm.id), {})
+            this.finishFrontVariantModal.show()
+
+
+        },
+        selectBackSideFinish() {
+            if ((this.doorForm.back_side_finish.door_variants || []).length === 0)
+                return
+
+            this.finishBackVariantModal = new bootstrap.Modal(document.getElementById('finish-back-variant-modal-' + this.doorForm.id), {})
+            this.finishBackVariantModal.show()
+
+
+        },
         alert(msg) {
             this.messages.push(msg)
         },
@@ -1026,11 +1197,25 @@ export default {
 .fixed-price {
     position: fixed;
     bottom: 101px;
-    right: 43px;
-    padding: 10px;
+    right: 30px;
+    padding: 5px;
     z-index: 10;
     box-sizing: border-box;
     font-weight: 800;
+    background-color: white;
+    min-width: 89px;
+
+
+        &:hover {
+
+            span {
+                color:white !important;
+            }
+
+
+
+        }
+
 
     @media (max-width: 767.98px) {
         width: 100%;

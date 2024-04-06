@@ -1187,7 +1187,7 @@ const mutations = {
         state.dictionary.finishes_variants = []
 
         payload.materials.forEach(item=>{
-            console.log(item.title)
+
             state.dictionary.finishes_variants.push({
                 id: item.id,
                 title: item.title,
@@ -1203,6 +1203,7 @@ const mutations = {
                 id: item.id,
                 title: item.title,
                 price: item.price,
+                color: item.color,
                 variants:item.variants,
             })
         })

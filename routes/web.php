@@ -16,6 +16,7 @@ use Inertia\Inertia;
 |
 */
 
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -103,13 +104,16 @@ Route::prefix("/sizes")
     ->group(function () {
         Route::get("/","index")->name('sizes');
         Route::post("/","getSizeList");
+        Route::get("/export-prices", [\App\Http\Controllers\SizeController::class,"exportPrices"]);
         Route::post("/recount","recountPrice");
         Route::post("/formatted","getFormatted");
+        Route::post("/prepared-prices","getPreparedPrices");
         Route::post("/generate","generateSizes");
         Route::get("/duplicate/{id}","duplicate");
         Route::post("/store","store");
         Route::post("/update-param","updateParam");
         Route::delete("/{id}","destroy");
+
     });
 
 Route::prefix("/users")

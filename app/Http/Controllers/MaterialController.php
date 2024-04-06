@@ -7,8 +7,10 @@ use App\Http\Requests\MaterialUpdateRequest;
 use App\Http\Resources\MaterialCollection;
 use App\Http\Resources\MaterialResource;
 use App\Models\Material;
+use App\Models\Size;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -43,7 +45,7 @@ class MaterialController extends Controller
     }
 
 
-    public function store(Request $request): MaterialResource | \Illuminate\Http\Response
+    public function store(Request $request): MaterialResource|\Illuminate\Http\Response
     {
         $request->validate([
             "title" => "required"
@@ -52,21 +54,75 @@ class MaterialController extends Controller
         $wrapper = json_decode($request->wrapper_variants ?? '[]');
         $door = json_decode($request->door_variants ?? '[]');
 
-        $tmp = $this->uploadPhotos($request->hasFile('wrapper_images') ? $request->file('wrapper_images') : null);
-        $wrapper = [...$wrapper, ...$tmp];
-        $tmp = $this->uploadPhotos($request->hasFile('door_images') ? $request->file('door_images') : null);
-        $door = [...$door, ...$tmp];
+        $wrapperImageInfo = json_decode($request->wrapper_images_info ?? '[]');
+        $doorImageInfo = json_decode($request->door_images_info ?? '[]');
+
+
+        $tmp = $this->uploadPhotos(
+            $request->hasFile('wrapper_images') ?
+                $request->file('wrapper_images') : null, true);
+
+        foreach ($tmp as $item)
+            foreach ($wrapperImageInfo as $key => $info) {
+                $info = (object)$info;
+                if ($item->original == ($info->image_name ?? null)) {
+                    $info->uuid = Str::uuid()->toString();
+                    $info->image = $item->current ?? '-';
+                    unset($info->image_name);
+                }
+            }
+
+        $wrapper = [...$wrapper, ...$wrapperImageInfo];
+
+        $tmp = $this->uploadPhotos(
+            $request->hasFile('door_images') ?
+                $request->file('door_images') : null, true);
+
+        foreach ($tmp as $item)
+            foreach ($doorImageInfo as $key => $info) {
+                $info = (object)$info;
+                if ($item->original == ($info->image_name ?? null)) {
+                    $info->uuid = Str::uuid()->toString();
+                    $info->image = $item->current ?? '-';
+                    unset($info->image_name);
+                }
+            }
+
+        $door = [...$door, ...$doorImageInfo];
 
         $id = $request->id ?? null;
 
-        if (is_null($id))
-        $material = Material::query()
-            ->create([
-                "title" => $request->title ?? null,
-                'wrapper_variants' => $wrapper,
-                'door_variants' => $door,
-            ]);
-        else {
+        if (is_null($id)) {
+            $heightList = array_values(Size::query()
+                ->distinct()
+                ->pluck("height")->toArray());
+
+            $widthList = array_values(Size::query()
+                ->distinct()
+                ->pluck("width")->toArray());
+
+
+            $material = Material::query()
+                ->create([
+                    "title" => $request->title ?? null,
+                    'wrapper_variants' => $wrapper,
+                    'door_variants' => $door,
+                ]);
+
+            $generateData = ($request->need_generate_sizes ?? false) == "true";
+
+            if ($generateData)
+                foreach ($heightList as $height)
+                    foreach ($widthList as $width)
+                        Size::query()->create([
+                            'material_id' => $material->id,
+                            'width' => $width,
+                            'height' => $height,
+                            'price' => 0,
+                            'price_koef' => 1,
+                            'loops_count' => 2,
+                        ]);
+        } else {
             $material = Material::query()->find($id);
 
             if (is_null($material))

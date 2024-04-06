@@ -1,3 +1,6 @@
+<script setup>
+import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
+</script>
 <template>
 
     <form action="" v-on:submit.prevent="submit">
@@ -17,6 +20,37 @@
             <label for="handle-title">Цена ручки</label>
         </div>
 
+        <div class="input-group mb-3">
+                <span class="input-group-text border-secondary"
+                      v-if="isHex(form.color)"
+                      v-bind:style="{'background-color':form.color}"
+                      id="basic-addon1" style="width: 40px;">
+                </span>
+            <div class="form-floating">
+                <input type="text"
+                       @invalid="alert('Вы не выбрали цвет фурнитуры')"
+                       v-model="form.color"
+                       class="form-control" id="fittings_color" required>
+                <label for="fittings_color"><i class="fa-solid fa-palette"></i> Цвет ручки</label>
+            </div>
+
+            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" @click="form.color = null">Не выбрано</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item"
+                       @click="selectColor"
+                       href="javascript:void(0)">Цвет RAL</a></li>
+            </ul>
+
+
+        </div>
+
         <div class="form-floating mb-3 border-gray-100 border">
             <input type="file" class="form-control"
                    accept="image/*"
@@ -29,36 +63,85 @@
 
         <div class="row">
             <div class="col-12" v-if="uploaded_variants_image.length>0">
-                <h6>Новые фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Новые фотографии к ручке</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in uploaded_variants_image">
-                <img :src="getPhoto(image).imageUrl"
-                     class="uploaded-image-mini"
-                     alt="">
 
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removePhoto('uploaded_variants_image',index)">Удалить</a>
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start"
+                 v-if="uploaded_variants_image.length>0"
+                 v-for="(variant, index) in uploaded_variants_image">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        :src="getPhoto(variant.image).imageUrl"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
+
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)" class="text-danger"
+                           @click="removePhoto('uploaded_variants_image',index)">Удалить фото</a>
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="uploaded_variants_image[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="uploaded_variants_image[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-12" v-if="form.variants.length>0">
-                <h6>Текущие фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Ранее загруженные фотографии к ручке</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in form.variants">
-                <img
-                    v-if="image.indexOf('http')===-1"
-                    :src="'/images/'+image"
-                     class="uploaded-image-mini"
-                     alt="">
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.variants">
 
-                <img
-                    v-else
-                    :src="image"
-                    class="uploaded-image-mini"
-                    alt="">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        v-if="variant.image.indexOf('http')===-1"
+                        :src="'/images/'+variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
 
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removeUploadedPhoto('variants',index)">Удалить</a>
+                    <img
+                        v-else
+                        style="min-height: 200px;"
+                        :src="variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)" class="text-danger" @click="removeUploadedPhoto('variants',index)">Удалить</a>
+                    </div>
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="form.variants[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="form.variants[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
+
+
             </div>
         </div>
 
@@ -98,6 +181,25 @@
             </div>
         </div>
     </form>
+
+    <!-- Modal -->
+    <div class="modal fade" :id="'choose-color-handle'" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор цвета RAL</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <RalColorSelector v-on:select="callbackSelectColor"></RalColorSelector>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 export default {
@@ -107,10 +209,12 @@ export default {
             messages: [],
             uploaded_variants_image: [],
             loading: false,
+            colorModal: null,
             form: {
                 id: null,
                 title: null,
                 price: null,
+                color: null,
                 variants: [],
 
             }
@@ -121,23 +225,38 @@ export default {
             return this.form.id ||
                 this.form.title ||
                 this.form.price ||
+                this.form.color ||
                 this.uploaded_variants_image.length > 0
 
         }
     },
     mounted() {
+        this.colorModal = new bootstrap.Modal(document.getElementById('choose-color-handle'), {})
+
         if (this.item)
             this.$nextTick(() => {
                 this.form = {
                     id: this.item.id || null,
                     title: this.item.title || null,
                     price: this.item.price || 0,
+                    color: this.item.color || null,
                     variants: this.item.variants || [],
 
                 }
             })
     },
     methods: {
+        callbackSelectColor(item) {
+            this.form.color = item.color.hex
+
+            this.colorModal.hide()
+        },
+        selectColor() {
+            this.colorModal.show()
+        },
+        isHex(num) {
+            return /^#[0-9A-F]{6}$/i.test(num)
+        },
         alert(msg) {
             this.messages.push(msg)
         },
@@ -147,6 +266,7 @@ export default {
             this.form.id = null
             this.form.title = null
             this.form.price = 0
+            this.form.color = null
             this.form.variants = []
 
             this.$refs.handleImageRef.value = null
@@ -166,7 +286,11 @@ export default {
         onChangePhotos(param, e) {
             const files = e.target.files
             for (let i = 0; i < files.length; i++)
-                this[param].push(files[i])
+                this[param].push({
+                    image: files[i],
+                    title: null,
+                    description: null,
+                })
 
         },
         removeMessage(index) {
@@ -184,8 +308,16 @@ export default {
                 });
 
 
-            for (let i = 0; i < this.uploaded_variants_image.length; i++)
-                data.append('uploaded_variants_image[]', this.uploaded_variants_image[i]);
+            if (this.uploaded_variants_image.length > 0) {
+                for (let i = 0; i < this.uploaded_variants_image.length; i++) {
+                    data.append('uploaded_variants_image[]', this.uploaded_variants_image[i].image);
+
+                    this.uploaded_variants_image[i].image_name = this.uploaded_variants_image[i].image.name || null
+                }
+
+
+                data.append('uploaded_image_info', JSON.stringify(this.uploaded_variants_image));
+            }
 
 
             this.$store.dispatch("storeHandle", {

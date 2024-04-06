@@ -16,6 +16,7 @@ class Handle extends Model
      */
     protected $fillable = [
         'title',
+        'color',
         'price',
         'variants',
 

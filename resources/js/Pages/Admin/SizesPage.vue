@@ -24,11 +24,34 @@ import {Head} from '@inertiajs/vue3';
                             :item="selectedSize"
                             v-on:callback="callbackSizeForm"></SizeForm>
                         <hr class="hr my-5"/>
-                        <SizeTable
-                            v-on:select="selectSize"
-                            v-if="!loading"></SizeTable>
-                        <hr>
-                        <SizeTable2></SizeTable2>
+
+                        <div class="d-flex justify-center my-2">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page"
+                                       v-bind:class="{'active':tab===0}"
+                                       @click="tab=0"
+                                       href="javascript:void(0)">Таблица размеров</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       v-bind:class="{'active':tab===1}"
+                                       @click="tab=1"
+                                       href="javascript:void(0)">Сводная таблица</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                        <template v-if="tab===0">
+                            <SizeTable
+                                v-on:select="selectSize"
+                                v-if="!loading"></SizeTable>
+                        </template>
+
+                        <template v-if="tab===1">
+                            <SizeTable2></SizeTable2>
+                        </template>
+
                     </div>
 
                 </div>
@@ -40,6 +63,7 @@ import {Head} from '@inertiajs/vue3';
 export default {
     data() {
         return {
+            tab:0,
             loading: false,
             selectedSize: null,
         }

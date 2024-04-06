@@ -9,6 +9,15 @@
             <label for="material-title">Название материала</label>
         </div>
 
+        <div class="form-check form-switch">
+            <input class="form-check-input"
+                   v-model="form.need_generate_sizes"
+                   type="checkbox" role="switch" id="recount-by-width">
+            <label class="form-check-label" for="recount-by-width">
+                Автоматически создать заглушки размеров
+            </label>
+        </div>
+
         <div class="form-floating mb-3 border-gray-100 border">
             <input type="file" class="form-control"
                    accept="image/*"
@@ -21,27 +30,80 @@
 
         <div class="row">
             <div class="col-12" v-if="uploaded_door_image.length>0">
-                <h6>Новые фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Новые фотографии к материалу</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in uploaded_door_image">
-                <img :src="getPhoto(image).imageUrl"
-                     class="uploaded-image-mini"
-                     alt="">
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in uploaded_door_image">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        :src="getPhoto(variant.image).imageUrl"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
 
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removePhoto('uploaded_door_image',index)">Удалить</a>
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)"  class="text-danger" @click="removePhoto('uploaded_door_image',index)">Удалить фото</a>
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="uploaded_door_image[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="uploaded_door_image[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <div class="col-12" v-if="form.door_variants.length>0">
-                <h6>Текущие фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Текущие фотографии к материалу</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in form.door_variants">
-                <img :src="'/images/'+image"
-                     class="uploaded-image-mini"
-                     alt="">
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.door_variants">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        v-if="variant.image.indexOf('http')===-1"
+                        :src="'/images/'+variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
 
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removeUploadedPhoto('door_variants',index)">Удалить</a>
+                    <img
+                        v-else
+                        style="min-height: 200px;"
+                        :src="variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)" class="text-danger" @click="removeUploadedPhoto('door_variants',index)">Удалить</a>
+                    </div>
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="form.door_variants[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="form.door_variants[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,26 +120,80 @@
 
         <div class="row">
             <div class="col-12" v-if="uploaded_wrapper_image.length>0">
-                <h6>Новые фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Новые фотографии к материалу</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in uploaded_wrapper_image">
-                <img :src="getPhoto(image).imageUrl"
-                     class="uploaded-image-mini"
-                     alt="">
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removePhoto('uploaded_door_image',index)">Удалить</a>
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in uploaded_wrapper_image">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        :src="getPhoto(variant.image).imageUrl"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
+
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)"  class="text-danger" @click="removePhoto('uploaded_wrapper_image',index)">Удалить фото</a>
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="uploaded_wrapper_image[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="uploaded_wrapper_image[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <div class="col-12" v-if="form.wrapper_variants.length>0">
-                <h6>Текущие фотографии к материалу</h6>
+                <h6 class="font-bold my-3">Текущие фотографии к материалу</h6>
             </div>
-            <div class="col-md-3 mb-2 image-preview" v-for="(image, index) in form.wrapper_variants">
-                <img :src="'/images/'+image"
-                     class="uploaded-image-mini"
-                     alt="">
+            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.wrapper_variants">
+                <div class="card w-100">
+                    <img
+                        style="min-height: 200px;"
+                        v-if="variant.image.indexOf('http')===-1"
+                        :src="'/images/'+variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
 
-                <div class="shadow justify-content-center align-items-center">
-                    <a href="javascript:void(0)" @click="removeUploadedPhoto('wrapper_variants',index)">Удалить</a>
+                    <img
+                        v-else
+                        style="min-height: 200px;"
+                        :src="variant.image"
+                        class="card-img-top uploaded-image-mini"
+                        alt="">
+                    <div class="card-body d-flex justify-center">
+                        <a href="javascript:void(0)" class="text-danger" @click="removeUploadedPhoto('wrapper_variants',index)">Удалить</a>
+                    </div>
+                    <div class="card-body">
+
+
+                        <div class="form-floating mb-3 ">
+                            <input type="text" v-model="form.wrapper_variants[index].title"
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                            <label for="floatingInput">Название</label>
+                        </div>
+
+
+
+                        <div class="form-floating">
+                            <textarea class="form-control"
+                                      v-model="form.wrapper_variants[index].description"
+                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                            <label for="floatingTextarea">Описание</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,6 +246,7 @@ export default {
             form: {
                 id: null,
                 title: null,
+                need_generate_sizes: false,
                 wrapper_variants: [],
                 door_variants: []
             }
@@ -187,7 +304,11 @@ export default {
         onChangePhotos(param, e) {
             const files = e.target.files
             for (let i = 0; i < files.length; i++)
-                this[param].push(files[i])
+                this[param].push({
+                    image:files[i],
+                    title:null,
+                    description:null,
+                })
 
         },
         removeMessage(index) {
@@ -205,12 +326,34 @@ export default {
                 });
 
 
-            for (let i = 0; i < this.uploaded_wrapper_image.length; i++)
-                data.append('wrapper_images[]', this.uploaded_wrapper_image[i]);
+            if (this.uploaded_wrapper_image.length>0) {
+                for (let i = 0; i < this.uploaded_wrapper_image.length; i++) {
+                    data.append('wrapper_images[]', this.uploaded_wrapper_image[i].image);
 
-            for (let i = 0; i < this.uploaded_door_image.length; i++)
+                    this.uploaded_wrapper_image[i].image_name = this.uploaded_wrapper_image[i].image.name || null
+                }
+
+
+                data.append('wrapper_images_info', JSON.stringify(this.uploaded_wrapper_image));
+            }
+
+         /*   for (let i = 0; i < this.uploaded_wrapper_image.length; i++)
+                data.append('wrapper_images[]', this.uploaded_wrapper_image[i]);*/
+
+            if (this.uploaded_door_image.length>0) {
+                for (let i = 0; i < this.uploaded_door_image.length; i++) {
+                    data.append('door_images[]', this.uploaded_door_image[i].image);
+
+                    this.uploaded_door_image[i].image_name = this.uploaded_door_image[i].image.name || null
+                }
+
+
+                data.append('door_images_info', JSON.stringify(this.uploaded_door_image));
+            }
+
+            /*for (let i = 0; i < this.uploaded_door_image.length; i++)
                 data.append('door_images[]', this.uploaded_door_image[i]);
-
+*/
 
             this.$store.dispatch("storeMaterial", {
                 materialForm: data

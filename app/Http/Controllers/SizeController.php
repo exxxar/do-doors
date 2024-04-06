@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PriceExport;
 use App\Http\Requests\SizeStoreRequest;
 use App\Http\Requests\SizeUpdateRequest;
 use App\Http\Resources\MaterialCollection;
@@ -13,9 +14,11 @@ use App\Models\Material;
 use App\Models\Size;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SizeController extends Controller
 {
@@ -26,55 +29,144 @@ class SizeController extends Controller
         return Inertia::render('Admin/SizesPage');
     }
 
-    /*    public function getFormattedOld()
-        {
-            $sizes[][][] = [];
+    public function getPreparedPrices(Request $request)
+    {
+        $heightList = array_values(Size::query()
+            ->distinct()
+            ->pluck("height")->toArray());
 
+        $widthList = array_values(Size::query()
+            ->distinct()
+            ->pluck("width")->toArray());
 
-            $materials = Material::query()->select("id", "title")->get();
+        $sizes = Size::query()
+            ->get()
+            ->sortBy([
+                ['height', 'asc'],
+                ['width', 'asc'],
+            ]);
 
-            $tmpSizes = Size::query()->get();
+        $tmp = [];
 
-            $width = [];
-            $height = [];
+        foreach ($heightList as $height) {
+            foreach ($widthList as $width) {
+                $materialList = Collection::make($sizes)
+                    ->where("width", $width)
+                    ->where("height", $height)
+                    ->unique("material_id")
+                    ->toArray();
 
-            $simple = [];
-
-            foreach ($tmpSizes as $item) {
-                foreach ($materials as $material)
-                    $sizes[$item->height][$item->width][$material->id] = 0;
-
-                if (!in_array($item->width, $width))
-                    $width[] = $item->width;
-
-                if (!in_array($item->height, $height))
-                    $height[] = $item->height;
-            }
-
-            foreach ($height as $h)
-                foreach ($width as $w) {
-                    foreach ($materials as $material) {
-                        $simple[$h . "x" . $w . "x" . $material->id] = 0;
-                        $sizes[$h][$w][$material->id] = 0;
-                    }
-
-
+                $tmpMaterials = [];
+                foreach ($materialList as $material) {
+                    $material = (object)$material;
+                    $tmpMaterials[] = (object)[
+                        "id" => $material->id ?? null,
+                        "price" => $material->price ?? 0,
+                        "price_koef" => $material->price_koef ?? 0,
+                        "width" => $material->width,
+                        "height" => $material->height,
+                        "material_id" => $material->material_id,
+                    ];
                 }
 
-            foreach ($tmpSizes as $item) {
-                $sizes[$item->height][$item->width][$item->material->id] = $item->price;
-                $simple[$item->height . "x" . $item->width . "x" . $item->material->id] = $item->price;
+                $tmp[] = (object)[
+                    "width" => $width,
+                    "height" => $height,
+                    "prices" => $tmpMaterials
+                ];
             }
+        }
+
+        $materials = Material::query()->select("title", "id")->get()->toArray();
+
+       /* foreach ($tmp as $item)
+            if (count($item->prices)<count($materials))
+            {
+                for ($i=0;$i<count($materials)-count($item->prices);$i++)
+                    $item->prices[] = (object)[
+                        "id" =>  null,
+                        "price" =>  0,
+                        "price_koef" =>  0,
+                        "width" => $item->width,
+                        "height" => $item->height,
+                        "material_id" => $materials[count($materials)-1]["id"],
+                    ];
+            }*/
+        //if (count($materials)<)
+        return response()->json([
+            "materials" => $materials,
+            "prices" => $tmp
+        ]);
+    }
 
 
-            return response()->json([
-                "width" => $width,
-                "height" => $height,
-                "sizes" => $sizes,
-                "materials" => $materials->toArray(),
-                "full" => $tmpSizes
+    public function exportPrices(Request $request)
+    {
+        $heightList = array_values(Size::query()
+            ->distinct()
+            ->pluck("height")->toArray());
+
+        $widthList = array_values(Size::query()
+            ->distinct()
+            ->pluck("width")->toArray());
+
+        $sizes = Size::query()
+            ->get()
+            ->sortBy([
+                ['height', 'asc'],
+                ['width', 'asc'],
             ]);
-        }*/
+
+        $tmp = [];
+
+        foreach ($heightList as $height) {
+            foreach ($widthList as $width) {
+                $materialList = Collection::make($sizes)
+                    ->where("width", $width)
+                    ->where("height", $height)
+                    ->unique("material_id")
+                    ->toArray();
+
+                $tmpMaterials = [];
+                foreach ($materialList as $material) {
+                    $material = (object)$material;
+                    $tmpMaterials[] = (object)[
+                        "id" => $material->id,
+                        "price" => $material->price,
+                        "price_koef" => $material->price_koef,
+                        "material_id" => $material->material_id,
+                    ];
+                }
+
+                $tmp[] = (object)[
+                    "width" => $width,
+                    "height" => $height,
+                    "prices" => $tmpMaterials
+                ];
+            }
+        }
+        $materials = Material::query()->select("title", "id")->get()->toArray();
+       /*
+
+        foreach ($tmp as $item)
+            if (count($item->prices)<count($materials))
+            {
+                for ($i=0;$i<((count($materials)-count($item->prices))+1);$i++)
+                    $item->prices[] = (object)[
+                        "id" =>  null,
+                        "price" =>  0,
+                        "price_koef" =>  0,
+
+                    ];
+            }*/
+
+
+        return Excel::download(new PriceExport([
+            "materials" => $materials,
+            "prices" => $tmp
+        ]), 'invoices.xlsx');
+
+    }
 
     public function getFormatted()
     {
@@ -290,10 +382,24 @@ class SizeController extends Controller
     public function updateParam(Request $request): \Illuminate\Http\Response|SizeResource
     {
         $request->validate([
-            'id' => "required",
             'key' => "required",
             'value' => "required",
         ]);
+
+        if (is_null($request->id ?? null)){
+            $size = Size::query()->create([
+                'width'=>$request->width,
+                'height'=>$request->height,
+                'material_id'=>$request->material_id,
+                'price'=>0,
+                'price_koef'=>0,
+                'loops_count'=>0,
+            ]);
+
+            $size[$request->key] = $request->value ?? $size[$request->key];
+            $size->save();
+            return new SizeResource($size);
+        }
 
         $size = Size::query()
             ->where("id", $request->id)

@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait Utility
 {
-    protected function uploadPhotos( array $uploadedFiles = null): array
+    protected function uploadPhotos(array $uploadedFiles = null, $needOriginalName = false): array
     {
         if (is_null($uploadedFiles))
             return [];
@@ -20,7 +20,10 @@ trait Utility
             $imageName = Str::uuid() . "." . $ext;
 
             $file->move($path, $imageName);
-            $photos[] = $imageName;
+            $photos[] = $needOriginalName ? (object)[
+                "current" => $imageName,
+                "original" => $file->getClientOriginalName()
+            ] : $imageName;
         }
 
         return $photos;

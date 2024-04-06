@@ -17,7 +17,21 @@ const getters = {
 }
 
 const actions = {
+    async loadPreparedPrices(context, payload = {dataObject:null}) {
 
+        let link = `${BASE_SIZES_LINK}/prepared-prices`
+        let method = 'POST'
+
+
+        let _axios = util.makeAxiosFactory(link, method, payload.dataObject)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadFormattedSizes(context) {
 
         let link = `${BASE_SIZES_LINK}/formatted`

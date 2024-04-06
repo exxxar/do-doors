@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Handle;
 use App\Models\Material;
 use Illuminate\Database\Seeder;
 
@@ -26,8 +27,10 @@ class MaterialSeeder extends Seeder
         ];
 
         foreach ($materials as $material)
-            Material::query()->create([
+            Material::factory()->create([
                 'title' => $material
             ]);
+
+
     }
 }

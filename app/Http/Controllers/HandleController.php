@@ -12,6 +12,7 @@ use App\Models\Handle;
 use App\Models\Material;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -38,6 +39,7 @@ class HandleController extends Controller
         if (!is_null($search))
             $handles = $handles
                 ->where("title", 'like', "%$search%")
+                ->orWhere("color", 'like', "%$search%")
                 ->orWhere("id", 'like', "%$search%");
 
         $handles = $handles->orderBy($order, $direction);
@@ -53,10 +55,25 @@ class HandleController extends Controller
         ]);
 
         $variants = json_decode($request->variants ?? '[]');
+        $imageInfo = json_decode($request->uploaded_image_info ?? '[]');
 
 
-        $tmp = $this->uploadPhotos($request->hasFile('uploaded_variants_image') ? $request->file('uploaded_variants_image') : null);
-        $variants = [...$variants, ...$tmp];
+        $tmp = $this->uploadPhotos(
+            $request->hasFile('uploaded_variants_image') ?
+                $request->file('uploaded_variants_image') : null, true);
+
+        foreach ($tmp as $item)
+            foreach ($imageInfo as $key => $info) {
+                $info = (object)$info;
+                if ($item->original == ($info->image_name ?? null)) {
+                    $info->uuid = Str::uuid()->toString();
+                    $info->image = $item->current ?? '-';
+                    unset($info->image_name);
+                }
+            }
+
+        $variants = [...$variants, ...$imageInfo];
+
 
         $id = $request->id ?? null;
 
@@ -65,7 +82,8 @@ class HandleController extends Controller
                 ->create([
                     "title" => $request->title ?? null,
                     'price' => $request->price ?? 0,
-                    'variants'=>$variants
+                    'color' => $request->color ?? null,
+                    'variants' => $variants
                 ]);
         else {
             $handle = Handle::query()->find($id);
@@ -76,7 +94,8 @@ class HandleController extends Controller
             $handle->update([
                 "title" => $request->title ?? null,
                 'price' => $request->price ?? 0,
-                'variants'=>$variants
+                'color' => $request->color ?? null,
+                'variants' => $variants
             ]);
 
         }

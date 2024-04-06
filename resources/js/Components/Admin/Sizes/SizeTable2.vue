@@ -1,28 +1,93 @@
 <script setup>
-import Pagination from "@/Components/Pagination.vue";
-import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue";
+
+import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
 </script>
 <template>
-        test
-    <div class="d-flex">
-        <span v-for="item in materials" class="mr-2">{{item.title}}</span>
-    </div>
-
-    <div class="d-flex flex-column" style="width: 100px;">
-        <div v-for="item in height" class="mr-2 d-flex justify-between">
-            <div>{{ item }}</div>
-            <div class="d-flex flex-column">
-                <span v-for="sub in width" >
-                    {{sub}}
-                </span>
-            </div>
-
+    <div class="row">
+        <div class="col-12">
+            <span class="badge  mr-2 cursor-pointer"
+                  @click="toggleMaterialId(material.id)"
+                  v-bind:class="{'bg-primary':selectedMaterials.indexOf(material.id)!=-1,'bg-secondary':selectedMaterials.indexOf(material.id)==-1}"
+                  v-for="material in materials"> {{ material.title }}</span>
         </div>
+
+    </div>
+    <PerfectScrollbar scrollTop class="py-2" v-if="prices.length>0&&selectedMaterials.length>0">
+        <table>
+            <thead>
+            <tr>
+
+                <td rowspan="2" class="table-side-column">Высота</td>
+                <td rowspan="2" class="table-side-column">Ширина</td>
+
+
+                <template v-for="material in materials">
+                    <td colspan="2" width="200px" style="font-weight: bold;text-align: center;border:1px solid #dadada;"
+                        v-if="selectedMaterials.indexOf(material.id)!=-1"
+                    > {{ material.title }}
+                    </td>
+                </template>
+            </tr>
+
+            <tr>
+                <template v-for="material in materials">
+                    <template v-if="selectedMaterials.indexOf(material.id)!=-1">
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada;">Цена
+                        </td>
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada;">
+                            Коэффициент
+                        </td>
+                    </template>
+                </template>
+            </tr>
+
+
+            </thead>
+            <tbody>
+
+            <tr v-for="(item, index) in prices">
+                <td class="table-side-column"><span>{{ item.height }}</span></td>
+                <td class="table-side-column"><span>{{ item.width }}</span></td>
+
+                <template v-for="(price, priceIndex) in item.prices">
+
+                    <template v-if="selectedMaterials.indexOf(price.material_id)!=-1">
+                        <td width="100px" style="text-align: center;border:1px solid #dadada;">
+
+
+                            <input type="text"
+
+                                   @change="saveParam('price', index, priceIndex)"
+                                   style="border:1px #dadada solid;" v-model="item.prices[priceIndex].price">
+
+                        </td>
+                        <td width="100px" style="text-align: center;border:1px solid #dadada;">
+                            <input type="text"
+
+                                   @change="saveParam('price_koef', index, priceIndex)"
+                                   style="border:1px #dadada solid;" v-model="item.prices[priceIndex].price_koef">
+
+                        </td>
+                    </template>
+
+                </template>
+            </tr>
+            </tbody>
+        </table>
+    </PerfectScrollbar>
+
+    <div class="alert alert-success my-3" role="alert" v-if="selectedMaterials.length===0">
+        <h4 class="alert-heading">Выберите материалы</h4>
+        <p>Для отображения таблицы выберите интересующие материалы</p>
     </div>
 
-
-
-
+    <div class="alert alert-success my-3" role="alert" v-if="prices.length===0">
+        <h4 class="alert-heading">Размеры</h4>
+        <p>К сожалению, раздел размеров пуст. Вы еще не добавили ни одного размера, который можно отобразить на этой
+            странице.</p>
+        <hr>
+        <p class="mb-0">Воспользуйтесь формой выше и добавьте свой первый размер</p>
+    </div>
 
 </template>
 <script>
@@ -31,39 +96,105 @@ import {mapGetters} from "vuex";
 export default {
     data() {
         return {
-            materials:[],
-            sizes:[],
-            width: [],
-            height: []
+            materials: [],
+            prices: [],
+            selectedMaterials: []
+
         }
     },
 
     mounted() {
         this.loadSizes();
-
-
-        this.$store.dispatch("loadFormattedSizes").then(resp => {
-
-        }).catch(() => {
-
-        })
     },
     methods: {
+        toggleMaterialId(id) {
+            let index = this.selectedMaterials.findIndex(item => item === id)
 
+            if (index === -1)
+                this.selectedMaterials.push(id)
+            else
+                this.selectedMaterials.splice(index, 1)
+        },
         loadSizes(page = 0) {
-            this.$store.dispatch("loadFormattedSizes").then(resp => {
-                this.width = resp.width
-                this.height = resp.height
-                this.sizes = resp.sizes
+            this.$store.dispatch("loadPreparedPrices").then(resp => {
                 this.materials = resp.materials
-
+                this.prices = resp.prices
+                this.selectedMaterials =    this.materials.map(o => o["id"]);
 
             }).catch(() => {
 
             })
         },
+        saveParam(param, index, priceIndex) {
 
+            this.$store.dispatch("updateSizeParam", {
+                dataObject: {
+                    id: this.prices[index].prices[priceIndex].id,
+                    key: param,
+                    value: this.prices[index].prices[priceIndex][param],
+                    height: this.prices[index].prices[priceIndex].height || null,
+                    width: this.prices[index].prices[priceIndex].width || null,
+                    material_id: this.prices[index].prices[priceIndex].material_id || null,
+                },
+            }).then(resp => {
+
+                if (!this.prices[index].prices[priceIndex].id)
+                    this.prices[index].prices[priceIndex].id = resp.data.id
+
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Параметры успешно обновлены",
+                });
+            }).catch(() => {
+                // this.loading = false
+            })
+        }
 
     }
 }
 </script>
+<style lang="scss">
+
+@import 'vue3-perfect-scrollbar/style.css';
+
+.ps {
+    //  max-height: 100px; /* or height: 100px; */
+}
+
+.ps__rail-x {
+    top: 0px;
+    bottom: auto;
+    /* If using `top`, there shouldn't be a `bottom`. */
+}
+
+.ps__thumb-x {
+    top: 2px;
+    bottom: auto;
+    /* If using `top`, there shouldn't be a `bottom`. */
+}
+
+.scrollable-area {
+    width: 100%;
+    overflow-y: auto;
+}
+
+.table-side-column {
+    font-weight: bold;
+    border: 1px solid #dadada;
+    width: 72px;
+    position: sticky;
+    text-align: center;
+    background-color: #ededed;
+    padding: 0px 5px;
+
+
+    &:nth-child(1) {
+        left: 0px;
+    }
+
+    &:nth-child(2) {
+        left: 68px;
+    }
+
+}
+</style>

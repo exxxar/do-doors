@@ -26,24 +26,25 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
     <!-- Button trigger modal -->
 
     <div class="row">
-        <div class="col-12 d-flex justify-center">
-            <button type="button"
-                    @click="saveFormattedSizes"
-                    class="btn btn-outline-primary mr-2">
-                Обновить JSON
-            </button>
+        <div class="col-12 d-flex">
 
-            <button type="button"
-                    @click="recountModalShow"
-                    class="btn btn-outline-primary mr-2">
-                Пересчет показателей
-            </button>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa-solid fa-bars mr-2"></i>Управление разделом
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/sizes/export-prices">Скачать шаблон таблицы</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные из Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="saveFormattedSizes">Обновить JSON</a>
+                    </li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="recountModalShow">Пересчет
+                        показателей</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="generateModalShow"> Генерация
+                        размеров</a></li>
+                </ul>
+            </div>
 
-            <button type="button"
-                    @click="generateModalShow"
-                    class="btn btn-outline-primary">
-                Генерация размеров
-            </button>
         </div>
     </div>
 
@@ -194,7 +195,7 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
 
         </tbody>
     </table>
-    <div class="alert alert-success" role="alert" v-if="items.length===0">
+    <div class="alert alert-success my-3" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Размеры</h4>
         <p>К сожалению, раздел размеров пуст. Вы еще не добавили ни одного размера, который можно отобразить на этой
             странице.</p>
@@ -207,6 +208,48 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                 v-on:pagination_page="loadSizes"
                 v-if="paginate_object"
                 :pagination="paginate_object"/>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="import-prices-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Форма загрузки таблицы</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form v-on:submit.prevent="importSubmit">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   v-model="importForm.need_rewrite"
+                                   type="checkbox" role="switch" id="need_rewrite">
+                            <label class="form-check-label" for="need_rewrite">
+                                <span v-if="importForm.need_rewrite">Перезаписать старые значения</span>
+                                <span v-else>Добавить новые значения</span>
+
+                            </label>
+                        </div>
+
+                        <div class="form-floating my-3 border-gray-100 border">
+                            <input type="file" class="form-control"
+                                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                   id="excel-file-for-import"
+                                   ref="importPriceFromExcel"
+                                   @change="onChangeFile($event)">
+                            <label for="excel-file-for-import">Файл-эксель</label>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-outline-primary w-100 p-3">Загрузить
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -453,6 +496,10 @@ export default {
                 selected_material: null,
                 steps: 0
             },
+            importForm:{
+                need_rewrite: false,
+                files:[],
+            },
             recountForm: {
                 selected_material: null,
                 need_recount_by_width: false,
@@ -462,19 +509,11 @@ export default {
                 recount_price: null,
             },
             recountModal: null,
+            importPricesModal: null,
             generateModal: null,
             current_page: 0,
             paginate_object: null,
             items: [
-                {
-                    id: null,
-                    width: 0,
-                    height: 0,
-                    material_id: null,
-                    price: 0,
-                    price_koef: 0,
-                    loops_count: 0,
-                }
             ]
         }
     },
@@ -485,15 +524,25 @@ export default {
         this.loadSizes();
 
         this.recountModal = new bootstrap.Modal(document.getElementById('recount-prices'), {})
+        this.importPricesModal = new bootstrap.Modal(document.getElementById('import-prices-form'), {})
         this.generateModal = new bootstrap.Modal(document.getElementById('generate-sizes'), {})
     },
     methods: {
+        onChangeFile( e) {
+            const files = e.target.files
+            for (let i = 0; i < files.length; i++)
+               this.importForm.files.push(files[i])
+
+        },
         saveFormattedSizes() {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
 
             }).catch(() => {
 
             })
+        },
+        openImportFormModal(){
+            this.importPricesModal.show()
         },
         generateModalShow() {
             this.generateModal.show()
@@ -522,6 +571,9 @@ export default {
             this.recountForm.selected_material = item.material
 
             this.recountModal.show()
+        },
+        importSubmit(){
+
         },
         submitRecountForm() {
             this.affected = null

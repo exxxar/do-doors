@@ -1,7 +1,7 @@
 import './bootstrap';
 import '../css/app.css';
 import store from './Store'
-
+import VueLazyLoad from 'vue3-lazyload'
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -21,6 +21,11 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(store)
             .use(Notifications)
+            .use(VueLazyLoad,
+                {
+                    loading: '/images/logo.jpg',
+                    error: '/images/not-found.jpg'
+                })
             .mount(el);
     },
     progress: {
