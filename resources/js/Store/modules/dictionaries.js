@@ -1128,14 +1128,17 @@ const state = {
             {
                 id: 1,
                 title: 'Опт',
+                key:'wholesale'
             },
             {
                 id: 2,
                 title: 'Розница',
+                key:'dealer'
             },
             {
                 id: 3,
                 title: 'Цена дилера',
+                key:'retail'
             }
         ], //типы цен
     }

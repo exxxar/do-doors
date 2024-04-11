@@ -1,6 +1,7 @@
 <script setup>
 import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 import DoorPreview from "@/Components/Doors/DoorPreview.vue";
+import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 </script>
 
 <template>
@@ -93,7 +94,11 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                         <a class="dropdown-item"
                            @click="selectDoorSize(item)"
                            v-bind:class="{'bg-primary':doorForm.width===item.width&&doorForm.width===item.height}"
-                           href="#" v-for="item in filteredHeight">{{ item.height }}x{{ item.width }}</a>
+                           href="#" v-for="item in filteredHeight">
+
+
+                            {{ item.height }}x{{ item.width }}
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -129,7 +134,11 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                         <a class="dropdown-item"
                            @click="selectDoorSize(item)"
                            v-bind:class="{'bg-primary text-white':doorForm.width===item.width&&doorForm.width===item.height}"
-                           href="#" v-for="item in filteredWidth">{{ item.height }}x{{ item.width }}</a>
+                           href="#" v-for="item in filteredWidth">
+
+
+                            {{ item.height }}x{{ item.width }}
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -162,15 +171,16 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
             </div>
         </div>
 
-        <div class="col-md-6 col-12">
-            <div class="form-floating mb-3">
+        <div class="col-md-6 col-12  mb-3">
+            <div class="form-floating">
                 <select class="form-select"
                         @change="selectFrontSideFinish"
                         @invalid="alert('Вы не выбрали отделку первой стороны двери!')"
                         v-model="doorForm.front_side_finish"
                         id="floatingSelect" aria-label="Floating label select example" required>
                     <option selected>Выберите один из вариантов</option>
-                    <option :value="item" v-for="item in getDictionary.finishes_variants">{{
+                    <option :value="item" v-for="item in getDictionary.finishes_variants">
+                        {{
                             item.title
                         }}
                     </option>
@@ -178,10 +188,12 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                 <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка первой стороны (<small>вровень
                     со стеной</small>)</label>
             </div>
+            <p v-if="priceForSide('front_side_finish')===0"><small><em><strong class="text-danger">Внимание!</strong>
+                сочетание размера и материала не доступно для заказа!</em></small></p>
         </div>
 
-        <div class="col-md-6 col-12">
-            <div class="form-floating mb-3">
+        <div class="col-md-6 col-12 mb-3">
+            <div class="form-floating ">
                 <select class="form-select"
                         @change="selectBackSideFinish"
                         @invalid="alert('Вы не выбрали отделку второй стороны двери!')"
@@ -195,6 +207,9 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                 </select>
                 <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка второй стороны</label>
             </div>
+            <p v-if="priceForSide('back_side_finish')===0"><small><em><strong class="text-danger">Внимание!</strong>
+                сочетание размера и материала не доступно для заказа!</em></small></p>
+
         </div>
 
 
@@ -411,30 +426,30 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
             </div>
         </div>
 
-        <div class="col-12" v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes">
+        <div class="col-12" v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
             <div class="row">
 
                 <div class="col-12">
-                    <p class="mb-2">Цвет ручки {{doorForm.handle_holes_type.color || 'не указан'}}
+                    <p class="mb-2">Цвет ручки {{ doorForm.handle_holes_type.color || 'не указан' }}
                         <span
                             class="d-inline-block"
                             v-bind:style="{'background-color': doorForm.handle_holes_type.color }"
                             style="width:50px; height: 10px;"
                             v-if="doorForm.handle_holes_type.color"
-                            >
+                        >
                         </span>
                     </p>
 
                 </div>
-                <div class="col-lg-2 col-md-4 col-12 mb-2"
+                <div class="col-lg-3 col-md-3 col-12 mb-2"
                      v-for="(item, index) in doorForm.handle_holes_type.variants">
                     <div class="card cursor-pointer"
                          v-bind:class="{'border-secondary shadow-lg':item.selected}"
                          @click="selectSideFinish('handle_holes_type','variants',index)">
                         <img v-lazy="item.image" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <h6 class="font-bold">{{ item.title || 'не указано' }}</h6>
-                            <p class="card-text">{{ item.description || 'не указано' }}</p>
+                            <h6 class="font-bold" v-if="item.title">{{ item.title || 'не указано' }}</h6>
+                            <p class="card-text" v-if="item.description">{{ item.description || 'не указано' }}</p>
 
                         </div>
                     </div>
@@ -630,13 +645,13 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                             <tr>
                                 <td>Цена</td>
                                 <td>
-                                    <strong v-if="doorForm.price_type.id!==3">{{
-                                            summaryPrice * doorForm.count
+                                    <strong>{{
+                                            resultPrice
                                         }}₽</strong>
-                                    <strong v-if="doorForm.price_type.id===3">{{
-                                            summaryPriceWithDealer * doorForm.count
+                                    x{{ doorForm.count || 0 }} =
+                                    <strong>{{
+                                            resultPrice * doorForm.count
                                         }}₽</strong>
-
                                 </td>
                             </tr>
                             </tbody>
@@ -691,54 +706,23 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
     <div class="modal fade" :id="'finish-front-variant-modal-'+doorForm.id" tabindex="-1"
          aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор типа материала для первый стороны</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modal-body">
-                    <h3 class="font-bold my-2">Выбранный материал
-                        "{{ doorForm.front_side_finish.title || 'не указан' }}"</h3>
+                    <MaterialSelectForm v-model:item="doorForm.front_side_finish">
 
-
-                    <div class="row mb-2" v-if="doorForm.front_side_finish.door_variants">
-                        <div class="col-12">
-                            <p>Перечень вариантов дверей</p>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-12 mb-2"
-                             v-for="(door, index) in doorForm.front_side_finish.door_variants">
-                            <div class="card cursor-pointer"
-                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
-                                 @click="selectSideFinish('front_side_finish','door_variants',index)">
-                                <img v-lazy="door.image" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
-                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2" v-if="doorForm.front_side_finish.wrapper_variants">
-                        <div class="col-12">
-                            <p>Перечень вариантов материала вокруг дверей</p>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-12 mb-2"
-                             v-for="(door, index) in doorForm.front_side_finish.wrapper_variants">
-                            <div class="card cursor-pointer"
-                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
-                                 @click="selectSideFinish('front_side_finish','wrapper_variants',index)">
-                                <img v-lazy="door.image" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
-                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </MaterialSelectForm>
                 </div>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary text-secondary" data-bs-dismiss="modal"
+                            aria-label="Close">Закрыть
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -747,61 +731,31 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
     <div class="modal fade" :id="'finish-back-variant-modal-'+doorForm.id" tabindex="-1"
          aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор типа материала для второй стороны</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i
+                        class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modal-body">
-                    <h3 class="font-bold my-2">Выбранный материал
-                        "{{ doorForm.back_side_finish.title || 'не указан' }}"</h3>
 
+                    <MaterialSelectForm v-model:item="doorForm.back_side_finish">
 
-                    <div class="row mb-2" v-if="doorForm.back_side_finish.door_variants">
-                        <div class="col-12">
-                            <p>Перечень вариантов дверей</p>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-12 mb-2"
-                             v-for="(door, index) in doorForm.back_side_finish.door_variants">
-                            <div class="card cursor-pointer"
-                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
-                                 @click="selectSideFinish('back_side_finish','door_variants',index)">
-                                <img v-lazy="door.image" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
-                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2" v-if="doorForm.back_side_finish.wrapper_variants">
-                        <div class="col-12">
-                            <p>Перечень вариантов материала вокруг дверей</p>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-12 mb-2"
-                             v-for="(door, index) in doorForm.back_side_finish.wrapper_variants">
-                            <div class="card cursor-pointer"
-                                 v-bind:class="{'border-secondary shadow-lg':door.selected}"
-                                 @click="selectSideFinish('back_side_finish','wrapper_variants',index)">
-                                <img v-lazy="door.image" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h6 class="font-bold" v-if="door.title">{{ door.title || 'не указано' }}</h6>
-                                    <p class="card-text" v-if="door.description">{{ door.description || 'не указано' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </MaterialSelectForm>
                 </div>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary text-secondary" data-bs-dismiss="modal"
+                            aria-label="Close">Закрыть
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
 
-    <div class="fixed-price btn btn-outline-primary rounded-5 shadow-lg" v-if="summaryPrice>0">
-        <span class="text-center badge text-primary font-bold">{{ summaryPrice }}₽</span>
+    <div class="fixed-price btn btn-outline-primary rounded-5 shadow-lg d-sm-none d-md-block" v-if="resultPrice>0">
+        <span class="text-center badge text-primary font-bold">{{ resultPrice }}₽</span>
     </div>
 
     <!-- Modal -->
@@ -815,10 +769,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                 <div class="modal-body d-flex justify-content-center">
 
                     <DoorPreview
-                        :door-image="'/images/стекло/01 White soft 9010.jpg'"
-                        :door-color="doorForm.front_side_finish_color">
-
-
+                        :door="doorForm">
                     </DoorPreview>
 
                 </div>
@@ -882,21 +833,31 @@ export default {
     },
     computed: {
         ...mapGetters(['getErrors', 'getDictionary', 'cartTotalCount', 'cartProducts', 'cartTotalPrice']),
-        summaryPriceWithDealer() {
-            return Math.round(this.summaryPrice * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
+
+        resultPrice() {
+            return (this.doorForm.price_type.id !== 3) ? this.summaryPrice : this.summaryPriceWithDealer
         },
-
-
+        summaryPriceWithDealer() {
+            return Math.round((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
+        },
         summaryPrice() {
             let sum = 0;
 
+
+            let type = this.doorForm.price_type.key
 
             Object.keys(this.doorForm).forEach(item => {
 
                 if (item) {
 
                     if (typeof this.doorForm[item] === "object" && this.doorForm[item] != null) {
-                        sum += (this.doorForm[item].price || 0)
+
+                        if (this.doorForm[item].price) {
+                            sum += (typeof this.doorForm[item].price === "object") ?
+                                (this.doorForm[item].price[type] || 0) :
+                                (this.doorForm[item].price || 0)
+                        }
+
                     }
                 }
 
@@ -918,32 +879,43 @@ export default {
 
             })
 
+
             if (find) {
-                console.log("item1=>", section)
                 section.materials.forEach(sub => {
-                    if (sub.id === this.doorForm.front_side_finish.id)
-                        price = sub.price
+                    if (sub.id === this.doorForm.front_side_finish.id) {
+                        price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                    }
+
+                    if (sub.id === this.doorForm.back_side_finish.id) {
+                        price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                    }
+
                 })
+
+
             } else {
 
                 for (let i = 0; i < basePrices.length; i++) {
                     if (basePrices[i].width >= this.doorForm.width && basePrices[i].height >= this.doorForm.height) {
-                        console.log(basePrices[i].width, basePrices[i].width >= this.doorForm.width && basePrices[i].height >= this.doorForm.height, this.doorForm.width)
-                        console.log(basePrices[i].materials)
 
                         basePrices[i].materials.forEach(sub => {
                             if (sub.id === this.doorForm.front_side_finish.id)
-                                price = sub.price
+                                price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                        })
+
+                        basePrices[i].materials.forEach(sub => {
+                            if (sub.id === this.doorForm.back_side_finish.id)
+                                price += typeof sub.price === "object" ? sub.price[type] : sub.price
                         })
                         break;
                     }
                 }
             }
 
-            console.log("width=", this.doorForm.width, " height=", this.doorForm.height, price)
 
-            return sum + price;
+            return sum + price;//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
+
         filteredHeight() {
             if (!this.getDictionary)
                 return []
@@ -1045,6 +1017,30 @@ export default {
             this.doorForm[section][param][index].selected =
                 !(this.doorForm[section][param][index].selected)
 
+        },
+        priceForSide(param) {
+            let type = this.doorForm.price_type.key
+            let price = 0
+            let section = null;
+            let basePrices = this.getDictionary.prices
+
+            if (this.doorForm.width === 0 && this.doorForm.height === 0)
+                return 0;
+
+            basePrices.forEach(sub => {
+                if (this.doorForm.width === sub.width && this.doorForm.height === sub.height) {
+                    section = sub;
+                }
+            })
+
+            if (section.materials)
+                section.materials.forEach(sub => {
+                    if (sub.id === this.doorForm[param].id) {
+                        price = typeof sub.price === "object" ? sub.price[type] : sub.price
+                    }
+
+                })
+            return price
         },
         isHex(num) {
             return /^#[0-9A-F]{6}$/i.test(num)
@@ -1206,57 +1202,27 @@ export default {
     min-width: 89px;
 
 
-        &:hover {
+    &:hover {
 
-            span {
-                color:white !important;
-            }
-
-
-
+        span {
+            color: white !important;
         }
+
+
+    }
 
 
     @media (max-width: 767.98px) {
         width: 100%;
         bottom: 50px;
         right: 0px;
+        display: none;
 
     }
 
 }
 
-.door-image {
-    max-width: 200px;
 
-    img {
-        object-fit: cover;
-    }
-}
-
-.door-wrapper {
-    width: 500px;
-    min-height: 589px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: end;
-    background: #f1e1df;
-
-    .back-image {
-        top: 0px;
-        left: 0px;
-        position: absolute;
-        object-fit: cover;
-        z-index: 0;
-    }
-
-    .front-image {
-        position: absolute;
-        object-fit: cover;
-        z-index: 1;
-    }
-}
 
 .scrollable-menu {
     height: 200px;

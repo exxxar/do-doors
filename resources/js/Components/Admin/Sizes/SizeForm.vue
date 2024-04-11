@@ -30,12 +30,53 @@ import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
             <div class="col-12 col-md-6">
                 <div class="form-floating mb-3">
                     <input type="number"
-                           v-model="form.price"
-                           class="form-control" id="size-price"
+                           v-model="form.price.wholesale"
+                           class="form-control" id="size-price-wholesale"
                            required>
-                    <label for="size-price">Цена, руб</label>
+                    <label for="size-price-wholesale">Цена опт, руб</label>
                 </div>
             </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="number"
+                           v-model="form.price.dealer"
+                           class="form-control" id="size-price-dealer"
+                           required>
+                    <label for="size-price-dealer">Цена дилеру, руб</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="number"
+                           v-model="form.price.wholesale"
+                           class="form-control" id="size-price-wholesale"
+                           required>
+                    <label for="size-price-wholesale">Цена опт, руб</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="number"
+                           v-model="form.price.retail"
+                           class="form-control" id="size-price-retail"
+                           required>
+                    <label for="size-price-retail">Цена розница, руб</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="number"
+                           v-model="form.price.cost"
+                           class="form-control" id="size-price-cost"
+                           required>
+                    <label for="size-price-cost">Себестоимость, руб</label>
+                </div>
+            </div>
+
             <div class="col-12 col-md-6">
                 <div class="form-floating mb-3">
                     <input type="number"
@@ -137,7 +178,12 @@ export default {
                 width: 0,
                 height: 0,
                 material_id: null,
-                price: 0,
+                price: {
+                    wholesale: 0,
+                    dealer: 0,
+                    retail: 0,
+                    cost: 0,
+                },
                 price_koef: 0,
                 loops_count: 0,
             }
@@ -165,7 +211,12 @@ export default {
                     width: this.item.width || null,
                     height: this.item.height || null,
                     size_id: this.item.size_id || null,
-                    price: this.item.price || null,
+                    price: this.item.price || {
+                        wholesale: 0,
+                        dealer: 0,
+                        retail: 0,
+                        cost: 0,
+                    },
                     price_koef: this.item.price_koef || null,
                     loops_count: this.item.loops_count || null,
                     material_id: this.item.material_id || null,
@@ -200,7 +251,14 @@ export default {
                 width: this.item.width || null,
                 height: this.item.height || null,
                 size_id: this.item.size_id || null,
-                price: this.item.price || null,
+                price: this.item.price || {
+
+                    wholesale: 0,
+                    dealer: 0,
+                    retail: 0,
+                    cost: 0,
+
+                },
                 price_koef: this.item.price_koef || null,
                 loops_count: this.item.loops_count || null,
             }

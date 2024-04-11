@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CartExport;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
 use Telegram\Bot\Api;
@@ -15,6 +17,17 @@ use Telegram\Bot\FileUpload\InputFile;
 class CalcController extends Controller
 {
 
+    public function downloadCartExcel(Request $request){
+        $request->validate([
+            "items" => "required",
+        ]);
+
+
+        $items = json_decode($request->items ?? '[]');
+
+
+        return Excel::download(new CartExport($items),"cart.xls");
+    }
     /**
      * @throws TelegramSDKException
      * @throws MpdfException

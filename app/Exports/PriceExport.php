@@ -2,25 +2,30 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 
-class PriceExport implements FromView
+class PriceExport implements  WithMultipleSheets
 {
-    public $prices;
-    public $materials;
+    use Exportable;
+
+    public $data;
+
     public function __construct($data = [])
     {
-        $this->prices = $data["prices"] ?? [];
-        $this->materials = $data["materials"] ?? [];
+        $this->data = $data;
     }
 
-    public function view():\Illuminate\Contracts\View\View
+    public function sheets(): array
     {
-        return view('export.prices', [
-            'prices' => $this->prices,
-            'materials' => $this->materials
-        ]);
+        return [
+            new PricePageExport($this->data,'wholesale',"Опт"),
+            new PricePageExport($this->data,'dealer',"Дилер"),
+            new PricePageExport($this->data,'retail',"Розница"),
+            new PricePageExport($this->data,'cost',"Себестоимость"),
+        ];
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('width')->default(0);
             $table->integer('height')->default(0);
             $table->foreignId('material_id')->constrained('materials');
-            $table->double('price')->default(0);
+            $table->json('price')->nullable();
             $table->double('price_koef')->default(0);
             $table->integer('loops_count')->default(0);
             $table->timestamps();

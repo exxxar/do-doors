@@ -127,7 +127,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 
                         <div class="form-floating mb-3 ">
                             <input type="text" v-model="form.variants[index].title"
-                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                                   class="form-control border-gray-300 rounded-md" id="floatingInput">
                             <label for="floatingInput">Название</label>
                         </div>
 
@@ -135,7 +135,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                         <div class="form-floating">
                             <textarea class="form-control"
                                       v-model="form.variants[index].description"
-                                      placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
+                                      placeholder="Leave a comment here" id="floatingTextarea"></textarea>
                             <label for="floatingTextarea">Описание</label>
                         </div>
                     </div>

@@ -26,7 +26,12 @@ class SizeFactory extends Factory
             'width' => $this->faker->numberBetween(800, 1000),
             'height' => $this->faker->numberBetween(2100, 3000),
             'material_id' => Material::query()->get()->random()->id,
-            'price' => $this->faker->randomFloat(0, 1000, 10000.),
+            'price' => (object)[
+                "wholesale"=>$this->faker->randomFloat(0, 1000, 10000.),
+                "dealer"=>$this->faker->randomFloat(0, 1000, 10000.),
+                "retail"=>$this->faker->randomFloat(0, 1000, 10000.),
+                "cost"=>$this->faker->randomFloat(0, 1000, 10000.),
+            ],
             'price_koef' => $this->faker->randomFloat(0, 1.1, 1.9),
             'loops_count' => $this->faker->numberBetween(2, 4),
         ];

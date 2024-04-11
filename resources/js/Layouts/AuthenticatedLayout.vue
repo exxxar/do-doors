@@ -208,6 +208,7 @@ const showingNavigationDropdown = ref(false);
            aria-controls="cart">
             <i class="fa-solid fa-basket-shopping text-primary"></i>
             <span class="badge text-primary font-bold">{{cartTotalCount}} шт.</span>
+
         </a>
     </div>
 

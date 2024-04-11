@@ -22,7 +22,7 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
 
 
                 <template v-for="material in materials">
-                    <td colspan="2" width="200px" style="font-weight: bold;text-align: center;border:1px solid #dadada;"
+                    <td colspan="5" width="200px" style="font-weight: bold;text-align: center;border:1px solid #dadada;"
                         v-if="selectedMaterials.indexOf(material.id)!=-1"
                     > {{ material.title }}
                     </td>
@@ -32,8 +32,10 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
             <tr>
                 <template v-for="material in materials">
                     <template v-if="selectedMaterials.indexOf(material.id)!=-1">
-                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada;">Цена
-                        </td>
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Опт</td>
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Дилер</td>
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Розница</td>
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Себестоимость</td>
                         <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada;">
                             Коэффициент
                         </td>
@@ -52,20 +54,24 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
                 <template v-for="(price, priceIndex) in item.prices">
 
                     <template v-if="selectedMaterials.indexOf(price.material_id)!=-1">
-                        <td width="100px" style="text-align: center;border:1px solid #dadada;">
 
 
-                            <input type="text"
 
-                                   @change="saveParam('price', index, priceIndex)"
-                                   style="border:1px #dadada solid;" v-model="item.prices[priceIndex].price">
 
+                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                           {{ item.prices[priceIndex].price.wholesale}}
+                        </td>
+                        <td  style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                            {{ item.prices[priceIndex].price.dealer}}
+                        </td>
+                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                            {{ item.prices[priceIndex].price.retail}}
+                        </td>
+                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                            {{ item.prices[priceIndex].price.cost}}
                         </td>
                         <td width="100px" style="text-align: center;border:1px solid #dadada;">
-                            <input type="text"
-
-                                   @change="saveParam('price_koef', index, priceIndex)"
-                                   style="border:1px #dadada solid;" v-model="item.prices[priceIndex].price_koef">
+                           {{item.prices[priceIndex].price_koef}}
 
                         </td>
                     </template>

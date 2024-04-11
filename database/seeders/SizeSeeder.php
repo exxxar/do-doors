@@ -14,8 +14,8 @@ class SizeSeeder extends Seeder
     public function run(): void
     {
 
-        $widthList = [700, 800, 900, 1000];
-        $heightList = [2100, 2300, 2500, 2700, 2800, 2900, 3000, 3100, 3200, 3300];
+        $widthList = [800, 900, 1000];
+        $heightList = [2100, 2300, 2500, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3500, 4000];
 
         $materials = Material::query()->get();
 
@@ -27,5 +27,7 @@ class SizeSeeder extends Seeder
                         'width' => $width,
                         'height' => $height,
                     ]);
+
+
     }
 }

@@ -36,7 +36,7 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/sizes/export-prices">Скачать шаблон таблицы</a></li>
                     <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные из Excel</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="saveFormattedSizes">Обновить JSON</a>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openConfirmModal">Обновить JSON</a>
                     </li>
                     <li><a class="dropdown-item" href="javascript:void(0)" @click="recountModalShow">Пересчет
                         показателей</a></li>
@@ -48,153 +48,160 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
         </div>
     </div>
 
-    <table class="table" v-if="items.length>0">
-        <thead>
-        <tr>
-            <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
-                <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('width')">Ширина, см
-                <span v-if="sort.direction === 'desc'&&sort.column === 'width'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'width'"><i
-                    class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('height')">Высота, см
-                <span v-if="sort.direction === 'desc'&&sort.column === 'height'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'height'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+    <div class="d-flex scrollable-area">
+        <table class="table table-responsive" v-if="items.length>0">
+            <thead>
+            <tr>
+                <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('width')">Ширина, см
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'width'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'width'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price')">Цена, руб
-                <span v-if="sort.direction === 'desc'&&sort.column === 'price'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'price'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('height')">Высота, см
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'height'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'height'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price_koef')">Ценовой коэффициент
-                <span v-if="sort.direction === 'desc'&&sort.column === 'price_koef'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'price_koef'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price')">Цена, руб
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'price'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'price'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('loops_count')">Число петель
-                <span v-if="sort.direction === 'desc'&&sort.column === 'loops_count'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'loops_count'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price_koef')">Ценовой коэффициент
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'price_koef'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'price_koef'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center" @click="sortAndLoad('material_id')">Материал
-                <span v-if="sort.direction === 'desc'&&sort.column === 'material_id'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'material_id'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                Дата изменения
-                <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center">Действие</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) in items">
-            <th scope="row">{{ item.id || index }}</th>
-            <td class="text-center" @click="selectItem(item)">
-                {{ item.width || 0 }}
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('loops_count')">Число петель
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'loops_count'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'loops_count'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </td>
-            <td class="text-center" @click="selectItem(item)">
-                {{ item.height || 0 }}
+                </th>
+                <th scope="col" class="text-center" @click="sortAndLoad('material_id')">Материал
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'material_id'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'material_id'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                    Дата изменения
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in items">
+                <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.width || 0 }}
+                </td>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.height || 0 }}
 
-            </td>
-            <td class="text-center">
+                </td>
+                <td class="text-center">
 
-                <p v-if="!items[index].need_edit_price" @click="items[index].need_edit_price = true">
-                    {{ items[index].price || 0 }}</p>
-                <input
-                    v-if="items[index].need_edit_price"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    @blur="blurParams('price_koef', index)"
-                    @change="saveParam('price', index)"
-                    v-model="items[index].price"
-                    class="form-control text-center"
-                    id="floatingInput"
-                    placeholder="name@example.com">
+                    <table>
+                        <thead>
+                        <th>опт</th>
+                        <th>дилер</th>
+                        <th>розница</th>
+                        <th>себестоимость</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}</td>
+                        </tr>
 
 
-            </td>
-            <td class="text-center">
-                <p v-if="!items[index].need_edit_koef" @click="items[index].need_edit_koef = true">
-                    {{ items[index].price_koef || 0 }}</p>
-                <input
-                    v-if="items[index].need_edit_koef"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    @blur="blurParams('price_koef', index)"
-                    @change="saveParam('price_koef', index)"
-                    v-model="items[index].price_koef"
-                    class="form-control text-center"
-                    id="floatingInput"
-                    placeholder="name@example.com">
+                        </tbody>
+                    </table>
+                </td>
+                <td class="text-center">
+                    <p v-if="!items[index].need_edit_koef" @click="items[index].need_edit_koef = true">
+                        {{ items[index].price_koef || 0 }}</p>
+                    <input
+                        v-if="items[index].need_edit_koef"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        @blur="blurParams('price_koef', index)"
+                        @change="saveParam('price_koef', index)"
+                        v-model="items[index].price_koef"
+                        class="form-control text-center"
+                        id="floatingInput"
+                        placeholder="name@example.com">
 
-            </td>
-            <td class="text-center">
-                {{ item.loops_count || 0 }}
+                </td>
+                <td class="text-center">
+                    {{ item.loops_count || 0 }}
 
-            </td>
-            <td class="text-center">
-                <p v-if="item.material">
-                    {{ item.material.title || '-' }} (#{{ item.material_id || '-' }})
-                </p>
-                <p v-else>Материал не выбран</p>
-            </td>
-            <td class="text-center">
-                {{ item.updated_at || '-' }}
-            </td>
-            <td class="text-center">
-                <div class="dropdown">
-                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"
-                               @click="selectItem(item)"
-                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
-                        <li><a class="dropdown-item"
-                               @click="recountByKoef(item)"
-                               href="javascript:void(0)"><i class="fa-solid fa-bolt mr-2"></i>Пересчитать по
-                            коэффициенту</a></li>
+                </td>
+                <td class="text-center">
+                    <p v-if="item.material">
+                        {{ item.material.title || '-' }} (#{{ item.material_id || '-' }})
+                    </p>
+                    <p v-else>Материал не выбран</p>
+                </td>
+                <td class="text-center">
+                    {{ item.updated_at || '-' }}
+                </td>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+                            <li><a class="dropdown-item"
+                                   @click="recountByKoef(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-bolt mr-2"></i>Пересчитать по
+                                коэффициенту</a></li>
 
-                        <li><a class="dropdown-item"
-                               @click="duplicateItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
-                        </li>
-                        <li><a class="dropdown-item text-danger"
-                               @click="removeItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
+                            <li><a class="dropdown-item"
+                                   @click="duplicateItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
+                            </li>
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+
+
     <div class="alert alert-success my-3" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Размеры</h4>
         <p>К сожалению, раздел размеров пуст. Вы еще не добавили ни одного размера, который можно отобразить на этой
@@ -242,7 +249,9 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         </div>
 
                         <button type="submit"
+                                :disabled="timer!=null"
                                 class="btn btn-outline-primary w-100 p-3">Загрузить
+                            <span v-if="timer!=null">{{timer}} сек</span>
                         </button>
                     </form>
                 </div>
@@ -469,6 +478,26 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
         </div>
     </div>
 
+    <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <p>Вы хотите обновить JSON-файл с размерами?</p>
+                   <div class="row">
+                       <div class="col-6">
+                           <button class="btn btn-outline-success w-100" type="button" @click="saveFormattedSizes">Да, продолжить</button>
+                       </div>
+                       <div class="col-6">
+                           <button class="btn btn-outline-danger w-100" @click="confirmModal.hide()">Нет, отменить</button>
+                       </div>
+                   </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -476,6 +505,7 @@ import {mapGetters} from "vuex";
 export default {
     data() {
         return {
+            timer:null,
             affected: null,
             sort: {
                 column: null,
@@ -509,6 +539,7 @@ export default {
                 recount_price: null,
             },
             recountModal: null,
+            confirmModal: null,
             importPricesModal: null,
             generateModal: null,
             current_page: 0,
@@ -523,11 +554,15 @@ export default {
     mounted() {
         this.loadSizes();
 
+        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
         this.recountModal = new bootstrap.Modal(document.getElementById('recount-prices'), {})
         this.importPricesModal = new bootstrap.Modal(document.getElementById('import-prices-form'), {})
         this.generateModal = new bootstrap.Modal(document.getElementById('generate-sizes'), {})
     },
     methods: {
+        openConfirmModal(){
+            this.confirmModal.show()
+        },
         onChangeFile( e) {
             const files = e.target.files
             for (let i = 0; i < files.length; i++)
@@ -536,9 +571,17 @@ export default {
         },
         saveFormattedSizes() {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
-
+                this.confirmModal.hide()
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно обновили данные",
+                });
             }).catch(() => {
-
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка обновления данных",
+                    type:'error'
+                });
             })
         },
         openImportFormModal(){
@@ -573,7 +616,54 @@ export default {
             this.recountModal.show()
         },
         importSubmit(){
+            let data = new FormData();
 
+
+            this.timer = 0
+            let tmpTimer = setInterval(()=>{
+                this.timer++
+            }, 1000)
+
+            Object.keys(this.importForm)
+                .forEach(key => {
+                    const item = this.importForm[key] || ''
+                    if (typeof item === 'object')
+                        data.append(key, JSON.stringify(item))
+                    else
+                        data.append(key, item)
+                });
+
+            if (this.importForm.files.length>0) {
+
+                data.delete("files")
+
+                for (let i = 0; i < this.importForm.files.length; i++) {
+                    data.append('files[]', this.importForm.files[i]);
+                }
+            }
+
+            this.$store.dispatch("importSizes", {
+                importForm: data
+            }).then((response) => {
+                this.loadSizes()
+                this.importPricesModal.hide()
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно загрузили данные",
+                });
+
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.confirmModal.show()
+            }).catch(()=>{
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка загрузки данных",
+                    type: "error"
+                });
+            })
         },
         submitRecountForm() {
             this.affected = null
@@ -668,7 +758,12 @@ export default {
         },
 
         blurParams(param, index) {
-            this.items[index].need_edit_price = false
+
+
+            this.items[index].need_edit_wholesale_price = false
+            this.items[index].need_edit_dealer_price = false
+            this.items[index].need_edit_retail_price = false
+            this.items[index].need_edit_cost_price = false
             this.items[index].need_edit_koef = false
         },
         saveParam(param, index) {
@@ -681,7 +776,10 @@ export default {
                 },
             }).then(resp => {
                 //this.loadSizes(0)
-                this.items[index].need_edit_price = false
+                this.items[index].need_edit_wholesale_price = false
+                this.items[index].need_edit_dealer_price = false
+                this.items[index].need_edit_retail_price = false
+                this.items[index].need_edit_cost_price = false
                 this.items[index].need_edit_koef = false
 
                 this.$notify({

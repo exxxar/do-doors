@@ -3,18 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PriceExport;
+use App\Exports\PriceV2Export;
 use App\Http\Requests\SizeStoreRequest;
 use App\Http\Requests\SizeUpdateRequest;
 use App\Http\Resources\MaterialCollection;
 use App\Http\Resources\MaterialResource;
 use App\Http\Resources\SizeCollection;
 use App\Http\Resources\SizeResource;
+use App\Imports\PriceImport;
 use App\Models\Handle;
 use App\Models\Material;
 use App\Models\Size;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -79,19 +83,19 @@ class SizeController extends Controller
 
         $materials = Material::query()->select("title", "id")->get()->toArray();
 
-       /* foreach ($tmp as $item)
-            if (count($item->prices)<count($materials))
-            {
-                for ($i=0;$i<count($materials)-count($item->prices);$i++)
-                    $item->prices[] = (object)[
-                        "id" =>  null,
-                        "price" =>  0,
-                        "price_koef" =>  0,
-                        "width" => $item->width,
-                        "height" => $item->height,
-                        "material_id" => $materials[count($materials)-1]["id"],
-                    ];
-            }*/
+        /* foreach ($tmp as $item)
+             if (count($item->prices)<count($materials))
+             {
+                 for ($i=0;$i<count($materials)-count($item->prices);$i++)
+                     $item->prices[] = (object)[
+                         "id" =>  null,
+                         "price" =>  0,
+                         "price_koef" =>  0,
+                         "width" => $item->width,
+                         "height" => $item->height,
+                         "material_id" => $materials[count($materials)-1]["id"],
+                     ];
+             }*/
         //if (count($materials)<)
         return response()->json([
             "materials" => $materials,
@@ -138,30 +142,32 @@ class SizeController extends Controller
                     ];
                 }
 
+               // Log::info("loop=>".print_r(array_values($materialList), true));
                 $tmp[] = (object)[
                     "width" => $width,
                     "height" => $height,
+                    "loops_count" => array_values($materialList)[0]["loops_count"] ?? 0,
                     "prices" => $tmpMaterials
                 ];
             }
         }
         $materials = Material::query()->select("title", "id")->get()->toArray();
-       /*
+        /*
 
-        foreach ($tmp as $item)
-            if (count($item->prices)<count($materials))
-            {
-                for ($i=0;$i<((count($materials)-count($item->prices))+1);$i++)
-                    $item->prices[] = (object)[
-                        "id" =>  null,
-                        "price" =>  0,
-                        "price_koef" =>  0,
+         foreach ($tmp as $item)
+             if (count($item->prices)<count($materials))
+             {
+                 for ($i=0;$i<((count($materials)-count($item->prices))+1);$i++)
+                     $item->prices[] = (object)[
+                         "id" =>  null,
+                         "price" =>  0,
+                         "price_koef" =>  0,
 
-                    ];
-            }*/
+                     ];
+             }*/
 
 
-        return Excel::download(new PriceExport([
+        return Excel::download(new PriceV2Export([
             "materials" => $materials,
             "prices" => $tmp
         ]), 'invoices.xlsx');
@@ -386,14 +392,14 @@ class SizeController extends Controller
             'value' => "required",
         ]);
 
-        if (is_null($request->id ?? null)){
+        if (is_null($request->id ?? null)) {
             $size = Size::query()->create([
-                'width'=>$request->width,
-                'height'=>$request->height,
-                'material_id'=>$request->material_id,
-                'price'=>0,
-                'price_koef'=>0,
-                'loops_count'=>0,
+                'width' => $request->width,
+                'height' => $request->height,
+                'material_id' => $request->material_id,
+                'price' => 0,
+                'price_koef' => 0,
+                'loops_count' => 0,
             ]);
 
             $size[$request->key] = $request->value ?? $size[$request->key];
@@ -416,6 +422,26 @@ class SizeController extends Controller
 
     }
 
+    public function import(Request $request)
+    {
+        $needRewrite = ($request->need_rewrite ?? false) == "true";
+
+        $tmp = $this->uploadDocuments(
+            $request->hasFile('files') ?
+                $request->file('files') : null);
+
+        if ($needRewrite) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::table('sizes')->truncate();
+        }
+
+        foreach ($tmp as $file)
+            Excel::import(new PriceImport, storage_path("app/public/documents/" . $file));
+
+
+        return response()->noContent();
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -431,6 +457,7 @@ class SizeController extends Controller
         if (is_null($material))
             return response()->noContent(404);
 
+        $priceData = json_decode($request->price ?? '[]');
 
         if (is_null($id)) {
 
@@ -443,12 +470,18 @@ class SizeController extends Controller
             if (!$isUniq)
                 return response()->noContent(400);
 
+
             $size = Size::query()
                 ->create([
                     'width' => $request->width ?? 0,
                     'height' => $request->height ?? 0,
                     'material_id' => $material->id,
-                    'price' => $request->price ?? 0,
+                    'price' => (object)[
+                        "wholesale" => $priceData->wholesale ?? 0,
+                        "dealer" => $priceData->dealer ?? 0,
+                        "retail" => $priceData->retail ?? 0,
+                        "cost" => $priceData->cost ?? 0,
+                    ],
                     'price_koef' => $request->price_koef ?? 0,
                     'loops_count' => $request->loops_count ?? 0,
                 ]);
@@ -462,7 +495,12 @@ class SizeController extends Controller
                 'width' => $request->width ?? 0,
                 'height' => $request->height ?? 0,
                 'material_id' => $material->id,
-                'price' => $request->price ?? 0,
+                'price' => (object)[
+                    "wholesale" => $priceData->wholesale ?? 0,
+                    "dealer" => $priceData->dealer ?? 0,
+                    "retail" => $priceData->retail ?? 0,
+                    "cost" => $priceData->cost ?? 0,
+                ],
                 'price_koef' => $request->price_koef ?? 0,
                 'loops_count' => $request->loops_count ?? 0,
             ]);

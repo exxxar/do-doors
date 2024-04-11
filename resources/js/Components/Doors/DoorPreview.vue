@@ -10,7 +10,7 @@
 </template>
 <script>
 export default {
-    props:["doorColor", "doorImage"]
+    props:["door"]
 }
 </script>
 <style lang="scss">
@@ -40,6 +40,38 @@ export default {
             left: 0;
             opacity: 50%;
         }
+    }
+}
+
+.door-image {
+    max-width: 200px;
+
+    img {
+        object-fit: cover;
+    }
+}
+
+.door-wrapper {
+    width: 500px;
+    min-height: 589px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    background: #f1e1df;
+
+    .back-image {
+        top: 0px;
+        left: 0px;
+        position: absolute;
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    .front-image {
+        position: absolute;
+        object-fit: cover;
+        z-index: 1;
     }
 }
 

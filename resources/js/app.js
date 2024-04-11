@@ -24,7 +24,7 @@ createInertiaApp({
             .use(VueLazyLoad,
                 {
                     loading: '/images/logo.jpg',
-                    error: '/images/not-found.jpg'
+                    error: '/images/logo.jpg'
                 })
             .mount(el);
     },

@@ -32,7 +32,7 @@ class Size extends Model
     protected $casts = [
         'id' => 'integer',
         'material_id' => 'integer',
-        'price' => 'double',
+        'price' => 'array',
         'height' => 'integer',
         'width' => 'integer',
         'price_koef' => 'double',

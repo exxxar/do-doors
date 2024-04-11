@@ -14,6 +14,7 @@ class MaterialSeeder extends Seeder
     public function run(): void
     {
         $materials = [
+            "Под покраску",
             "Стекло крашенное",
             "Зеркало",
             "Стекло цветное(Лакобель)",

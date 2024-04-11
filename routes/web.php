@@ -15,7 +15,21 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/open-calc', function (\Illuminate\Http\Request $request) {
+    $params = $request->get("settings") ?? null;
 
+    $test = base64_encode(json_encode([
+        "bgColor"=>"#f8f9fa"
+    ]));
+
+    if (!is_null($params))
+        $params = json_decode(base64_decode($params));
+
+    Inertia::setRootView("open-app");
+    return Inertia::render('OpenCalcPage',[
+        "params"=>$params
+    ]);
+})->name('open.calc.page');
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -75,6 +89,7 @@ Route::prefix("/calc")
     ->controller(App\Http\Controllers\CalcController::class)
     ->group(function(){
         Route::post("/checkout","checkout")->name('checkout');
+        Route::post("/download-excel","downloadCartExcel")->name('download.cart.excel');
     });
 
 
@@ -111,6 +126,7 @@ Route::prefix("/sizes")
         Route::post("/generate","generateSizes");
         Route::get("/duplicate/{id}","duplicate");
         Route::post("/store","store");
+        Route::post("/import","import");
         Route::post("/update-param","updateParam");
         Route::delete("/{id}","destroy");
 

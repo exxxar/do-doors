@@ -11,6 +11,18 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
             <DoorMiniItem
 
                 :item="item" v-for="item in cartProducts"></DoorMiniItem>
+
+            <div class="hr my-3"></div>
+            <button
+                @click="downloadCartExcel"
+                class="btn btn-outline-success rounded-5 w-100 mb-2" >
+                Скачать в виде Excel-файла
+            </button>
+            <button
+                @click="clearCart"
+                class="btn btn-outline-danger rounded-5 w-100 mb-2" >
+                Очистить корзину
+            </button>
         </div>
         <div class="offcanvas-body" v-else>
             <div class="card">
@@ -105,6 +117,58 @@ export default {
         }
     },
     methods: {
+        clearCart(){
+            this.$store.dispatch("clearCart").then((response) => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Успешно очищено",
+                    type: 'success'
+                });
+
+            }).catch(error => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибочка...",
+                    type: 'error'
+                });
+            })
+        },
+        downloadCartExcel() {
+
+            let items = this.cartProducts
+
+            let data = new FormData();
+            data.append("items",JSON.stringify(items))
+
+            this.$store.dispatch("downloadExcel", {
+                cardData: data
+            }).then((response) => {
+
+
+                var fileURL = window.URL.createObjectURL(new Blob([response]));
+                var fURL = document.createElement('a');
+
+                fURL.href = fileURL;
+                fURL.setAttribute('download', 'cart.xls');
+                document.body.appendChild(fURL);
+
+                fURL.click();
+
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Excel успешно скачан!",
+                    type: 'success'
+                });
+
+            }).catch(error => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибочка...",
+                    type: 'error'
+                });
+            })
+
+        },
         submit() {
 
             this.clientForm.items = this.cartProducts
@@ -155,3 +219,10 @@ export default {
     }
 }
 </script>
+<style>
+.hr {
+    width: 100%;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+</style>
