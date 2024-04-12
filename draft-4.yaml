@@ -1,0 +1,11 @@
+models:
+  Color:
+    title: string:255 nullable
+    price: double default:0
+    type: string:50 nullable
+    code: string:50 nullable
+
+controllers:
+  Color:
+    resource
+

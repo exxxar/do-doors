@@ -1,4 +1,21 @@
+created:
+    - app/Http/Controllers/ColorController.php
+    - database/factories/ColorFactory.php
+    - database/migrations/2024_04_12_174442_create_colors_table.php
+    - app/Models/Color.php
+    - tests/Feature/Http/Controllers/ColorControllerTest.php
+    - app/Http/Requests/ColorStoreRequest.php
+    - app/Http/Requests/ColorUpdateRequest.php
+    - resources/views/color/index.blade.php
+    - resources/views/color/create.blade.php
+    - resources/views/color/show.blade.php
+    - resources/views/color/edit.blade.php
+updated:
+    - routes/web.php
 models:
     Material: { title: 'string:255 nullable', wrapper_variants: 'json nullable', door_variants: 'json nullable', relationships: { hasMany: Size } }
     Handle: { title: 'string:255 nullable', price: 'double default:0', variants: json }
     Size: { width: 'integer default:0', height: 'integer default:0', material_id: 'id foreign:users', price: 'double default:0', price_koef: 'double default:0', loops_count: 'integer default:0', relationships: { belongsTo: Material } }
+    Hinge: { title: 'string:255 nullable', price: 'double default:0' }
+    DoorVariant: { title: 'string:255 nullable', price: 'double default:0' }
+    Color: { title: 'string:255 nullable', price: 'double default:0', type: 'string:50 nullable', code: 'string:50 nullable' }

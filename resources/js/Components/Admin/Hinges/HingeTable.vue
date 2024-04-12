@@ -9,10 +9,10 @@ import Pagination from "@/Components/Pagination.vue";
                 <div class="form-floating">
                     <input type="search"
                            v-model="search"
-                           class="form-control" id="search-handles">
+                           class="form-control" id="search-hinges">
                     <label
 
-                        for="search-handles">Поиск по ручкам</label>
+                        for="search-hinges">Поиск по производителям петель</label>
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
@@ -48,14 +48,7 @@ import Pagination from "@/Components/Pagination.vue";
                     class="fa-solid fa-caret-up"></i></span>
 
             </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('color')">Цвет
-                <span v-if="sort.direction === 'desc'&&sort.column === 'color'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'color'"><i
-                    class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center">Варианты ручек</th>
 
             <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                 Дата изменения
@@ -76,19 +69,6 @@ import Pagination from "@/Components/Pagination.vue";
             <td class="text-center" >
                 {{ item.price || 0 }}
             </td>
-            <td class="text-center d-flex justify-center">
-                <span
-                    v-if="item.color"
-                    class="d-block shadow-md"
-                    v-bind:style="{'background-color': item.color}"
-                    style="width: 50px; height: 50px;"></span>
-                <span v-else>Цвет не указан</span>
-            </td>
-            <td class="text-center">
-                {{ item.variants.length }}
-
-            </td>
-
 
 
             <td class="text-center">
@@ -116,16 +96,16 @@ import Pagination from "@/Components/Pagination.vue";
         </tbody>
     </table>
     <div class="alert alert-success" role="alert" v-if="items.length===0">
-        <h4 class="alert-heading">Ручки</h4>
-        <p>К сожалению, раздел ручек пуст. Вы еще не добавили ни одной ручки, которые можно отобразить на этой
+        <h4 class="alert-heading">Петли</h4>
+        <p>К сожалению, раздел петель пуст. Вы еще не добавили ни одного производителя петель, которые можно отобразить на этой
             странице.</p>
         <hr>
-        <p class="mb-0">Воспользуйтесь формой выше и добавьте свою первую ручку</p>
+        <p class="mb-0">Воспользуйтесь формой выше и добавьте своего первого производителя петель</p>
     </div>
     <div class="row mb-3" v-if="items.length>0">
         <div class="col-12">
             <Pagination
-                v-on:pagination_page="loadHandles"
+                v-on:pagination_page="loadHinges"
                 v-if="paginate_object"
                 :pagination="paginate_object"/>
         </div>
@@ -149,28 +129,26 @@ export default {
                     id: null,
                     title: null,
                     price: 0,
-                  variants: [],
-
                 }
             ]
         }
     },
     computed: {
-        ...mapGetters(['getHandles', 'getHandlesPaginateObject']),
+        ...mapGetters(['getHinges', 'getHingesPaginateObject']),
     },
     mounted() {
-        this.loadHandles();
+        this.loadHinges();
     },
     methods: {
         sortAndLoad(column) {
             this.sort.column = column
             this.sort.direction = this.sort.direction === "desc" ? "asc" : "desc"
-            this.loadHandles(this.current_page)
+            this.loadHinges(this.current_page)
         },
 
-        loadHandles(page = 0) {
+        loadHinges(page = 0) {
             this.current_page = page
-            this.$store.dispatch("loadHandles", {
+            this.$store.dispatch("loadHinges", {
                 dataObject: {
                     search: this.search,
                     order: this.sort.column,
@@ -178,8 +156,8 @@ export default {
                 },
                 page: this.current_page
             }).then(resp => {
-                this.items = this.getHandles
-                this.paginate_object = this.getHandlesPaginateObject
+                this.items = this.getHinges
+                this.paginate_object = this.getHingesPaginateObject
 
             }).catch(() => {
                 this.loading = false
@@ -189,15 +167,15 @@ export default {
             this.$emit("select", item)
         },
         duplicateItem(id) {
-            this.$store.dispatch("duplicateHandle", {
-                handleId: id
+            this.$store.dispatch("duplicateHinge", {
+                hingeId: id
             }).then(() => {
                 this.sortAndLoad("id")
             })
         },
         removeItem(id) {
-            this.$store.dispatch("removeHandle", {
-                handleId: id
+            this.$store.dispatch("removeHinge", {
+                hingeId: id
             }).then(() => {
                 this.sortAndLoad("id")
             })

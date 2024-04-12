@@ -103,6 +103,36 @@ Route::prefix("/materials")
         Route::delete("/{id}","destroy");
     });
 
+Route::prefix("/door-variants")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\DoorVariantController::class)
+    ->group(function () {
+        Route::get("/","index")->name('door-variants');
+        Route::post("/","getDoorVariantList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
+Route::prefix("/colors")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\ColorController::class)
+    ->group(function () {
+        Route::get("/","index")->name('colors');
+        Route::post("/","getColorList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
+Route::prefix("/hinges")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\HingeController::class)
+    ->group(function () {
+        Route::get("/","index")->name('hinges');
+        Route::post("/","getHingeList");
+        Route::post("/store","store");
+        Route::delete("/{id}","destroy");
+    });
+
 Route::prefix("/handles")
     ->middleware(['auth', 'verified'])
     ->controller(App\Http\Controllers\HandleController::class)
@@ -144,3 +174,12 @@ Route::prefix("/users")
 
 
 
+
+
+Route::resource('hinge', App\Http\Controllers\HingeController::class);
+
+
+Route::resource('door-variant', App\Http\Controllers\DoorVariantController::class);
+
+
+Route::resource('color', App\Http\Controllers\ColorController::class);

@@ -863,16 +863,19 @@ const state = {
                 id: 1,
                 title: 'НА СЕБЯ',
                 depth: 43,
+                direction: 'on',
             },
             {
                 id: 2,
                 title: 'НА СЕБЯ',
                 depth: 57,
+                direction: 'on',
             },
             {
                 id: 3,
                 title: 'ОТ СЕБЯ',
                 depth: 57,
+                direction: 'from',
             }
         ],
         door_variants: [
@@ -988,11 +991,13 @@ const state = {
         loops_variants: [
             {
                 id: 1,
-                title: 'Слева'
+                title: 'Слева',
+                type:'left'
             },
             {
-                id: 1,
-                title: 'Справа'
+                id: 2,
+                title: 'Справа',
+                type:'right'
             },
         ], //петли
         size_variants: [
@@ -1211,7 +1216,38 @@ const mutations = {
             })
         })
 
+        state.dictionary.hinge_manufacturer_variants = []
 
+        payload.hinges.forEach(item=>{
+            state.dictionary.hinge_manufacturer_variants.push({
+                id: item.id,
+                title: item.title,
+                price: item.price,
+            })
+        })
+
+        state.dictionary.door_variants = []
+
+        payload.door_variants.forEach(item=>{
+            state.dictionary.door_variants.push({
+                id: item.id,
+                title: item.title,
+                price: item.price,
+            })
+        })
+
+
+        state.dictionary.color_variants = []
+
+        payload.colors.forEach(item=>{
+            state.dictionary.color_variants.push({
+                id: item.id,
+                title: item.title,
+                price: item.price,
+                code: item.code,
+                type: item.type,
+            })
+        })
     },
 }
 

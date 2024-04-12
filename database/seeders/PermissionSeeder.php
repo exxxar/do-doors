@@ -51,6 +51,22 @@ class PermissionSeeder extends Seeder
         $permission->save();
 
         $permission = new Permission();
+        $permission->name = 'Работа с петлями';
+        $permission->slug = 'manage-hinges';
+        $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'Работа с вариантами дверей';
+        $permission->slug = 'manage-door-variants';
+        $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'Работа с цветами';
+        $permission->slug = 'manage-colors';
+        $permission->save();
+
+
+        $permission = new Permission();
         $permission->name = 'Работа с заказами';
         $permission->slug = 'manage-orders';
         $permission->save();

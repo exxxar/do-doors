@@ -35,6 +35,15 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink
+                                    data-bs-toggle="offcanvas"
+                                    href="#main-side-admin-menu"
+                                    role="button"
+                                    aria-controls="main-side-admin-menu"
+                                    v-if="hasRoles('administrator')">
+                                    Админ.меню
+                                </NavLink>
+
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Главная
                                 </NavLink>
@@ -50,38 +59,10 @@ const showingNavigationDropdown = ref(false);
                                     Корзина <span class="badge bg-danger ml-1 rounded-full">{{cartTotalCount}}</span>
                                 </NavLink>
 
-                                <NavLink
-                                    v-if="can('manage-users')"
-                                    :href="route('users')" :active="route().current('users')">
-                                    Пользователи
-                                </NavLink>
-                                <NavLink
-                                    v-if="can('manage-clients')"
-                                    :href="route('clients')" :active="route().current('clients')">
-                                    Клиенты
-                                </NavLink>
-                                <NavLink
-                                    v-if="can('manage-orders')"
-                                    :href="route('orders')" :active="route().current('orders')">
-                                    Заказы
-                                </NavLink>
 
 
-                                <NavLink
-                                    v-if="can('manage-materials')"
-                                    :href="route('materials')" :active="route().current('materials')">
-                                    Материалы
-                                </NavLink>
-                                <NavLink
-                                    v-if="can('manage-handles')"
-                                    :href="route('handles')" :active="route().current('handles')">
-                                    Ручки
-                                </NavLink>
-                                <NavLink
-                                    v-if="can('manage-sizes')"
-                                    :href="route('sizes')" :active="route().current('sizes')">
-                                    Размеры
-                                </NavLink>
+
+
                             </div>
                         </div>
 
@@ -213,6 +194,83 @@ const showingNavigationDropdown = ref(false);
     </div>
 
     <CalcCartSimple></CalcCartSimple>
+
+    <div class="offcanvas offcanvas-start"
+         data-bs-scroll="true" data-bs-backdrop="false"
+         tabindex="-1" id="main-side-admin-menu" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+                DoDoors
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="offcanvas-body">
+            <div>
+                <nav class="d-flex flex-col align-items-center">
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-users')"
+                        :href="route('users')" :active="route().current('users')">
+                        Пользователи
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-clients')"
+                        :href="route('clients')" :active="route().current('clients')">
+                        Клиенты
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-orders')"
+                        :href="route('orders')" :active="route().current('orders')">
+                        Заказы
+                    </NavLink>
+
+
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-materials')"
+                        :href="route('materials')" :active="route().current('materials')">
+                        Материалы
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-handles')"
+                        :href="route('handles')" :active="route().current('handles')">
+                        Ручки
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-hinges')"
+                        :href="route('hinges')" :active="route().current('hinges')">
+                        Петли
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-door-variants')"
+                        :href="route('door-variants')" :active="route().current('door-variants')">
+                        Типы дверей
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-colors')"
+                        :href="route('colors')" :active="route().current('colors')">
+                        Цвета
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-sizes')"
+                        :href="route('sizes')" :active="route().current('sizes')">
+                        Размеры
+                    </NavLink>
+                </nav>
+
+            </div>
+
+        </div>
+    </div>
 </template>
 
 <script>
@@ -223,7 +281,13 @@ export default {
         ...mapGetters(['getErrors', 'cartTotalCount', 'cartProducts']),
 
     },
+    mounted() {
+      console.log(this.$page.props.auth)
+    },
     methods:{
+        hasRoles(role){
+            return (this.$page.props.auth.roles||[]).includes(role)
+        },
         can(permission){
             return (this.$page.props.auth.permissions||[]).includes(permission)
         }

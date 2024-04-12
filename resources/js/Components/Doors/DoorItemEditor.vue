@@ -42,7 +42,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         v-model="doorForm.door_type"
                         @invalid="alert('Вы не выбрали тип двери!')"
                         id="door-type" aria-label="door-type" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.door_variants">{{ item.title }}</option>
                 </select>
                 <label for="door-type"><i class="fa-solid fa-door-open"></i> Выберите тип двери</label>
@@ -55,7 +55,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         v-model="doorForm.hinge_manufacturer"
                         @invalid="alert('Вы не выбрали расположение петель!')"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.hinge_manufacturer_variants">{{
                             item.title
                         }}
@@ -103,7 +103,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                 </ul>
             </div>
         </div>
-        <div class="col-md-6 col-12">
+        <div class="col-md-6 col-12 mt-2">
             <div class="input-group mb-3">
 
                 <div class="form-floating">
@@ -149,7 +149,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         v-model="doorForm.opening_type"
                         @invalid="alert('Вы не выбрали вариант открывания и толщину двери!')"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.opening_variants">{{ item.title }} (толщина
                         {{ item.depth }}
                         мм)
@@ -162,9 +162,10 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
         <div class="col-md-6 col-12">
             <div class="form-floating mb-3">
                 <select class="form-select"
+                        v-model="doorForm.loops"
                         @invalid="alert('Вы не выбрали сторону петель!')"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.loops_variants">{{ item.title }}</option>
                 </select>
                 <label for="floatingSelect"><i class="fa-solid fa-angles-left"></i> Сторона петель</label>
@@ -178,7 +179,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         @invalid="alert('Вы не выбрали отделку первой стороны двери!')"
                         v-model="doorForm.front_side_finish"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.finishes_variants">
                         {{
                             item.title
@@ -199,7 +200,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         @invalid="alert('Вы не выбрали отделку второй стороны двери!')"
                         v-model="doorForm.back_side_finish"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.finishes_variants">{{
                             item.title
                         }}
@@ -240,7 +241,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <li><a class="dropdown-item"
                            @click="selectColor('front_side_finish_color',item)"
                            v-bind:class="{'bg-primary text-white':doorForm.front_side_finish_color.title===item.title}"
-                           href="#" v-for="item in getDictionary.color_variants">{{ item.title }}</a></li>
+                           href="#" v-for="item in filteredSideFinishColors">{{ item.title }}</a></li>
                 </ul>
             </div>
         </div>
@@ -272,7 +273,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <li><a class="dropdown-item"
                            @click="selectColor('back_side_finish_color',item)"
                            v-bind:class="{'bg-primary text-white':doorForm.back_side_finish_color.title===item.title }"
-                           href="#" v-for="item in getDictionary.color_variants">{{ item.title }}</a></li>
+                           href="#" v-for="item in filteredSideFinishColors">{{ item.title }}</a></li>
                 </ul>
             </div>
         </div>
@@ -304,7 +305,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <li><a class="dropdown-item"
                            v-bind:class="{'bg-primary text-white':doorForm.box_and_frame_color.title===item.title }"
                            @click="selectColor('box_and_frame_color',item)"
-                           href="#" v-for="item in getDictionary.color_variants">{{ item.title }}</a></li>
+                           href="#" v-for="item in filteredBoxAndFrameColors">{{ item.title }}</a></li>
                 </ul>
             </div>
         </div>
@@ -335,7 +336,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <li><a class="dropdown-item"
                            v-bind:class="{'bg-primary text-white':doorForm.seal_color.title===item.title }"
                            @click="selectColor('seal_color',item)"
-                           href="#" v-for="item in getDictionary.color_variants">{{ item.title }}</a></li>
+                           href="#" v-for="item in filteredSealColors">{{ item.title }}</a></li>
                 </ul>
             </div>
         </div>
@@ -366,7 +367,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <li><a class="dropdown-item"
                            v-bind:class="{'bg-primary text-white':doorForm.fittings_color.title===item.title }"
                            @click="selectColor('fittings_color',item)"
-                           href="#" v-for="item in getDictionary.color_variants">{{ item.title }}</a></li>
+                           href="#" v-for="item in filteredFittingsColors">{{ item.title }}</a></li>
                 </ul>
             </div>
         </div>
@@ -400,7 +401,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         @invalid="alert('Вы не выбрали отверстие под ручку!')"
                         v-model="doorForm.handle_holes"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.handle_holes_variants">{{
                             item.title
                         }}
@@ -416,7 +417,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         @invalid="alert('Вы не выбрали внешний вид ручки!')"
                         v-model="doorForm.handle_holes_type"
                         id="floatingSelect" aria-label="Floating label select example" required>
-                    <option selected>Выберите один из вариантов</option>
+                    <option :value="{title:null}">Выберите один из вариантов</option>
                     <option :value="item" v-for="item in getDictionary.handle_holes_type_variants">{{
                             item.title
                         }}
@@ -426,7 +427,8 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
             </div>
         </div>
 
-        <div class="col-12" v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
+        <div class="col-12"
+             v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
             <div class="row">
 
                 <div class="col-12">
@@ -536,7 +538,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                         v-model="doorForm.price_type"
                                         @invalid="alert('Вы не выбрали тип цены!')"
                                         id="door-type" aria-label="door-type" required>
-                                    <option selected>Выберите один из вариантов</option>
+                                    <option :value="{title:null}">Выберите один из вариантов</option>
                                     <option :value="item"
                                             v-for="item in getDictionary.price_type_variants">{{
                                             item.title
@@ -644,14 +646,21 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                             </tr>
                             <tr>
                                 <td>Цена</td>
+
                                 <td>
-                                    <strong>{{
-                                            resultPrice
-                                        }}₽</strong>
-                                    x{{ doorForm.count || 0 }} =
-                                    <strong>{{
-                                            resultPrice * doorForm.count
-                                        }}₽</strong>
+                                    <p v-if="doorForm.price_type.key">
+                                        <strong>{{
+                                                resultPrice
+                                            }}₽</strong>
+                                        x{{ doorForm.count || 0 }} =
+                                        <strong>{{
+                                                resultPrice * doorForm.count
+                                            }}₽</strong>
+                                    </p>
+                                    <p v-else>
+                                        Необходимо выбрать тип цены
+                                    </p>
+
                                 </td>
                             </tr>
                             </tbody>
@@ -670,12 +679,11 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
             <div class="col-12">
 
                 <div
+                    @click="removeMessage(index)"
                     v-if="messages.length>0"
                     v-for="(message, index) in messages"
-                    class="alert alert-danger alert-dismissible fade show" role="alert">
+                    class="alert alert-danger alert-dismissible fade show my-2" role="alert">
                     <strong>Внимание!</strong> {{ message || 'Ошибка' }}
-                    <button type="button" class="btn-close"
-                            @click="removeMessage(index)"></button>
                 </div>
 
             </div>
@@ -714,9 +722,10 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="modal-body">
-                    <MaterialSelectForm v-model:item="doorForm.front_side_finish">
-
+                    <MaterialSelectForm
+                        v-model:item="doorForm.front_side_finish">
                     </MaterialSelectForm>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary text-secondary" data-bs-dismiss="modal"
@@ -760,13 +769,13 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 
     <!-- Modal -->
     <div class="modal fade" id="door-preview" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog ">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Превью двери</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body d-flex justify-content-center">
+                <div class="modal-body">
 
                     <DoorPreview
                         :door="doorForm">
@@ -833,6 +842,23 @@ export default {
     },
     computed: {
         ...mapGetters(['getErrors', 'getDictionary', 'cartTotalCount', 'cartProducts', 'cartTotalPrice']),
+
+        filteredSideFinishColors() {
+            let colors = this.getDictionary.color_variants
+            return colors.filter(item => item.type === "side_finish" || item.type === "all")
+        },
+        filteredBoxAndFrameColors() {
+            let colors = this.getDictionary.color_variants
+            return colors.filter(item => item.type === "box_and_frame" || item.type === "all")
+        },
+        filteredFittingsColors() {
+            let colors = this.getDictionary.color_variants
+            return colors.filter(item => item.type === "fittings" || item.type === "all")
+        },
+        filteredSealColors() {
+            let colors = this.getDictionary.color_variants
+            return colors.filter(item => item.type === "seal" || item.type === "all")
+        },
 
         resultPrice() {
             return (this.doorForm.price_type.id !== 3) ? this.summaryPrice : this.summaryPriceWithDealer
@@ -915,7 +941,6 @@ export default {
 
             return sum + price;//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
-
         filteredHeight() {
             if (!this.getDictionary)
                 return []
@@ -939,6 +964,16 @@ export default {
     },
     watch: {
 
+        'doorForm.need_handle_holes': {
+            handler(val) {
+                if (!this.doorForm.need_handle_holes) {
+                    this.doorForm.handle_holes = {title: null}
+                    this.doorForm.handle_holes_type = {title: null}
+                }
+
+            },
+            deep: true
+        },
         'doorForm.opening_type': {
             handler(val) {
                 if (this.doorForm.opening_type) {
@@ -972,7 +1007,7 @@ export default {
 
         if (!this.door) {
             this.doorForm.id = uuid.v1()
-            this.clearForm(true)
+            this.clearForm(false)
         } else {
             this.$nextTick(() => {
                 this.doorForm = {
@@ -1046,18 +1081,30 @@ export default {
             return /^#[0-9A-F]{6}$/i.test(num)
         },
         callbackSelectColor(item) {
-            this.doorForm[this.selectedColorParam] = {
-                title: item.color.hex,
-                code: item.color.code || null
-            }
+            this.doorForm[this.selectedColorParam].title = item.color.hex
+            this.doorForm[this.selectedColorParam].code = item.color.code || item.color.hex || null
 
             this.colorModal.hide()
         },
         selectColor(param, item) {
-            this.doorForm[param] = item
+
+            this.doorForm[param] = {
+                title: item.code || null,
+                code: item.code || null,
+                price: item.price || 0,
+                type: item.type || 'all',
+            }
 
             if (item.title === "RAL") {
                 this.selectedColorParam = param
+
+                this.doorForm[param] = {
+                    title: 'RAL',
+                    code: 'RAL',
+                    price: item.price || 0,
+                    type: item.type || 'all',
+                }
+
                 this.colorModal = new bootstrap.Modal(document.getElementById('choose-color-' + this.doorForm.id), {})
                 this.colorModal.show()
             }
@@ -1067,12 +1114,12 @@ export default {
             if (needTestData)
                 this.doorForm = {
                     id: uuid.v1(),
-                    width: 800,
-                    height: 2700,
-                    depth: 57,
-                    count: 1,
+                    width: 0,
+                    height: 0,
+                    depth: 0,
+                    count: 0,
                     size: null,
-                    purpose: null,
+                    purpose: "test",
                     handle_holes: this.getDictionary.handle_holes_variants[0],
                     handle_holes_type: this.getDictionary.handle_holes_type_variants[0],
                     opening_type: this.getDictionary.opening_variants[0],
@@ -1085,7 +1132,7 @@ export default {
                     seal_color: this.getDictionary.color_variants[0],
                     fittings_color: this.getDictionary.color_variants[0],
                     loops: this.getDictionary.loops_variants[0],//расположение петель
-                    loops_count: 0,
+                    loops_count: 2,
                     price_type: this.getDictionary.price_type_variants[0],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
 
@@ -1221,7 +1268,6 @@ export default {
     }
 
 }
-
 
 
 .scrollable-menu {

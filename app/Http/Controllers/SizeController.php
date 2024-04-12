@@ -11,7 +11,10 @@ use App\Http\Resources\MaterialResource;
 use App\Http\Resources\SizeCollection;
 use App\Http\Resources\SizeResource;
 use App\Imports\PriceImport;
+use App\Models\Color;
+use App\Models\DoorVariant;
 use App\Models\Handle;
+use App\Models\Hinge;
 use App\Models\Material;
 use App\Models\Size;
 use Illuminate\Http\RedirectResponse;
@@ -82,6 +85,8 @@ class SizeController extends Controller
         }
 
         $materials = Material::query()->select("title", "id")->get()->toArray();
+        $hinges = Hinge::query()->select("title", "id","price")->get()->toArray();
+        $doorVariants= DoorVariant::query()->select("title", "id","price")->get()->toArray();
 
         /* foreach ($tmp as $item)
              if (count($item->prices)<count($materials))
@@ -99,7 +104,9 @@ class SizeController extends Controller
         //if (count($materials)<)
         return response()->json([
             "materials" => $materials,
-            "prices" => $tmp
+            "prices" => $tmp,
+            "hinges"=>$hinges,
+            "door_variants"=>$doorVariants
         ]);
     }
 
@@ -152,6 +159,7 @@ class SizeController extends Controller
             }
         }
         $materials = Material::query()->select("title", "id")->get()->toArray();
+
         /*
 
          foreach ($tmp as $item)
@@ -238,7 +246,10 @@ class SizeController extends Controller
         file_put_contents(public_path() . '\sizes.json', json_encode([
             "prices" => $tmp,
             "materials" => Material::query()->get(),
-            "handles" => Handle::query()->get()
+            "handles" => Handle::query()->get(),
+            "hinges"=>   Hinge::query()->get(),
+            "door_variants"=>   DoorVariant::query()->get(),
+            "colors"=>   Color::query()->get()
         ]));
 
     }
@@ -310,7 +321,12 @@ class SizeController extends Controller
                     'width' => $baseWidth,
                     'height' => $baseHeight,
                     'material_id' => $material_id,
-                    'price' => $basePrice,
+                    'price' => (object)[
+                        "wholesale" => $basePrice,
+                        "dealer" => $basePrice,
+                        "retail" => $basePrice,
+                        "cost" => $basePrice,
+                    ],
                     'price_koef' => $baseKoef,
                     'loops_count' => $baseLoops,
                 ]);
@@ -349,7 +365,15 @@ class SizeController extends Controller
 
         $changeCount = 0;
         foreach ($sizes as $size) {
-            $size->price = $price * ($size->price_koef ?? 1);
+            $tmp = (object)$size->price;
+            $size->price = (object)[
+                "wholesale" => $tmp->wholesale * ($size->price_koef ?? 1),
+                "dealer" => $tmp->dealer * ($size->price_koef ?? 1),
+                "retail" => $tmp->retail * ($size->price_koef ?? 1),
+                "cost" => $tmp->cost * ($size->price_koef ?? 1),
+            ];// $price * ($size->price_koef ?? 1);
+
+
             $size->save();
 
             $changeCount++;
@@ -397,7 +421,12 @@ class SizeController extends Controller
                 'width' => $request->width,
                 'height' => $request->height,
                 'material_id' => $request->material_id,
-                'price' => 0,
+                'price' => (object)[
+                    "wholesale" => 0,
+                    "dealer" => 0,
+                    "retail" => 0,
+                    "cost" => 0,
+                ],
                 'price_koef' => 0,
                 'loops_count' => 0,
             ]);

@@ -1,0 +1,11 @@
+models:
+  Hinge:
+    title: string:255 nullable
+    price: double default:0
+
+seeds: Hinge
+
+controllers:
+  Hinge:
+    resource
+
