@@ -243,9 +243,20 @@ const showingNavigationDropdown = ref(false);
             <main>
                 <slot />
             </main>
+
+
         </div>
     </div>
 
+    <div class="container border-b border-gray-100">
+        <footer class="py-3 my-4">
+
+            <div class="d-flex justify-center">
+                <img src="/images/logo.jpg" style="width: 200px;" alt="">
+            </div>
+            <p class="text-center text-muted">© 2024 DoDoors</p>
+        </footer>
+    </div>
 
     <div class="cart-fixed-btn" v-if="cartTotalCount>0">
         <a class="btn btn-outline-primary rounded-5 shadow-lg"
@@ -283,14 +294,16 @@ const showingNavigationDropdown = ref(false);
                     <NavLink
                         class="p-3"
                         v-if="can('manage-clients')"
-                        :href="route('clients')" :active="route().current('clients')">
-                        Клиенты
+                        >
+<!--                        :href="route('clients')" :active="route().current('clients')"-->
+                        Клиенты <i class="fa-solid fa-lock"></i>
                     </NavLink>
                     <NavLink
                         class="p-3"
                         v-if="can('manage-orders')"
-                        :href="route('orders')" :active="route().current('orders')">
-                        Заказы
+                        >
+<!--                        :href="route('orders')" :active="route().current('orders')"-->
+                        Заказы <i class="fa-solid fa-lock"></i>
                     </NavLink>
 
 
