@@ -162,6 +162,71 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Выход
                             </ResponsiveNavLink>
+                            <hr>
+                        </div>
+
+                        <div class="mt-3 space-y-1">
+
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-users')"
+                                :href="route('users')" :active="route().current('users')">
+                                Пользователи
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-clients')"
+                               >
+<!--                                :href="route('clients')" :active="route().current('clients')"-->
+                                Клиенты <i class="fa-solid fa-lock"></i>
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-orders')"
+                              >
+<!--                                :href="route('orders')" :active="route().current('orders')"-->
+                                Заказы <i class="fa-solid fa-lock"></i>
+                            </ResponsiveNavLink>
+
+
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-materials')"
+                                :href="route('materials')" :active="route().current('materials')">
+                                Материалы
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-handles')"
+                                :href="route('handles')" :active="route().current('handles')">
+                                Ручки
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-hinges')"
+                                :href="route('hinges')" :active="route().current('hinges')">
+                                Петли
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-door-variants')"
+                                :href="route('door-variants')" :active="route().current('door-variants')">
+                                Типы дверей
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-colors')"
+                                :href="route('colors')" :active="route().current('colors')">
+                                Цвета
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                class="p-3"
+                                v-if="can('manage-sizes')"
+                                :href="route('sizes')" :active="route().current('sizes')">
+                                Размеры
+                            </ResponsiveNavLink>
+
+
                         </div>
                     </div>
                 </div>

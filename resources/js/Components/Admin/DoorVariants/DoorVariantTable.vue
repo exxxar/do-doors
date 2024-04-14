@@ -24,80 +24,83 @@ import Pagination from "@/Components/Pagination.vue";
 
         </div>
     </form>
-    <table class="table" v-if="items.length>0">
-        <thead>
-        <tr>
-            <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
-                <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
-                <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'title'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+    <div style="overflow-y: auto;">
+        <table class="table" v-if="items.length>0">
+            <thead>
+            <tr>
+                <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'title'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
+                </th>
 
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price')">Цена
-                <span v-if="sort.direction === 'desc'&&sort.column === 'price'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'price'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price')">Цена
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'price'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'price'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-
-
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                Дата изменения
-                <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center">Действие</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) in items">
-            <th scope="row">{{ item.id || index }}</th>
-            <td class="text-center"  @click="selectItem(item)">
-                {{ item.title || '-' }}
-            </td>
-            <td class="text-center" >
-                {{ item.price || 0 }}
-            </td>
+                </th>
 
 
-            <td class="text-center">
-                {{ item.updated_at || '-' }}
-            </td>
-            <td class="text-center">
-                <div class="dropdown">
-                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"
-                               @click="selectItem(item)"
-                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                    Дата изменения
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in items">
+                <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.title || '-' }}
+                </td>
+                <td class="text-center">
+                    {{ item.price || 0 }}
+                </td>
 
-                        <li><a class="dropdown-item text-danger"
-                               @click="removeItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
 
-        </tbody>
-    </table>
+                <td class="text-center">
+                    {{ item.updated_at || '-' }}
+                </td>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
     <div class="alert alert-success" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Варианты дверей</h4>
-        <p>К сожалению, раздел Варианты дверей пуст. Вы еще не добавили ни одного варианта дверей, которые можно отобразить на этой
+        <p>К сожалению, раздел Варианты дверей пуст. Вы еще не добавили ни одного варианта дверей, которые можно
+            отобразить на этой
             странице.</p>
         <hr>
         <p class="mb-0">Воспользуйтесь формой выше и добавьте свой первый вариант дверей</p>

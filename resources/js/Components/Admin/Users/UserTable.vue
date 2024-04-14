@@ -24,76 +24,79 @@ import Pagination from "@/Components/Pagination.vue";
 
         </div>
     </form>
-    <table class="table" v-if="items.length>0">
-        <thead>
-        <tr>
-            <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
-                <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('email')">Почта
-                <span v-if="sort.direction === 'desc'&&sort.column === 'email'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'email'"><i
-                    class="fa-solid fa-caret-up"></i></span>
 
-            </th>
+    <div style="overflow-y: auto;">
+        <table class="table" v-if="items.length>0">
+            <thead>
+            <tr>
+                <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('email')">Почта
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'email'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'email'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('name')">Имя
-                <span v-if="sort.direction === 'desc'&&sort.column === 'name'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'name'"><i
-                    class="fa-solid fa-caret-up"></i></span>
+                </th>
 
-            </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('name')">Имя
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'name'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'name'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                Дата изменения
-                <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center">Действие</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) in items">
-            <th scope="row">{{ item.id || index }}</th>
-            <td class="text-center"  @click="selectItem(item)">
-                {{ item.email || '-' }}
-            </td>
-            <td class="text-center" >
-                {{ item.name || 0 }}
-            </td>
+                </th>
+
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                    Дата изменения
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in items">
+                <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.email || '-' }}
+                </td>
+                <td class="text-center">
+                    {{ item.name || 0 }}
+                </td>
 
 
-            <td class="text-center">
-                {{ item.updated_at || '-' }}
-            </td>
-            <td class="text-center">
-                <div class="dropdown">
-                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"
-                               @click="selectItem(item)"
-                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+                <td class="text-center">
+                    {{ item.updated_at || '-' }}
+                </td>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
 
-                        <li><a class="dropdown-item text-danger"
-                               @click="removeItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
     <div class="alert alert-success" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Ручки</h4>
         <p>К сожалению, раздел ручек пуст. Вы еще не добавили ни одной ручки, которые можно отобразить на этой
@@ -128,7 +131,7 @@ export default {
                     id: null,
                     title: null,
                     price: 0,
-                  variants: [],
+                    variants: [],
 
                 }
             ]

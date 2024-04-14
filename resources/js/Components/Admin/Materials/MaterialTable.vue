@@ -24,75 +24,79 @@ import Pagination from "@/Components/Pagination.vue";
 
         </div>
     </form>
-    <table class="table" v-if="items.length>0">
-        <thead>
-        <tr>
-            <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
-                <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
-                <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'title'"><i
-                    class="fa-solid fa-caret-up"></i></span>
 
-            </th>
-            <th scope="col" class="text-center">Варианты двери</th>
-            <th scope="col" class="text-center">Варианты контура вокруг</th>
-            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                Дата изменения
-                <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-down"></i></span>
-                <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                    class="fa-solid fa-caret-up"></i></span>
-            </th>
-            <th scope="col" class="text-center">Действие</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(item, index) in items">
-            <th scope="row">{{ item.id || index }}</th>
-            <td class="text-center"  @click="selectItem(item)">
-                {{ item.title || '-' }}
-            </td>
-            <td class="text-center">
-                {{ (item.door_variants||[]).length }}
+    <div style="overflow-y: auto;">
+        <table class="table" v-if="items.length>0">
+            <thead>
+            <tr>
+                <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'title'"><i
+                        class="fa-solid fa-caret-up"></i></span>
 
-            </td>
-            <td class="text-center">
-                {{ (item.wrapper_variants||[]).length }}
+                </th>
+                <th scope="col" class="text-center">Варианты двери</th>
+                <th scope="col" class="text-center">Варианты контура вокруг</th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                    Дата изменения
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+                <th scope="col" class="text-center">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in items">
+                <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center"  @click="selectItem(item)">
+                    {{ item.title || '-' }}
+                </td>
+                <td class="text-center">
+                    {{ (item.door_variants||[]).length }}
 
-            </td>
-            <td class="text-center">
-                {{ item.updated_at || '-' }}
-            </td>
-            <td class="text-center">
-                <div class="dropdown">
-                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"
-                               @click="selectItem(item)"
-                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
-                        <li><a class="dropdown-item"
-                               @click="duplicateItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
-                        </li>
-                        <li><a class="dropdown-item text-danger"
-                               @click="removeItem(item.id)"
-                               href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
+                </td>
+                <td class="text-center">
+                    {{ (item.wrapper_variants||[]).length }}
 
-        </tbody>
-    </table>
+                </td>
+                <td class="text-center">
+                    {{ item.updated_at || '-' }}
+                </td>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+                            <li><a class="dropdown-item"
+                                   @click="duplicateItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
+                            </li>
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
     <div class="alert alert-success" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Материалы</h4>
         <p>К сожалению, раздел материалов пуст. Вы еще не добавили ни одного материала, который можно отобразить на этой
