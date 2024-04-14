@@ -107,7 +107,11 @@ const mutations = {
                 quantity: product.count || 1
             })
         else
+        {
+            cartItem.product = product
             cartItem.quantity++;
+        }
+
 
         localStorage.setItem('dodoors_basket', JSON.stringify(state.items));
     },

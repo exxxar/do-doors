@@ -1222,7 +1222,7 @@ export default {
 
             this.$store.dispatch("addProductToCart", this.doorForm).then(() => {
 
-                this.clearForm()
+                this.$emit("callback")
 
                 this.$notify({
                     title: "DoDoors",
