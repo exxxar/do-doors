@@ -106,10 +106,9 @@ const mutations = {
                 product,
                 quantity: product.count || 1
             })
-        else
-        {
+        else {
             cartItem.product = product
-            cartItem.quantity++;
+            cartItem.quantity = product.count || 1
         }
 
 
