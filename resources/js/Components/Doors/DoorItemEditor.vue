@@ -594,7 +594,8 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     </button>
                     <button
                         :disabled="!doorForm.price_type.key"
-                        class="btn btn-outline-success rounded-5 w-100">Сохранить</button>
+                        class="btn btn-outline-success rounded-5 w-100">Сохранить
+                    </button>
                 </div>
             </div>
         </div>
@@ -1224,7 +1225,9 @@ export default {
 
             this.$store.dispatch("addProductToCart", this.doorForm).then(() => {
 
-                this.doorForm.id = uuid.v4()
+                this.$nextTick(() => {
+                    this.doorForm.id = uuid.v4()
+                })
 
                 this.$emit("callback")
 

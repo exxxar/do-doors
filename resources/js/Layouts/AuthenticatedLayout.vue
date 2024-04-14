@@ -47,11 +47,11 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Главная
                                 </NavLink>
-                                <NavLink
+<!--                                <NavLink
                                     v-if="can('manage-calc')"
                                     :href="route('calc')" :active="route().current('calc')">
                                     Калькулятор
-                                </NavLink>
+                                </NavLink>-->
 
                                 <NavLink
                                     v-if="cartTotalCount>0"
@@ -252,7 +252,7 @@ const showingNavigationDropdown = ref(false);
         <footer class="py-3 my-4">
 
             <div class="d-flex justify-center">
-                <img src="/images/logo.jpg" style="width: 200px;" alt="">
+                <img src="/images/logo.jpg" style="width: 100px;" alt="">
             </div>
             <p class="text-center text-muted">© 2024 DoDoors</p>
         </footer>
