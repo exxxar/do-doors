@@ -592,7 +592,9 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         class="btn btn-outline-primary rounded-5 w-100 mb-2"
                         data-bs-toggle="modal" data-bs-target="#door-preview">Посмотреть превью
                     </button>
-                    <button class="btn btn-outline-success rounded-5 w-100">Сохранить</button>
+                    <button
+                        :disabled="!doorForm.price_type.key"
+                        class="btn btn-outline-success rounded-5 w-100">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -1221,6 +1223,8 @@ export default {
             this.messages = []
 
             this.$store.dispatch("addProductToCart", this.doorForm).then(() => {
+
+                this.doorForm.id = uuid.v1()
 
                 this.$emit("callback")
 
