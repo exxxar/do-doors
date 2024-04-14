@@ -172,7 +172,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -192,7 +192,7 @@ return [
         'role' => RoleMiddleware::class,
         'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
-        'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class
+        'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class,
     ])->toArray(),
 
 ];

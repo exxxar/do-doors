@@ -6,6 +6,7 @@ use App\Exports\CartExport;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\Mpdf;
@@ -85,12 +86,24 @@ class CalcController extends Controller
 
         $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
 
-        $tmp = [
-            'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-            "document" => InputFile::createFromContents($file, "order-" . (Carbon::now("+3:00")->format("Y-m-d-H-i-s")) . ".pdf"),
-            "parse_mode" => "HTML",
-        ];
+        $excelFileName = Str::uuid().".xls";
 
-        $telegram->sendDocument($tmp);
+        $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
+
+        Excel::store(new CartExport($items), $excelFileName);
+
+        $telegram->sendDocument([
+            'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+            "document" => InputFile::createFromContents(Storage::get("$excelFileName"), "order-" . $timeFragment . ".xls"),
+            "parse_mode" => "HTML",
+        ]);
+
+        Storage::delete($excelFileName);
+
+        $telegram->sendDocument( [
+            'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+            "document" => InputFile::createFromContents($file, "order-" . $timeFragment . ".pdf"),
+            "parse_mode" => "HTML",
+        ]);
     }
 }
