@@ -1224,7 +1224,7 @@ export default {
 
             this.$store.dispatch("addProductToCart", this.doorForm).then(() => {
 
-                this.doorForm.id = uuid.v1()
+                this.doorForm.id = uuid.v4()
 
                 this.$emit("callback")
 
