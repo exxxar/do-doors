@@ -1,15 +1,37 @@
 created:
-    - app/Http/Controllers/ColorController.php
-    - database/factories/ColorFactory.php
-    - database/migrations/2024_04_12_174442_create_colors_table.php
-    - app/Models/Color.php
-    - tests/Feature/Http/Controllers/ColorControllerTest.php
-    - app/Http/Requests/ColorStoreRequest.php
-    - app/Http/Requests/ColorUpdateRequest.php
-    - resources/views/color/index.blade.php
-    - resources/views/color/create.blade.php
-    - resources/views/color/show.blade.php
-    - resources/views/color/edit.blade.php
+    - app/Http/Controllers/ClientController.php
+    - app/Http/Controllers/OrderController.php
+    - app/Http/Controllers/OrderDetailController.php
+    - database/factories/ClientFactory.php
+    - database/factories/OrderFactory.php
+    - database/factories/OrderDetailFactory.php
+    - database/migrations/2024_04_19_220251_create_clients_table.php
+    - database/migrations/2024_04_19_220252_create_orders_table.php
+    - database/migrations/2024_04_19_220253_create_order_details_table.php
+    - app/Models/Client.php
+    - app/Models/Order.php
+    - app/Models/OrderDetail.php
+    - tests/Feature/Http/Controllers/ClientControllerTest.php
+    - tests/Feature/Http/Controllers/OrderControllerTest.php
+    - tests/Feature/Http/Controllers/OrderDetailControllerTest.php
+    - app/Http/Requests/ClientStoreRequest.php
+    - app/Http/Requests/ClientUpdateRequest.php
+    - app/Http/Requests/OrderStoreRequest.php
+    - app/Http/Requests/OrderUpdateRequest.php
+    - app/Http/Requests/OrderDetailStoreRequest.php
+    - app/Http/Requests/OrderDetailUpdateRequest.php
+    - resources/views/client/index.blade.php
+    - resources/views/client/create.blade.php
+    - resources/views/client/show.blade.php
+    - resources/views/client/edit.blade.php
+    - resources/views/order/index.blade.php
+    - resources/views/order/create.blade.php
+    - resources/views/order/show.blade.php
+    - resources/views/order/edit.blade.php
+    - resources/views/orderDetail/index.blade.php
+    - resources/views/orderDetail/create.blade.php
+    - resources/views/orderDetail/show.blade.php
+    - resources/views/orderDetail/edit.blade.php
 updated:
     - routes/web.php
 models:
@@ -19,3 +41,6 @@ models:
     Hinge: { title: 'string:255 nullable', price: 'double default:0' }
     DoorVariant: { title: 'string:255 nullable', price: 'double default:0' }
     Color: { title: 'string:255 nullable', price: 'double default:0', type: 'string:50 nullable', code: 'string:50 nullable' }
+    Client: { status: 'string:50 nullable', phone: 'string:255 nullable', fax: 'string:255 nullable', email: 'string:255 nullable', fact_address: 'string:255 nullable', fact_address_comment: 'longtext nullable', comment: 'longtext nullable', code: 'string:255 nullable', external_code: 'string:255 nullable', user_id: 'id foreign:users', title: 'string:255 nullable', law_address: 'string:255 nullable', inn: 'string:20 nullable', kpp: 'string:50 nullable', ogrn: 'string:50 nullable', okpo: 'string:50 nullable', requisites: 'json nullable', relationships: { belongsTo: User } }
+    Order: { contract_number: "string:255 nullable comment:'номер договора'", contract_date: "datetime nullable comment:'дата договора'", completion_at: "datetime nullable comment:'Предпологаемая дата сдачи'", client_id: "id foreign:clients nullable comment:'Заказчик'", status: 'integer default:0', source: "string:255 nullable comment:'источник'", contact_person: "string:255 nullable comment:'контактное лицо'", phone: "string:255 nullable comment:'номер телефона'", organizational_form: "string:255 nullable comment:'Форма организации:ООО, ИП, ЗАО, ПАО'", contract_amount: "double default:0 comment:'сумма договора'", paid: "double default:0 comment:'оплачено'", debt: "double default:0 comment:'Задолженность'", profit: "double default:0 comment:'прибыль'", relationships: { belongsTo: Client } }
+    OrderDetail: { order_id: "id foreign:orders nullable comment:'Сам заказ'", door_type: "string:255 nullable comment:'Тип двери'", count: "integer default:0 comment:'Количество'", price: "double default:0 comment:'цена за единицу'", comment: 'longtext nullable', purpose: 'longtext nullable', door: "json nullable comment:'параметры двери в json'", relationships: { belongsTo: Order } }

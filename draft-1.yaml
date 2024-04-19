@@ -14,7 +14,7 @@ models:
   Size:
     width: integer default:0
     height: integer default:0
-    material_id: id foreign:users
+    material_id: id foreign:materials
     price: double default:0
     price_koef: double default:0
     loops_count: integer default:0

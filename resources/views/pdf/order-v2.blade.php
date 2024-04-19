@@ -76,6 +76,11 @@
             </tr>
 
             <tr>
+                <td><strong>Комментарий</strong></td>
+                <td>{{$item->product->comment ?? 'не указано'}}</td>
+            </tr>
+
+            <tr>
                 <td><strong>Отверстие под ручку </strong></td>
                 <td>{{$item->product->handle_holes->title ?? 'не указано'}}</td>
             </tr>

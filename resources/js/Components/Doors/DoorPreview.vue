@@ -1,18 +1,21 @@
 <template>
+
     <div class="row">
         <div class="col-12 mb-2">
-           <button class="btn mr-2"
-                   v-bind:class="{'btn-outline-primary':side===0,'btn-outline-secondary':side!==0}"
-                   @click="side=0"> Лицевая сторона</button>
+            <button class="btn mr-2 rounded-0 "
+                    v-bind:class="{'btn-dark':side===0,'btn-outline-secondary':side!==0}"
+                    @click="side=0"> Лицевая сторона
+            </button>
 
-            <button class="btn"
-                    v-bind:class="{'btn-outline-primary':side===1,'btn-outline-secondary':side!==1}"
-                    @click="side=1"> Внутренняя сторона</button>
+            <button class="btn rounded-0"
+                    v-bind:class="{'btn-dark':side===1,'btn-outline-secondary':side!==1}"
+                    @click="side=1"> Внутренняя сторона
+            </button>
         </div>
 
     </div>
     <div class="row">
-        <div class="col-8">
+        <div class="col-12 col-md-8">
             <div class="stage w-100"
                  v-bind:style="{'background-color':sideColor || 'transparent', 'background-image':'url('+selectedSideFinishImageForWrapper+')'}">
                 <div class="upper-jumper d-flex justify-content-center align-items-center"
@@ -26,13 +29,14 @@
                         <img :src="doorImage?doorImage:'/images/door-1.jpg'"
                              class="w-100 h-100" style="object-fit: cover;"
                              alt="">
-                        <div class="door-color" v-bind:style="{'background-image':'url('+selectedSideFinishImageForDoor+')','background-color':sideColor || 'transparent'}"></div>
+                        <div class="door-color" v-bind:style="{'background-color':sideColor || 'transparent'}"></div>
                         <div class="height"><span>{{ door.height }}</span></div>
                         <div class="width"><span>{{ door.width }}</span></div>
                         <div class="handle"
                              v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
                              v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent'}"
-                             v-if="door.handle_holes.id!==3">6</div>
+                             v-if="door.handle_holes.id!==3">6
+                        </div>
                         <div class="loops"
                              v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}">
                             <span v-for="loop in door.loops_count">7</span>
@@ -44,7 +48,6 @@
                         <div class="depth"><span>{{ door.depth }}</span></div>
                     </div>
                 </div>
-
 
 
                 <div class="door-footer">
@@ -77,10 +80,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-4">
-            <ul class="list-group list-group-numbered">
+        <div class="col-md-4 col-12">
+            <ul class="list-group list-group-numbered rounded-0">
                 <li class="list-group-item">Верхняя перемычка</li>
-                <li class="list-group-item">Скрытый порожек</li>
+                <li class="list-group-item">Скрытый порог</li>
                 <li class="list-group-item">Скрытый плинтус</li>
                 <li class="list-group-item">Скрытый стопор</li>
                 <li class="list-group-item">Скрытый доводчик</li>
@@ -92,42 +95,44 @@
         </div>
 
     </div>
+
+
 </template>
 <script>
 export default {
     props: ["door"],
-    data(){
-      return {
-          side:0
-      }
+    data() {
+        return {
+            side: 0
+        }
     },
-    computed:{
-        sideColor(){
-          return this.side===0?this.door.front_side_finish_color.code : this.door.back_side_finish_color.code
+    computed: {
+        sideColor() {
+            return this.side === 0 ? this.door.front_side_finish_color.code : this.door.back_side_finish_color.code
         },
-        selectedSideFinishImageForDoor(){
-            let param = this.side===0? "front_side_finish":"back_side_finish"
+        selectedSideFinishImageForDoor() {
+            let param = this.side === 0 ? "front_side_finish" : "back_side_finish"
 
             if (!this.door[param].door_variants)
                 return null
 
-            let index = this.door[param].door_variants.findIndex(item=>item.selected)
+            let index = this.door[param].door_variants.findIndex(item => item.selected)
 
 
-            if (index===-1)
+            if (index === -1)
                 return null;
             return this.door[param].door_variants[index].image
         },
-        selectedSideFinishImageForWrapper(){
-            let param = this.side===0? "front_side_finish":"back_side_finish"
+        selectedSideFinishImageForWrapper() {
+            let param = this.side === 0 ? "front_side_finish" : "back_side_finish"
 
             if (!this.door[param].wrapper_variants)
                 return null
 
-            let index = this.door[param].wrapper_variants.findIndex(item=>item.selected)
+            let index = this.door[param].wrapper_variants.findIndex(item => item.selected)
 
 
-            if (index===-1)
+            if (index === -1)
                 return null;
             return this.door[param].wrapper_variants[index].image
         }
@@ -251,7 +256,7 @@ export default {
         position: absolute;
         right: -90px;
         top: 0;
-        border:1px black solid;
+        border: 1px black solid;
 
         background-image: repeating-linear-gradient(
                 -45deg,
@@ -487,4 +492,9 @@ export default {
     }
 }
 
+
+.preview {
+    position: sticky;
+    top: 10px;
+}
 </style>

@@ -126,7 +126,7 @@ import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
             <div class="col-12 d-flex justify-content-center">
                 <button
                     :disabled="!needClearForm||form.material_id == null"
-                    class="btn btn-outline-success rounded-5">
+                    class="btn btn-dark rounded-0">
                     <i class="fa-regular fa-floppy-disk mr-1" v-if="!loading"></i>
                     <span class="spinner-border spinner-border-sm  text-success"
                           role="status" v-else></span>
@@ -136,7 +136,7 @@ import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
                     v-if="needClearForm&&!loading"
                     type="button"
                     @click="resetForm"
-                    class="btn btn-outline-danger rounded-5 ml-2">
+                    class="btn btn-outline-secondary rounded-0 ml-2">
                     <i class="fa-solid fa-xmark mr-1"></i>
                     Очистить форму
                 </button>

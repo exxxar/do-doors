@@ -7,7 +7,7 @@
     </div>
 
     <div class="d-flex flex-wrap">
-        <span class="badge  mr-1 mb-1 cursor-pointer"
+        <span class="badge  mr-1 mb-1 cursor-pointer rounded-0"
               v-bind:class="{'bg-primary':color_blocks.indexOf(item*1000)!=-1,'bg-secondary':color_blocks.indexOf(item*1000)==-1}"
               @click="addFilter(item*1000)"
               v-for="item in 9">RAL {{ item }}000</span>

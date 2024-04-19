@@ -11,7 +11,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
             <button
                 type="button"
                 @click="openConfirmModal('Внимание!','Вы очищает текущую работу в калькуляторе! Продолжить?')"
-                class="btn btn-outline-success rounded-5 my-3 w-100">Очистить форму
+                class="btn rounded-0 my-3 w-100 btn-dark p-3">Очистить форму
             </button>
         </div>
 
@@ -56,28 +56,10 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
         </div>-->
 
 
-    <!-- Modal -->
-    <div class="modal fade" id="choose-color" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog ">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор цвета RAL</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
 
-                    <RalColorSelector v-on:select="selectColor"></RalColorSelector>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade  " id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content rounded-0">
 
                 <div class="modal-body">
                     <div class="d-flex justify-center p-3">
@@ -87,12 +69,12 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
                     <p class="text-center pb-3">{{confirm.message||'-'}}</p>
                     <div class="row">
                         <div class="col-6">
-                            <button class="btn btn-outline-success w-100" type="button" @click="clearForm">Да,
+                            <button class="btn btn-dark rounded-0 w-100" type="button" @click="clearForm">Да,
                                 очистить
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-danger w-100" @click="confirmModal.hide()">Нет, не очищать
+                            <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет, не очищать
                             </button>
                         </div>
                     </div>

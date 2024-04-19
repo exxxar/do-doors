@@ -15,12 +15,12 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
             <div class="hr my-3"></div>
             <button
                 @click="downloadCartExcel"
-                class="btn btn-outline-success rounded-5 w-100 mb-2" >
+                class="btn btn-dark rounded-0 w-100 mb-2" >
                 Скачать в виде Excel-файла
             </button>
             <button
                 @click="clearCart"
-                class="btn btn-outline-danger rounded-5 w-100 mb-2" >
+                class="btn btn-outline-secondary rounded-0 w-100 mb-2" >
                 Очистить корзину
             </button>
         </div>
@@ -32,7 +32,7 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
             </div>
         </div>
         <div class="offcanvas-footer p-3" v-if="cartProducts.length>0">
-            <div class="card">
+            <div class="card rounded-0">
                 <div class="card-body">
                     <h6 class="font-bold">Итого цена {{ cartTotalPrice }} ₽</h6>
                     <p class="mb-2"><small>Возможно в рассрочку!</small></p>
@@ -40,13 +40,13 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
                         зависит, просто уточните эти детали в бесседе с менеджером</small></p>
 
                     <div v-if="step===0">
-                        <button class="btn btn-outline-primary rounded-5 w-100 mb-2" @click="step=1">Обсудить заказ с
+                        <button class="btn btn-dark rounded-0 w-100 mb-2" @click="step=1">Обсудить заказ с
                             менеджером
                         </button>
-                        <button class="btn btn-outline-primary rounded-5 w-100 mb-2" @click="step=1">Получить цену на
+                        <button class="btn btn-outline-secondary rounded-0 w-100 mb-2" @click="step=1">Получить цену на
                             почту
                         </button>
-                        <button class="btn btn-outline-primary rounded-5 w-100 mb-2" @click="step=1">Получить цену в
+                        <button class="btn btn-outline-secondary rounded-0 w-100 mb-2" @click="step=1">Получить цену в
                             Telegram
                         </button>
                     </div>

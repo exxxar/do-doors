@@ -35,7 +35,8 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/sizes/export-prices">Скачать шаблон таблицы</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные из Excel</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные из Excel или Google таблицы</a></li>
+
                     <li><a class="dropdown-item" href="javascript:void(0)" @click="openConfirmModal">Обновить JSON</a>
                     </li>
                     <li><a class="dropdown-item" href="javascript:void(0)" @click="recountModalShow">Пересчет
@@ -227,7 +228,19 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form v-on:submit.prevent="importSubmit">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               v-model="need_import_from_google"
+                               type="checkbox" role="switch" id="need_rewrite">
+                        <label class="form-check-label" for="need_rewrite">
+                            <span v-if="need_import_from_google">Загрузить из Google-таблицы</span>
+                            <span v-else>Загрузить из Excel-файла</span>
+
+                        </label>
+                    </div>
+                    <form
+                        v-if="!need_import_from_google"
+                        v-on:submit.prevent="importSubmit">
                         <div class="form-check form-switch">
                             <input class="form-check-input"
                                    v-model="importForm.need_rewrite"
@@ -246,6 +259,40 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                                    ref="importPriceFromExcel"
                                    @change="onChangeFile($event)">
                             <label for="excel-file-for-import">Файл-эксель</label>
+                        </div>
+
+                        <button type="submit"
+                                :disabled="timer!=null"
+                                class="btn btn-outline-primary w-100 p-3">Загрузить
+                            <span v-if="timer!=null">{{timer}} сек</span>
+                        </button>
+                    </form>
+                    <form
+                        v-else
+                        v-on:submit.prevent="importFromGoogleSubmit">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   v-model="importGoogleForm.need_rewrite"
+                                   type="checkbox" role="switch" id="need_rewrite_google">
+                            <label class="form-check-label" for="need_rewrite_google">
+                                <span v-if="importGoogleForm.need_rewrite">Перезаписать старые значения</span>
+                                <span v-else>Добавить новые значения</span>
+
+                            </label>
+                        </div>
+
+                        <div class="form-floating my-3 border-gray-100 border">
+                            <input type="text" class="form-control"
+                                   v-model="importGoogleForm.sheet_id"
+                                   id="sheet-id" placeholder="name@example.com">
+                            <label for="sheet-id">Идентификатор таблицы</label>
+                        </div>
+
+                        <div class="form-floating my-3 border-gray-100 border">
+                            <input type="text"
+                                   v-model="importGoogleForm.sheet_title"
+                                   class="form-control" id="sheet-title" placeholder="name@example.com">
+                            <label for="sheet-title">Название листа</label>
                         </div>
 
                         <button type="submit"
@@ -479,17 +526,17 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
     </div>
 
     <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog ">
+            <div class="modal-content rounded-0">
 
                 <div class="modal-body">
                     <p>Вы хотите обновить JSON-файл с размерами?</p>
                    <div class="row">
                        <div class="col-6">
-                           <button class="btn btn-outline-success w-100" type="button" @click="saveFormattedSizes">Да, продолжить</button>
+                           <button class="btn btn-dark rounded-0 w-100" type="button" @click="saveFormattedSizes">Да, продолжить</button>
                        </div>
                        <div class="col-6">
-                           <button class="btn btn-outline-danger w-100" @click="confirmModal.hide()">Нет, отменить</button>
+                           <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет, отменить</button>
                        </div>
                    </div>
                 </div>
@@ -525,6 +572,12 @@ export default {
                 price_step: 0,
                 selected_material: null,
                 steps: 0
+            },
+            need_import_from_google:false,
+            importGoogleForm:{
+                sheet_id: null,
+                sheet_title:null,
+                need_rewrite:false,
             },
             importForm:{
                 need_rewrite: false,
@@ -572,6 +625,7 @@ export default {
         saveFormattedSizes() {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
                 this.confirmModal.hide()
+                this.loadSizes();
                 this.$notify({
                     title: "DoDoors",
                     text: "Вы успешно обновили данные",
@@ -615,6 +669,50 @@ export default {
 
             this.recountModal.show()
         },
+        importFromGoogleSubmit(){
+            let data = new FormData();
+
+
+            this.timer = 0
+            let tmpTimer = setInterval(()=>{
+                this.timer++
+            }, 1000)
+
+            Object.keys(this.importGoogleForm)
+                .forEach(key => {
+                    const item = this.importGoogleForm[key] || ''
+                    if (typeof item === 'object')
+                        data.append(key, JSON.stringify(item))
+                    else
+                        data.append(key, item)
+                });
+
+            this.$store.dispatch("importSizesFromGoogle", {
+                importForm: data
+            }).then((response) => {
+
+                window.open(response.url, '_blank').focus();
+
+                this.loadSizes()
+                this.importPricesModal.hide()
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно загрузили данные",
+                });
+
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.confirmModal.show()
+            }).catch(()=>{
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка загрузки данных",
+                    type: "error"
+                });
+            })
+        },
         importSubmit(){
             let data = new FormData();
 
@@ -645,6 +743,8 @@ export default {
             this.$store.dispatch("importSizes", {
                 importForm: data
             }).then((response) => {
+
+
                 this.loadSizes()
                 this.importPricesModal.hide()
                 this.$notify({

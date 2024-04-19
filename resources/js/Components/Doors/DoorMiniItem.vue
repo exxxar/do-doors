@@ -1,5 +1,5 @@
 <template>
-    <div class="card mb-2">
+    <div class="card mb-2 rounded-0">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
@@ -32,14 +32,16 @@
                 <div class="col-5 col-md-5 col-lg-5 col-xl-5 d-flex justify-content-center mt-2">
                     <button class="btn btn-link px-2"
                             type="button"
+                            style="color: black;"
                             @click="changeQuantityProductInCart('decrement')">
                         <i class="fas fa-minus"></i>
                     </button>
 
-                    <span class="btn">{{item.quantity}}</span>
+                    <span class="btn"  style="color: black;">{{item.quantity}}</span>
 
                     <button class="btn btn-link px-2"
                             type="button"
+                            style="color: black;"
                             @click="changeQuantityProductInCart('increment')">
                         <i class="fas fa-plus"></i>
                     </button>
@@ -55,6 +57,7 @@
                 <div class="col-12">
                     <button
                         type="button"
+                        style="color: black;"
                         class="btn btn-link"
                         @click="editDoorItem"><i class="fa-regular fa-pen-to-square mr-2"></i>Редактировать</button>
                 </div>

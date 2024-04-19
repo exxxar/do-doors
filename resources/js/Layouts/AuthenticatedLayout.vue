@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link} from '@inertiajs/vue3';
 import CalcCartSimple from '@/Components/Calc/CalcCartSimple.vue';
 
 const showingNavigationDropdown = ref(false);
@@ -47,20 +47,17 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Главная
                                 </NavLink>
-<!--                                <NavLink
-                                    v-if="can('manage-calc')"
-                                    :href="route('calc')" :active="route().current('calc')">
-                                    Калькулятор
-                                </NavLink>-->
+                                <!--                                <NavLink
+                                                                    v-if="can('manage-calc')"
+                                                                    :href="route('calc')" :active="route().current('calc')">
+                                                                    Калькулятор
+                                                                </NavLink>-->
 
                                 <NavLink
                                     v-if="cartTotalCount>0"
                                     :href="route('basket')" :active="route().current('basket')">
-                                    Корзина <span class="badge bg-danger ml-1 rounded-full">{{cartTotalCount}}</span>
+                                    Корзина <span class="badge bg-danger ml-1 rounded-full">{{ cartTotalCount }}</span>
                                 </NavLink>
-
-
-
 
 
                             </div>
@@ -71,10 +68,10 @@ const showingNavigationDropdown = ref(false);
                             <div class="ms-3 relative">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
-                                        <span class="inline-flex rounded-md">
+                                        <span class="inline-flex rounded-0">
                                             <button
                                                 type="button"
-                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-0 text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
                                             >
                                                 {{ $page.props.auth.user.name }}
 
@@ -95,7 +92,7 @@ const showingNavigationDropdown = ref(false);
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('profile.edit')"> Профиль </DropdownLink>
+                                        <DropdownLink :href="route('profile.edit')"> Профиль</DropdownLink>
                                         <DropdownLink :href="route('logout')" method="post" as="button">
                                             Выход
                                         </DropdownLink>
@@ -158,7 +155,7 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')"> Профиль </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('profile.edit')"> Профиль</ResponsiveNavLink>
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Выход
                             </ResponsiveNavLink>
@@ -176,15 +173,15 @@ const showingNavigationDropdown = ref(false);
                             <ResponsiveNavLink
                                 class="p-3"
                                 v-if="can('manage-clients')"
-                               >
-<!--                                :href="route('clients')" :active="route().current('clients')"-->
+                            >
+                                <!--                                :href="route('clients')" :active="route().current('clients')"-->
                                 Клиенты <i class="fa-solid fa-lock"></i>
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 class="p-3"
                                 v-if="can('manage-orders')"
-                              >
-<!--                                :href="route('orders')" :active="route().current('orders')"-->
+                            >
+                                <!--                                :href="route('orders')" :active="route().current('orders')"-->
                                 Заказы <i class="fa-solid fa-lock"></i>
                             </ResponsiveNavLink>
 
@@ -235,13 +232,13 @@ const showingNavigationDropdown = ref(false);
             <!-- Page Heading -->
             <header class="bg-white shadow" v-if="$slots.header">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <slot name="header" />
+                    <slot name="header"/>
                 </div>
             </header>
 
             <!-- Page Content -->
             <main>
-                <slot />
+                <slot/>
             </main>
 
 
@@ -259,12 +256,12 @@ const showingNavigationDropdown = ref(false);
     </div>
 
     <div class="cart-fixed-btn" v-if="cartTotalCount>0">
-        <a class="btn btn-outline-primary rounded-5 shadow-lg"
-                data-bs-toggle="offcanvas"
-                href="#cart" role="button"
+        <a class="btn rounded-0 shadow-lg"
+           data-bs-toggle="offcanvas"
+           href="#cart" role="button"
            aria-controls="cart">
             <i class="fa-solid fa-basket-shopping text-primary"></i>
-            <span class="badge text-primary font-bold">{{cartTotalCount}} шт.</span>
+            <span class="badge text-primary font-bold">{{ cartTotalCount }} шт.</span>
 
         </a>
     </div>
@@ -283,27 +280,50 @@ const showingNavigationDropdown = ref(false);
             </button>
         </div>
         <div class="offcanvas-body">
-            <div>
-                <nav class="d-flex flex-col align-items-center">
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn w-100 rounded-0"
+                            v-bind:class="{'btn-dark':menuTab === 0, 'btn-outline-secondary':menuTab!==0}"
+                            @click="menuTab = 0"><i class="fa-solid fa-user-tie mr-2"></i>Общее
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn w-100 rounded-0"
+                            v-bind:class="{'btn-dark':menuTab === 1, 'btn-outline-secondary':menuTab!==1}"
+                            @click="menuTab = 1"><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Админ
+                    </button>
+                </div>
+            </div>
+            <div class="py-5">
+                <nav class="d-flex flex-col align-items-center" v-if="menuTab===0">
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-calc')"
+                        :href="route('calc')" :active="route().current('calc')">
+                        Калькулятор
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-clients')"
+                        :href="route('clients')" :active="route().current('clients')">
+                        Клиенты
+                    </NavLink>
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-orders')"
+                        :href="route('orders')" :active="route().current('orders')">
+                        Заказы
+                    </NavLink>
+
+                </nav>
+                <nav class="d-flex flex-col align-items-center" v-if="menuTab===1">
                     <NavLink
                         class="p-3"
                         v-if="can('manage-users')"
                         :href="route('users')" :active="route().current('users')">
                         Пользователи
-                    </NavLink>
-                    <NavLink
-                        class="p-3"
-                        v-if="can('manage-clients')"
-                        >
-<!--                        :href="route('clients')" :active="route().current('clients')"-->
-                        Клиенты <i class="fa-solid fa-lock"></i>
-                    </NavLink>
-                    <NavLink
-                        class="p-3"
-                        v-if="can('manage-orders')"
-                        >
-<!--                        :href="route('orders')" :active="route().current('orders')"-->
-                        Заказы <i class="fa-solid fa-lock"></i>
                     </NavLink>
 
 
@@ -355,19 +375,24 @@ const showingNavigationDropdown = ref(false);
 import {mapGetters} from "vuex";
 
 export default {
+    data() {
+        return {
+            menuTab: 0
+        }
+    },
     computed: {
         ...mapGetters(['getErrors', 'cartTotalCount', 'cartProducts']),
 
     },
     mounted() {
-      console.log(this.$page.props.auth)
+        console.log(this.$page.props.auth)
     },
-    methods:{
-        hasRoles(role){
-            return (this.$page.props.auth.roles||[]).includes(role)
+    methods: {
+        hasRoles(role) {
+            return (this.$page.props.auth.roles || []).includes(role)
         },
-        can(permission){
-            return (this.$page.props.auth.permissions||[]).includes(permission)
+        can(permission) {
+            return (this.$page.props.auth.permissions || []).includes(permission)
         }
     }
 }
@@ -375,8 +400,8 @@ export default {
 <style lang="scss">
 .cart-fixed-btn {
     position: fixed;
-    bottom: 50px;
-    right: 20px;
+    bottom: 111px;
+    right: 13px;
     padding: 10px;
     z-index: 10;
     box-sizing: border-box;
@@ -393,5 +418,9 @@ export default {
     .btn {
         background-color: white;
     }
+}
+
+.btn-dark {
+    background-color: black;
 }
 </style>

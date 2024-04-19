@@ -109,6 +109,19 @@ const actions = {
         })
     },
 
+
+    async importSizesFromGoogle(context, payload = {importForm: null}) {
+        let link = `${BASE_SIZES_LINK}/import-from-google`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.importForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async importSizes(context, payload = {importForm: null}) {
         let link = `${BASE_SIZES_LINK}/import`
 

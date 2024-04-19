@@ -19,6 +19,7 @@
             <td style="width: 50px;">Высота</td>
             <td style="width: 50px;">Глубина</td>
             <td style="width: 150px;">Для каких целей</td>
+            <td style="width: 150px;">Комментарий</td>
             <td style="width: 150px;">Отверстие под ручку </td>
             <td style="width: 150px;">Тип отверстия под ручку </td>
             <td style="width: 150px;">Тип открывания двери </td>
@@ -54,6 +55,7 @@
                 <td style="width: 50px;">{{$item->product->height ?? 0}}</td>
                 <td style="width: 50px;">{{$item->product->depth ?? 0}}</td>
                 <td>{{$item->product->purpose ?? 'не указано'}}</td>
+                <td>{{$item->product->comment ?? 'не указано'}}</td>
                 <td>{{$item->product->handle_holes->title ?? 'не указано'}}</td>
                 <td>{{$item->product->handle_holes_type->title ?? 'не указано'}}</td>
                 <td>{{$item->product->opening_type->title ?? 'не указано'}}</td>

@@ -1,11 +1,24 @@
 models:
   Client:
-
+    status: string:50 nullable
+    phone: string:255 nullable
+    fax: string:255 nullable
+    email: string:255 nullable
+    fact_address: string:255 nullable
+    fact_address_comment: longtext nullable
+    comment: longtext nullable
+    code: string:255 nullable
+    external_code: string:255 nullable
+    user_id: id foreign:users
     title: string:255 nullable
-    wrapper_variants: json nullable
-    door_variants: json nullable
+    law_address: string:255 nullable
+    inn: string:20 nullable
+    kpp: string:50 nullable
+    ogrn: string:50 nullable
+    okpo: string:50 nullable
+    requisites: json nullable
     relationships:
-      hasMany: Size
+      belongsTo: User
 
   Order:
     contract_number: string:255 nullable comment:'номер договора'
@@ -21,45 +34,26 @@ models:
     paid: double default:0 comment:'оплачено'
     debt: double default:0 comment:'Задолженность'
     profit: double default:0 comment:'прибыль'
+    relationships:
+      belongsTo: Client
 
   OrderDetail:
     order_id: id foreign:orders nullable comment:'Сам заказ'
     door_type: string:255 nullable comment:'Тип двери'
     count: integer default:0 comment:'Количество'
     price: double default:0 comment:'цена за единицу'
-    need_upper_jumper: boolean defult:false comment:'верхняя перемычка'
-    width:  integer default:0 comment:'ширина'
-    height: integer default:0 comment:'высота'
-    loops_count: integer default:0 comment:'кол-во петель'
+    comment: longtext nullable
+    purpose: longtext nullable
+    door: json nullable comment:'параметры двери в json'
+    relationships:
+      belongsTo: Order
 
+seeds:   Client,   Order,  OrderDetail
 
-
-      depth: 0,
-      count: 1,
-      price: 0,
-      size: null,
-      purpose: null,
-      dealer_percent: 0,
-      opening_type: { title: null },
-      box_and_frame_color: { title: null },
-      door_type: { title: null },
-      front_side_finish: { title: null },
-      back_side_finish: { title: null },
-      front_side_finish_color: { title: null },
-      back_side_finish_color: { title: null },
-      seal_color: { title: null },
-      fittings_color: { title: null },
-      loops: { title: null }, //расположение петель
-      loops_count: 0,
-      price_type: { title: null }, //Тип цены
-      hinge_manufacturer: { title: null }, //Производитель петель
-      handle_holes: { title: null }, //отверстие для ручек
-      handle_holes_type: { title: null }, //тип ручки
-      need_handle_holes: false, //нужна дверная ручка
-      need_upper_jumper: false, //Верхняя перемычка
-      need_automatic_doorstep: false, //Автоматический порог
-      need_hidden_stopper: false, //Скрытый стопор
-      need_hidden_door_closer: false, //Скрытый доводчик
-      need_hidden_skirting_board: false, //нужен плинтус
-      need_door_install: false //нужна установка двери
-		договор	номер двери	дата сдачи	цена за единицу	верхняя перемычка	профиль	растояние без верхн.перемычки от верха до конца посл петли	высота	ширина	кол-во петель	цвет профиля	отделка лицо	ral	отделка зад	ral	Производитель петель	Отверстий под ручку	Автоматический порог	Скрытый стопор	Скрытый доводчик	Защелка	открывание	петли	упаковка
+controllers:
+  Client:
+    resource
+  Order:
+    resource
+  OrderDetail:
+    resource

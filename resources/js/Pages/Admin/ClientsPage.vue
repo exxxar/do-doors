@@ -1,9 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import CalcForm from "@/Components/Calc/CalcForm.vue";
-import SizeForm from "@/Components/Admin/Sizes/SizeForm.vue";
-import SizeTable from "@/Components/Admin/Sizes/SizeTable.vue";
-import SizeTable2 from "@/Components/Admin/Sizes/SizeTable2.vue";
+
+import ClientTable from "@/Components/Admin/Clients/ClientTable.vue";
+import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
 import {Head} from '@inertiajs/vue3';
 </script>
 
@@ -19,7 +18,14 @@ import {Head} from '@inertiajs/vue3';
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-
+                        <ClientForm
+                            v-if="!loading"
+                            :item="selectedClient"
+                            v-on:callback="callbackClientForm"></ClientForm>
+                        <hr class="hr my-5"/>
+<!--                        <ClientTable
+                            v-on:select="selectClient"
+                            v-if="!loading"></ClientTable>-->
                     </div>
 
                 </div>
@@ -32,10 +38,24 @@ export default {
     data() {
         return {
             loading: false,
+            selectedClient: null,
         }
     },
     methods: {
-
+        selectClient(item) {
+            this.selectedClient = item;
+            this.loading = true
+            this.$nextTick(() => {
+                this.loading = false
+            })
+        },
+        callbackClientForm() {
+            this.loading = true
+            this.selectedClient = null
+            this.$nextTick(() => {
+                this.loading = false
+            })
+        }
     }
 }
 </script>
