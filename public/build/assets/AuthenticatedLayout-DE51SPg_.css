@@ -1,0 +1,1 @@
+.hr{width:100%;height:1px;background-color:#e0e0e0}.cart-fixed-btn{position:fixed;bottom:111px;right:13px;padding:10px;z-index:10;box-sizing:border-box}@media (max-width: 767.98px){.cart-fixed-btn{bottom:10px;right:0;width:100%}.cart-fixed-btn .btn{width:100%}}.cart-fixed-btn .btn{background-color:#fff}.btn-dark{background-color:#000}
