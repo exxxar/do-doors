@@ -38,6 +38,50 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async loadSelfClients(context) {
+        let link = `${BASE_CLIENTS_LINK}/self-list`
+        let method = 'GET'
+
+        let _axios = util.makeAxiosFactory(link, method)
+
+        return _axios.then((response) => {
+            let dataObject = response.data
+            return Promise.resolve(dataObject);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+    async requestByBik(context, payload = {bik: null}) {
+        let link = `${BASE_CLIENTS_LINK}/request-by-bik`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+    async requestByInn(context, payload = {inn: null}) {
+        let link = `${BASE_CLIENTS_LINK}/request-by-inn`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async storeClient(context, payload = {clientForm: null}) {
         let link = `${BASE_CLIENTS_LINK}/store`
 

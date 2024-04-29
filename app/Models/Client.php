@@ -44,6 +44,8 @@ class Client extends Model
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
+    protected $with = ["user"];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

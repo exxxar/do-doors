@@ -156,12 +156,71 @@ Route::prefix("/handles")
         Route::delete("/{id}", "destroy");
     });
 
+Route::prefix("/roles")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\RolesController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('roles');
+        Route::post("/", "getRolesList");
+        Route::post("/store", "store");
+        Route::delete("/{id}", "destroy");
+    });
+
+Route::prefix("/permissions")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\PermissionsController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('permissions');
+        Route::post("/", "getPermissionsList");
+        Route::post("/store", "store");
+        Route::delete("/{id}", "destroy");
+    });
+
+Route::prefix("/promo-codes")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\PromoCodeController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('promo-codes');
+        Route::post("/", "getPromoCodesList");
+        Route::post("/store", "store");
+        Route::post("/find-promo", "findPromo");
+        Route::delete("/{id}", "destroy");
+    });
+
+Route::prefix("/orders")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\OrderController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('orders');
+        Route::get("/download-order-excel/{id}", "downloadOrderExcel");
+        Route::get("/download-filtered-orders", "downloadFilteredOrdersExcel");
+        Route::get("/download-contract", "downloadContract");
+        Route::get("/download-template", "downloadTemplate");
+        Route::post("/", "getOrderList");
+        Route::post("/update-contract-templates", "updateContractTemplates");
+        Route::post("/store", "store");
+        Route::delete("/{id}", "destroy");
+    });
+
+Route::prefix("/order-details")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\OrderDetailController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('order-details');
+        Route::post("/", "getOrderDetailList");
+        Route::post("/store", "store");
+        Route::delete("/{id}", "destroy");
+    });
+
 Route::prefix("/clients")
     ->middleware(['auth', 'verified'])
     ->controller(App\Http\Controllers\ClientController::class)
     ->group(function () {
         Route::get("/", "index")->name('clients');
         Route::post("/", "getClientList");
+        Route::get("/self-list", "getSelfClientList");
+        Route::post("/request-by-inn", "getDataByInn");
+        Route::post("/request-by-bik", "getDataByBik");
         Route::post("/store", "store");
         Route::delete("/{id}", "destroy");
     });

@@ -17,10 +17,12 @@
     <div class="row">
         <div class="col-12 col-md-8">
             <div class="stage w-100"
-                 v-bind:style="{'background-color':sideColor || 'transparent', 'background-image':'url('+selectedSideFinishImageForWrapper+')'}">
+                 v-bind:style="{/*'background-color':sideColor || 'transparent',*/ 'background-image':'url('+selectedSideFinishImageForWrapper+')'}">
                 <div class="upper-jumper d-flex justify-content-center align-items-center"
                      v-if="door.need_upper_jumper">
-                    <p class="text-center" style="font-size: 12px;">1</p>
+                    <div class="door-upper-jumper d-flex justify-content-center align-items-center">
+                        <p class="text-center" style="font-size: 12px;">1</p>
+                    </div>
                 </div>
 
 
@@ -59,7 +61,7 @@
                     <div class="skirting-board d-flex justify-content-center align-items-center"
                          style="font-size: 12px;"
                          v-if="door.need_hidden_skirting_board">
-                        3
+                        <p>3</p>
                     </div>
 
                     <div class="stopper d-flex justify-content-center align-items-center"
@@ -159,14 +161,26 @@ export default {
         position: relative;
         border-bottom: 1px dashed black;
 
-        color: white;
-        background-image: repeating-linear-gradient(
-                -45deg,
-                #3f0909 0,
-                #3f0909 15px,
-                #ffffff 15px,
-                #ffffff 25px
-        );
+        .door-upper-jumper {
+
+            height: 100%;
+            width: 200px;
+            background-image: repeating-linear-gradient(
+                    -45deg,
+                    #3f0909 0,
+                    #3f0909 15px,
+                    #ffffff 15px,
+                    #ffffff 25px
+            );
+            p {
+                display: inline-block;
+                width: 40px;
+                text-align: center;
+                font-weight: bold;
+                color: black;
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+        }
     }
 
 
@@ -201,7 +215,7 @@ export default {
             height: 18px;
             bottom: 0px;
             border-top: 1px dashed black;
-            color: white;
+
             z-index: 2;
             background-image: repeating-linear-gradient(
                     -45deg,
@@ -210,6 +224,15 @@ export default {
                     #ffffff 15px,
                     #ffffff 25px
             );
+
+            p {
+                display: inline-block;
+                background-color: rgba(255, 255, 255, 0.7);
+                width: 40px;
+                text-align: center;
+                font-weight: bold;
+                color: black;
+            }
         }
 
         .stopper {

@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+
 import UserTable from "@/Components/Admin/Users/UserTable.vue";
+import UserForm from "@/Components/Admin/Users/UserForm.vue";
 import {Head} from '@inertiajs/vue3';
 </script>
 
@@ -16,7 +18,14 @@ import {Head} from '@inertiajs/vue3';
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <UserTable></UserTable>
+                        <UserForm
+                            v-if="!loading"
+                            :item="selectedUser"
+                            v-on:callback="callbackUserForm"></UserForm>
+                        <hr class="hr my-5"/>
+                        <UserTable
+                            v-on:select="selectUser"
+                            v-if="!loading"></UserTable>
                     </div>
 
                 </div>
@@ -29,10 +38,24 @@ export default {
     data() {
         return {
             loading: false,
+            selectedUser: null,
         }
     },
     methods: {
-
+        selectUser(item) {
+            this.selectedUser = item;
+            this.loading = true
+            this.$nextTick(() => {
+                this.loading = false
+            })
+        },
+        callbackUserForm() {
+            this.loading = true
+            this.selectedUser = null
+            this.$nextTick(() => {
+                this.loading = false
+            })
+        }
     }
 }
 </script>

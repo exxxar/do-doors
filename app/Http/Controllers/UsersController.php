@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\HandleCollection;
-use App\Http\Resources\HandleResource;
 use App\Http\Resources\UserCollection;
-use App\Models\Handle;
+use App\Http\Resources\UserResource;
+
 use App\Models\User;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\StoreUserRequest;
@@ -55,36 +56,61 @@ class UsersController extends Controller
             "email" => "required",
         ]);
 
-        $variants = json_decode($request->variants ?? '[]');
 
-
-        $tmp = $this->uploadPhotos($request->hasFile('uploaded_variants_image') ? $request->file('uploaded_variants_image') : null);
-        $variants = [...$variants, ...$tmp];
+        $roles = is_null($request->roles ?? null)? null : json_decode($request->roles);
+        $permissions = is_null($request->permissions ?? null)? null : json_decode($request->permissions);
 
         $id = $request->id ?? null;
 
         if (is_null($id))
-            $handle = Handle::query()
+            $user = User::query()
                 ->create([
-                    "title" => $request->title ?? null,
-                    'price' => $request->price ?? 0,
-                    'variants'=>$variants
+                    "name" => $request->name ?? null,
+                    'email' => $request->email ?? null,
+                    'password' => is_null($request->password ?? null) ? bcrypt("password") : bcrypt($request->password),
                 ]);
         else {
-            $handle = Handle::query()->find($id);
+            $user = User::query()->find($id);
 
-            if (is_null($handle))
+            if (is_null($user))
                 return response()->noContent(404);
 
-            $handle->update([
-                "title" => $request->title ?? null,
-                'price' => $request->price ?? 0,
-                'variants'=>$variants
+            $user->update([
+                "name" => $request->name ?? null,
+                'email' => $request->email ?? null,
             ]);
 
+            if (!is_null($request->password ?? null))
+            {
+                $user->password =  bcrypt($request->password);
+                $user->save();
+            }
         }
 
-        return new HandleResource($handle);
+        if (is_null($roles))
+            $user->roles()->detach();
+        else
+        {
+
+            $roles = array_values(Collection::make($roles)
+                ->pluck("id")->toArray());
+
+            $user->roles()->sync($roles);
+        }
+
+
+        if (is_null($permissions))
+            $user->permissions()->detach();
+        else
+        {
+            $permissions = array_values(Collection::make($permissions)
+                ->pluck("id")->toArray());
+
+            $user->permissions()->sync($permissions);
+        }
+
+
+        return new UserResource($user);
     }
 
 

@@ -1,6 +1,6 @@
 <template>
 
-    <form action="" v-on:submit.prevent="submit">
+<!--    <form action="" v-on:submit.prevent="submit">
         <div class="form-floating mb-3">
             <input type="text"
                    v-model="form.title"
@@ -89,7 +89,7 @@
 
             </div>
         </div>
-    </form>
+    </form>-->
 </template>
 <script>
 export default {

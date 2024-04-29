@@ -2,97 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PermissionCollection;
+use App\Http\Resources\PermissionResource;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Permission;
+use Inertia\Inertia;
 
 class PermissionsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $permissions = Permission::all();
+    use Utility;
 
-        return view('permissions.index', [
-            'permissions' => $permissions
-        ]);
+    public function index(Request $request): \Inertia\Response
+    {
+        return Inertia::render('Admin/PermissionsPage');
     }
 
-    /**
-     * Show form for creating permissions
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function getPermissionsList(Request $request): PermissionCollection
     {
-        return view('permissions.create');
+
+        $search = $request->search ?? null;
+        $order = $request->order ?? "id";
+        $direction = $request->direction ?? "asc";
+
+        $size = $size ?? config('app.results_per_page');
+
+        $permissions = Permission::query();
+
+        if (!is_null($search))
+            $permissions = $permissions
+                ->where("name", 'like', "%$search%");
+
+        $permissions = $permissions->orderBy($order, $direction);
+
+        return new PermissionCollection($permissions->paginate($size));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:users,name'
+            "name" => "required",
+            "slug" => "required"
         ]);
 
-        Permission::create($request->only('name'));
 
-        return redirect()->route('permissions.index')
-            ->withSuccess(__('Permission created successfully.'));
+        $id = $request->id ?? null;
+
+        $tmp = [
+            "name" => $request->name ?? null,
+            'slug' => $request->slug ?? null,
+
+        ];
+
+        if (is_null($id))
+            $permission = Permission::query()
+                ->create($tmp);
+        else {
+            $permission = Permission::query()->find($id);
+
+            if (is_null($permission))
+                return response()->noContent(404);
+
+            $permission->update($tmp);
+
+        }
+
+        return new PermissionResource($permission);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  Permission  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Permission $permission)
+
+    public function destroy(Request $request, $id): \Illuminate\Http\Response
     {
-        return view('permissions.edit', [
-            'permission' => $permission
-        ]);
-    }
+        $permission = Permission::query()->find($id);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Permission  $permission
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Permission $permission)
-    {
-        $request->validate([
-            'name' => 'required|unique:permissions,name,'.$permission->id
-        ]);
+        if (is_null($permission))
+            return response()->noContent(404);
 
-        $permission->update($request->only('name'));
-
-        return redirect()->route('permissions.index')
-            ->withSuccess(__('Permission updated successfully.'));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Permission $permission)
-    {
         $permission->delete();
 
-        return redirect()->route('permissions.index')
-            ->withSuccess(__('Permission deleted successfully.'));
+        return response()->noContent(200);
     }
 }

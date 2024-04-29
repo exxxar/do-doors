@@ -9,6 +9,10 @@ import colors from './modules/colors.js'
 import door_variants from './modules/door_variants.js'
 import clients from './modules/clients.js'
 import orders from './modules/orders.js'
+import orderDetails from './modules/order_details.js'
+import promoCodes from './modules/promo_codes.js'
+import roles from './modules/roles.js'
+import permissions from './modules/permissions.js'
 import users from './modules/users.js'
 
 export default createStore({
@@ -37,6 +41,10 @@ export default createStore({
         hinges,
         door_variants,
         colors,
+        promoCodes,
+        roles,
+        permissions,
+        orderDetails,
         users
     }
 })

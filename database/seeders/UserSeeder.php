@@ -28,6 +28,9 @@ class UserSeeder extends Seeder
         $managerHinges = Permission::where('slug','manage-hinges')->first();
         $managerDoorVariants = Permission::where('slug','manage-door-variants')->first();
         $managerColor= Permission::where('slug','manage-colors')->first();
+        $managerPromoCodes= Permission::where('slug','manage-promo-codes')->first();
+        $managerRoles = Permission::where('slug','manage-roles')->first();
+        $managerPermissions = Permission::where('slug','manage-permissions')->first();
 
         $user = new User();
         $user->name = 'Admin';
@@ -47,6 +50,9 @@ class UserSeeder extends Seeder
         $user->permissions()->attach($managerHinges);
         $user->permissions()->attach($managerDoorVariants);
         $user->permissions()->attach($managerColor);
+        $user->permissions()->attach($managerPromoCodes);
+        $user->permissions()->attach($managerPermissions);
+        $user->permissions()->attach($managerRoles);
 
 
     }

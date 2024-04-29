@@ -315,6 +315,7 @@ export default {
             this.messages.splice(index, 1)
         },
         submit() {
+
             let data = new FormData();
             Object.keys(this.form)
                 .forEach(key => {
@@ -337,8 +338,8 @@ export default {
                 data.append('wrapper_images_info', JSON.stringify(this.uploaded_wrapper_image));
             }
 
-         /*   for (let i = 0; i < this.uploaded_wrapper_image.length; i++)
-                data.append('wrapper_images[]', this.uploaded_wrapper_image[i]);*/
+            /*   for (let i = 0; i < this.uploaded_wrapper_image.length; i++)
+                   data.append('wrapper_images[]', this.uploaded_wrapper_image[i]);*/
 
             if (this.uploaded_door_image.length>0) {
                 for (let i = 0; i < this.uploaded_door_image.length; i++) {
@@ -363,7 +364,6 @@ export default {
             }).catch(error => {
                 this.alert(error.response.data.message)
             })
-
 
         }
     }

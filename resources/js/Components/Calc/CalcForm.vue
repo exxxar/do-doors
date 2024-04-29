@@ -6,7 +6,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 </script>
 <template>
 
-    <div class="row">
+<!--    <div class="row">
         <div class="col-md-6 col-lg-3  col-12">
             <button
                 type="button"
@@ -15,7 +15,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
             </button>
         </div>
 
-    </div>
+    </di-->
 
     <div class="row">
         <div class="col-lg-12">
@@ -57,6 +57,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 
 
 
+<!--
     <div class="modal fade  " id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0">
@@ -83,6 +84,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
             </div>
         </div>
     </div>
+-->
 
 
     <!-- Modal -->
@@ -118,7 +120,7 @@ export default {
     name: 'MyComponent',
     data() {
         return {
-            confirmModal: null,
+
             loading: false,
             messages: [],
             selectedColor: null,
@@ -158,7 +160,7 @@ export default {
 
 
     mounted() {
-        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
+
 
         window.addEventListener("select-door-item", (e) => {
             this.selectedDoor = e.detail.item || null
@@ -185,12 +187,7 @@ export default {
         selectColor(item) {
             this.selectedColor = item.color.hex
         },
-        openConfirmModal(title,message) {
-            this.confirm.title = title || null
-            this.confirm.message = message || null
 
-            this.confirmModal.show()
-        },
         clearForm() {
             this.loading = true
 
@@ -200,7 +197,7 @@ export default {
                 this.loading = false
             })
 
-            this.confirmModal.hide()
+
 
             this.$notify({
                 title: "DoDoors",

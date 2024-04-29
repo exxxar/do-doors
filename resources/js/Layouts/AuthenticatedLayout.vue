@@ -40,7 +40,7 @@ const showingNavigationDropdown = ref(false);
                                     href="#main-side-admin-menu"
                                     role="button"
                                     aria-controls="main-side-admin-menu"
-                                    v-if="hasRoles('administrator')">
+                                    v-if="can('manage-vies-adminmenu')">
                                     Админ.меню
                                 </NavLink>
 
@@ -316,7 +316,12 @@ const showingNavigationDropdown = ref(false);
                         :href="route('orders')" :active="route().current('orders')">
                         Заказы
                     </NavLink>
-
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-promo-codes')"
+                        :href="route('promo-codes')" :active="route().current('promo-codes')">
+                        Промокоды
+                    </NavLink>
                 </nav>
                 <nav class="d-flex flex-col align-items-center" v-if="menuTab===1">
                     <NavLink
@@ -326,6 +331,19 @@ const showingNavigationDropdown = ref(false);
                         Пользователи
                     </NavLink>
 
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-roles')"
+                        :href="route('roles')" :active="route().current('roles')">
+                        Роли пользователей
+                    </NavLink>
+
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-permissions')"
+                        :href="route('permissions')" :active="route().current('permissions')">
+                        Разрешения пользователей
+                    </NavLink>
 
                     <NavLink
                         class="p-3"

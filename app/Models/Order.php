@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
@@ -38,18 +39,33 @@ class Order extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'contract_date' => 'datetime',
         'completion_at' => 'datetime',
         'client_id' => 'integer',
         'contract_amount' => 'double',
         'paid' => 'double',
         'debt' => 'double',
         'profit' => 'double',
+        'contract_date' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
+
+    protected $with = ["client"];
+
+    protected $appends = ["cost_price"];
 
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function details():hasMany {
+        return $this->hasMany(OrderDetail::class,"order_id","id");
+    }
+
+    public function getCostPriceAttribute(){
+        if ($this->details()->count()==0)
+            return 0;
+
+        return 0;
     }
 }

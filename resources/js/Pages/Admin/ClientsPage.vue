@@ -23,9 +23,9 @@ import {Head} from '@inertiajs/vue3';
                             :item="selectedClient"
                             v-on:callback="callbackClientForm"></ClientForm>
                         <hr class="hr my-5"/>
-<!--                        <ClientTable
+                        <ClientTable
                             v-on:select="selectClient"
-                            v-if="!loading"></ClientTable>-->
+                            v-if="!loading"></ClientTable>
                     </div>
 
                 </div>

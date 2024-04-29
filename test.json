@@ -1,0 +1,89 @@
+{
+    "id": "495c34f1-ff45-11ee-acdc-71fcedfc6a19",
+    "width": 800,
+    "height": 2100,
+    "depth": 43,
+    "count": 1,
+    "size": null,
+    "purpose": "Дверь 1",
+    "handle_holes": {
+        "id": 1,
+        "title": "Отверстие под ручку"
+    },
+    "handle_holes_type": {
+        "title": null
+    },
+    "opening_type": {
+        "id": 1,
+        "title": "НА СЕБЯ",
+        "depth": 43,
+        "direction": "on"
+    },
+    "box_and_frame_color": {
+        "title": "#C0C0C0",
+        "code": "#C0C0C0",
+        "price": 0,
+        "type": "box_and_frame"
+    },
+    "door_type": {
+        "id": 1,
+        "title": "Комплект двери скрытого монтажа",
+        "price": 1000
+    },
+    "front_side_finish": {
+        "id": 2,
+        "title": "Зеркало",
+        "wrapper_variants": null,
+        "door_variants": null
+    },
+    "back_side_finish": {
+        "id": 1,
+        "title": "Стекло крашенное",
+        "wrapper_variants": null,
+        "door_variants": null
+    },
+    "front_side_finish_color": {
+        "title": "#C0C0C0",
+        "code": "#C0C0C0",
+        "price": 0,
+        "type": "side_finish"
+    },
+    "back_side_finish_color": {
+        "title": "#ffd700",
+        "code": "#ffd700",
+        "price": 0,
+        "type": "side_finish"
+    },
+    "seal_color": {
+        "title": "#000000",
+        "code": "#000000",
+        "price": 0,
+        "type": "seal"
+    },
+    "fittings_color": {
+        "title": "#C0C0C0",
+        "code": "#C0C0C0",
+        "price": 0,
+        "type": "fittings"
+    },
+    "loops": {
+        "id": 1,
+        "title": "Слева",
+        "type": "left"
+    },
+    "loops_count": 2,
+    "price_type": {
+        "id": 1,
+        "title": "Опт",
+        "key": "wholesale"
+    },
+    "hinge_manufacturer": {
+        "id": 1,
+        "title": "Стандарт",
+        "price": 1000
+    },
+    "price": 23660,
+    "need_upper_jumper": false,
+    "need_handle_holes": true,
+    "need_automatic_doorstep": false
+}

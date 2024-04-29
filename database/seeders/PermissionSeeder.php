@@ -18,6 +18,15 @@ class PermissionSeeder extends Seeder
         $permission->slug = 'manage-users';
         $permission->save();
 
+        $permission = new Permission();
+        $permission->name = 'Работа с ролями';
+        $permission->slug = 'manage-roles';
+        $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'Работа с разрешениями';
+        $permission->slug = 'manage-permissions';
+        $permission->save();
 
         $permission = new Permission();
         $permission->name = 'Работа с ролями и разрешениями';
@@ -69,6 +78,11 @@ class PermissionSeeder extends Seeder
         $permission = new Permission();
         $permission->name = 'Работа с заказами';
         $permission->slug = 'manage-orders';
+        $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'Работа с промокодами';
+        $permission->slug = 'manage-promo-codes';
         $permission->save();
     }
 }

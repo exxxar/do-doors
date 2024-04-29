@@ -1,0 +1,20 @@
+models:
+  PromoCode:
+    code: string:255 unique
+    discount: double default:0
+    description: longtext nullable
+    end_at: timestamp nullable
+    is_active: boolean default:false
+
+  PromoCodeHistory:
+    client_id: id foreign:clients
+    promo_code_id: id foreign:promo_codes
+    relationships:
+      belongsTo: Client, PromoCode
+
+
+seeders:   PromoCode
+
+controllers:
+  PromoCode:
+    resource: api

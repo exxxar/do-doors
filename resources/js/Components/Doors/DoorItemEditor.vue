@@ -7,12 +7,53 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 <template>
 
     <div class="row">
+
         <div class="col-md-6">
             <form
                 v-on:submit.prevent="submitForm"
             >
 
                 <div class="row">
+                    <div class="col-md-6 col-12">
+                        <button
+                            type="button"
+                            @click="openConfirmModal('Внимание!','Вы очищает текущую работу в калькуляторе! Продолжить?')"
+                            class="btn rounded-0 w-100 btn-dark p-3">Очистить форму
+                        </button>
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <div class="input-group mb-3">
+                            <div class="form-floating">
+                                <input type="text"
+                                       min="0"
+                                       v-model="doorForm.purpose"
+                                       class="form-control" id="floatingInput">
+                                <label for="floatingInput"><i class="fa-solid fa-signs-post"></i> Назначение
+                                    двери</label>
+                            </div>
+                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
+                                <li><a class="dropdown-item"
+                                       @click="doorForm.purpose = null"
+                                       href="javascript:void(0)">Не выбрано</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item"
+                                       @click="doorForm.purpose = item"
+                                       v-bind:class="{'bg-primary text-white':doorForm.purpose===item}"
+                                       href="javascript:void(0)" v-for="item in getDictionary.purpose_variants">{{
+                                        item
+                                    }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
 
                     <div class="col-md-6 col-12">
                         <div class="input-group mb-3">
@@ -129,36 +170,21 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
-                            <div class="form-floating">
-                                <input type="text"
-                                       min="0"
-                                       v-model="doorForm.purpose"
-                                       class="form-control" id="floatingInput">
-                                <label for="floatingInput"><i class="fa-solid fa-signs-post"></i> Назначение
-                                    двери</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item"
-                                       @click="doorForm.purpose = null"
-                                       href="javascript:void(0)">Не выбрано</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       @click="doorForm.purpose = item"
-                                       v-bind:class="{'bg-primary text-white':doorForm.purpose===item}"
-                                       href="javascript:void(0)" v-for="item in getDictionary.purpose_variants">{{
-                                        item
-                                    }}</a>
-                                </li>
-                            </ul>
+                        <div class="form-floating mb-3">
+                            <select class="form-select"
+                                    v-model="doorForm.door_type"
+                                    @invalid="alert('Вы не выбрали тип двери!')"
+                                    id="door-type" aria-label="door-type" required>
+                                <option :value="{title:null}">Выберите один из вариантов</option>
+                                <option :value="item" v-for="item in getDictionary.door_variants">{{
+                                        item.title
+                                    }}
+                                </option>
+                            </select>
+                            <label for="door-type"><i class="fa-solid fa-door-open"></i> Выберите тип двери</label>
                         </div>
                     </div>
+
 
                     <div class="col-md-6 col-12">
                         <div class="form-floating mb-3">
@@ -338,21 +364,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-12">
-                        <div class="form-floating mb-3">
-                            <select class="form-select"
-                                    v-model="doorForm.door_type"
-                                    @invalid="alert('Вы не выбрали тип двери!')"
-                                    id="door-type" aria-label="door-type" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
-                                <option :value="item" v-for="item in getDictionary.door_variants">{{
-                                        item.title
-                                    }}
-                                </option>
-                            </select>
-                            <label for="door-type"><i class="fa-solid fa-door-open"></i> Выберите тип двери</label>
-                        </div>
-                    </div>
+
 
                     <div class="col-md-6 col-12">
                         <div class="input-group mb-3 ">
@@ -471,23 +483,10 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                             <label for="door-comment">Комментарий к двери</label>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="row py-3" v-if="need_addition">
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch ">
-                            <input class="form-check-input"
-                                   v-model="doorForm.need_upper_jumper"
-                                   type="checkbox" role="switch" id="need-upper-jumper" checked>
-                            <label class="form-check-label" for="need-upper-jumper">
-                                Нужна верхняя перемычка
-                            </label>
-                        </div>
-
-                        s
-
-
-                    </div>
 
                     <div class="col-12 d-flex align-items-center">
                         <div class="form-check form-switch">
@@ -507,7 +506,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                     @invalid="alert('Вы не выбрали отверстие под ручку!')"
                                     v-model="doorForm.handle_holes"
                                     id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
+<!--                                <option :value="{title:null}">Выберите один из вариантов</option>-->
                                 <option :value="item" v-for="item in getDictionary.handle_holes_variants">{{
                                         item.title
                                     }}
@@ -529,7 +528,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                     }}
                                 </option>
                             </select>
-                            <label for="floatingSelect">Внешний вид ручки</label>
+                            <label for="floatingSelect">Выбор ручки</label>
                         </div>
                     </div>
 
@@ -571,10 +570,24 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <div class="col-12"
                          v-if="(doorForm.handle_holes_type.variants||[]).length===0&&doorForm.need_handle_holes">
 
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-warning rounded-0" role="alert">
                             <p>Вариантов изображений ручки нет</p>
                         </div>
                     </div>
+
+                    <div class="col-12 d-flex align-items-center">
+                        <div class="form-check form-switch ">
+                            <input class="form-check-input"
+                                   v-model="doorForm.need_upper_jumper"
+                                   type="checkbox" role="switch" id="need-upper-jumper" checked>
+                            <label class="form-check-label" for="need-upper-jumper">
+                                Нужна верхняя перемычка
+                            </label>
+                        </div>
+
+                    </div>
+
+
 
                     <div class="col-12 d-flex align-items-center">
                         <div class="form-check form-switch">
@@ -638,6 +651,21 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                    role="switch" id="need-door-install" checked>
                             <label class="form-check-label" for="need-door-install">
                                 Нужен установка двери \ не нужна
+                            </label>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="col-12 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   v-model="doorForm.need_wrapper"
+                                   role="switch" id="need-door-wrapper" checked>
+                            <label class="form-check-label" for="need-door-wrapper">
+                                Нужен упаковка двери \ не нужна
                             </label>
                         </div>
 
@@ -786,6 +814,32 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 
     </div>
 
+    <div class="modal fade  " id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body">
+                    <div class="d-flex justify-center p-3">
+                        <img src="/images/logo.png" style="width: 100px;" alt="">
+                    </div>
+                    <h3 class="font-bold text-center py-3">{{ confirm.title||'-' }}</h3>
+                    <p class="text-center pb-3">{{confirm.message||'-'}}</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-dark rounded-0 w-100" type="button" @click="clearForm">Да,
+                                очистить
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет, не очищать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" :id="'choose-color-'+doorForm.id" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -876,11 +930,15 @@ export default {
             filterWidth: null,
             selectedColorParam: null,
             colorModal: null,
+            confirmModal: null,
             finishFrontVariantModal: null,
             finishBackVariantModal: null,
 
             colors: [],
-
+            confirm: {
+                title: null,
+                message: null,
+            },
             doorForm: {
                 id: null,
                 width: 0,
@@ -907,13 +965,14 @@ export default {
                 hinge_manufacturer: {title: null}, //Производитель петель
                 handle_holes: {title: null}, //отверстие для ручек
                 handle_holes_type: {title: null}, //тип ручки
-                need_handle_holes: false, //нужна дверная ручка
+                need_handle_holes: true, //нужна дверная ручка
                 need_upper_jumper: false, //Верхняя перемычка
                 need_automatic_doorstep: false, //Автоматический порог
                 need_hidden_stopper: false, //Скрытый стопор
                 need_hidden_door_closer: false, //Скрытый доводчик
                 need_hidden_skirting_board: false, //нужен плинтус
-                need_door_install: false //нужна установка двери
+                need_door_install: false, //нужна установка двери
+                need_wrapper: false //нужна упаковка двери
             }
         }
     },
@@ -1109,7 +1168,7 @@ export default {
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
-                    this.doorForm.handle_holes = {title: null}
+                    this.doorForm.handle_holes =  this.getDictionary.handle_holes_variants[0]
                     this.doorForm.handle_holes_type = {title: null}
                 }
 
@@ -1146,12 +1205,13 @@ export default {
     },
 
     mounted() {
+        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
 
         this.loadRalColors()
 
         if (!this.door) {
             this.doorForm.id = uuid.v1()
-            this.clearForm(true)
+            this.clearForm(false)
         } else {
             this.$nextTick(() => {
                 this.doorForm = {
@@ -1177,14 +1237,29 @@ export default {
                     loops_count: this.door.product.loops_count || 0,
                     price_type: this.door.product.price_type || null,
                     hinge_manufacturer: this.door.product.hinge_manufacturer || null,
+                    need_handle_holes: true, //нужна дверная ручка
+                    need_upper_jumper: false, //Верхняя перемычка
+                    need_automatic_doorstep: false, //Автоматический порог
+                    need_hidden_stopper: false, //Скрытый стопор
+                    need_hidden_door_closer: false, //Скрытый доводчик
+                    need_hidden_skirting_board: false, //нужен плинтус
+                    need_door_install: false,//нужна установка двери
+                    need_wrapper: false //нужна упаковка двери
 
                 }
             })
         }
 
+
         this.doorForm.purpose = "Дверь " + (this.cartProducts.length + 1)
     },
     methods: {
+        openConfirmModal(title,message) {
+            this.confirm.title = title || null
+            this.confirm.message = message || null
+
+            this.confirmModal.show()
+        },
         loadRalColors() {
             axios.get("/ral_pretty.json").then(resp => {
                 this.colors = resp.data
@@ -1205,6 +1280,7 @@ export default {
 
         },
         priceForSide(param) {
+
             let type = this.doorForm.price_type.key
             let price = 0
             let section = null;
@@ -1222,13 +1298,18 @@ export default {
             if (!section)
                 return price;
 
+            let tmp = null
             if (section.materials)
                 section.materials.forEach(sub => {
                     if (sub.id === this.doorForm[param].id) {
+                        tmp = sub.price
                         price = typeof sub.price === "object" ? sub.price[type] : sub.price
                     }
 
                 })
+
+            this.doorForm[param].price_variants = tmp
+
             return price
         },
         isHex(num) {
@@ -1265,6 +1346,8 @@ export default {
 
         },
         clearForm(needTestData = false) {
+
+            this.confirmModal.hide()
             if (needTestData) {
                 this.doorForm = {
                     id: uuid.v1(),
@@ -1289,6 +1372,14 @@ export default {
                     loops_count: 2,
                     price_type: this.getDictionary.price_type_variants[0],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
+                    need_handle_holes: true, //нужна дверная ручка
+                    need_upper_jumper: false, //Верхняя перемычка
+                    need_automatic_doorstep: false, //Автоматический порог
+                    need_hidden_stopper: false, //Скрытый стопор
+                    need_hidden_door_closer: false, //Скрытый доводчик
+                    need_hidden_skirting_board: false, //нужен плинтус
+                    need_door_install: false, //нужна установка двери
+                    need_wrapper: false //нужна упаковка двери
 
                 }
             } else
@@ -1315,16 +1406,19 @@ export default {
                     loops_count: 0,
                     price_type: {title: null}, //Тип цены
                     hinge_manufacturer: {title: null}, //Производитель петель
-                    handle_holes: {title: null}, //отверстие для ручек
-                    handle_holes_type: {title: null}, //тип ручки
-                    need_handle_holes: false, //нужна дверная ручка
+                    handle_holes: this.getDictionary.handle_holes_variants[0],
+                    handle_holes_type: {title: null},
+                    need_handle_holes: true, //нужна дверная ручка
                     need_upper_jumper: false, //Верхняя перемычка
                     need_automatic_doorstep: false, //Автоматический порог
                     need_hidden_stopper: false, //Скрытый стопор
                     need_hidden_door_closer: false, //Скрытый доводчик
                     need_hidden_skirting_board: false, //нужен плинтус
-                    need_door_install: false //нужна установка двери
+                    need_door_install: false, //нужна установка двери
+                    need_wrapper: false //нужна упаковка двери
                 }
+
+
         },
         selectDoorSize(item) {
 
@@ -1379,12 +1473,13 @@ export default {
                 this.$nextTick(() => {
                     this.doorForm.id = uuid.v4()
                 })
-
-                this.$emit("callback")
+                this.confirmModal.show()
+                //this.$emit("callback")
 
                 this.$notify({
                     title: "DoDoors",
                     text: "Дверь успешно добавлена в корзину",
+                    type:"success"
                 });
             })
         }

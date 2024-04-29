@@ -9,6 +9,8 @@ use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -20,6 +22,45 @@ class ClientController extends Controller
     public function index(Request $request): \Inertia\Response
     {
         return Inertia::render('Admin/ClientsPage');
+    }
+
+    public function getDataByBik(Request $request){
+        $request->validate([
+            "bik" => "required"
+        ]);
+
+        $result =  Http::withHeader("Content-Type", "application/json")
+            ->get("https://bik-info.ru/api.html?type=json&bik=".$request->bik);
+
+        return response()->json($result->json());
+    }
+
+    public function getDataByInn(Request $request)
+    {
+        $request->validate([
+            "inn" => "required"
+        ]);
+
+       $result = Http::asForm()
+            ->withHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+            ->post("https://egrul.nalog.ru/", [
+                "query" => $request->inn
+            ]);
+
+       $result = Http::withHeader("Content-Type", "application/json")
+            ->get("https://egrul.nalog.ru/search-result/".$result->json("t"));
+
+
+       return response()->json($result->json("rows"));
+    }
+
+
+    public function getSelfClientList(Request $request): ClientCollection
+    {
+        $clients = Client::query()
+            ->where("user_id", Auth::user()->id);
+
+        return new ClientCollection($clients->get());
     }
 
     public function getClientList(Request $request): ClientCollection

@@ -16,7 +16,7 @@ import Pagination from "@/Components/Pagination.vue";
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
-                        class="btn btn-outline-primary">
+                        class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
@@ -51,14 +51,16 @@ import Pagination from "@/Components/Pagination.vue";
 
                 </th>
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                <th scope="col"
+                    v-if="!forSelect"
+                    class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
                     <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center">Действие</th>
+                <th scope="col" class="text-center" v-if="!forSelect">Действие</th>
             </tr>
             </thead>
             <tbody>
@@ -72,10 +74,10 @@ import Pagination from "@/Components/Pagination.vue";
                 </td>
 
 
-                <td class="text-center">
+                <td class="text-center" v-if="!forSelect">
                     {{ item.updated_at || '-' }}
                 </td>
-                <td class="text-center">
+                <td class="text-center" v-if="!forSelect">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-bars"></i>
@@ -117,6 +119,7 @@ import Pagination from "@/Components/Pagination.vue";
 import {mapGetters} from "vuex";
 
 export default {
+    props:["forSelect"],
     data() {
         return {
             sort: {

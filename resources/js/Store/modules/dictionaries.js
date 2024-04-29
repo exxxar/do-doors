@@ -2,6 +2,32 @@ import util from './utilites';
 
 const state = {
     dictionary: {
+        statuses: [
+            {
+                title: 'Новый клиент',
+                value: 'new_client'
+            },
+            {
+                title: 'Юридическое лицо',
+                value: 'legal_entity'
+            },
+            {
+                title: 'Физическое лицо',
+                value: 'individual'
+            },
+            {
+                title: 'Индивидуальный предприниматель',
+                value: 'sole_proprietor'
+            },
+            {
+                title: 'Дилер',
+                value: 'dealer'
+            },
+            {
+                title: 'Дистрибьютор',
+                value: 'distributor'
+            }
+        ],
         prices:[
             {
                 id:1,
@@ -856,7 +882,7 @@ const state = {
             },
         ],
         purpose_variants:[
-          'Входная','В спальню', 'В детскую', 'Офисная'
+          'Входная','В спальню', 'В детскую', 'Офисная','В санузел'
         ],
         opening_variants: [
             {
