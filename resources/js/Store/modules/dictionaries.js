@@ -28,880 +28,883 @@ const state = {
                 value: 'distributor'
             }
         ],
-        prices:[
+        prices: [
             {
-                id:1,
-                height:2100,
-                width:800,
-                materials:[
+                id: 1,
+                height: 2100,
+                width: 800,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:2,
-                height:2100,
-                width:900,
-                materials:[
+                id: 2,
+                height: 2100,
+                width: 900,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:3,
-                height:2100,
-                width:1000,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-
-            {
-                id:4,
-                height:2300,
-                width:800,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:14920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:5,
-                height:2300,
-                width:900,
-                materials:[
+                id: 3,
+                height: 2100,
+                width: 1000,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:15920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:6,
-                height:2300,
-                width:1000,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:16920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
 
             {
-                id:7,
-                height:2500,
-                width:800,
-                materials:[
+                id: 4,
+                height: 2300,
+                width: 800,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 14920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:8,
-                height:2500,
-                width:900,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:9,
-                height:2500,
-                width:1000,
-                materials:[
+                id: 5,
+                height: 2300,
+                width: 900,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 15920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-
-            {
-                id:10,
-                height:2700,
-                width:800,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:11,
-                height:2700,
-                width:900,
-                materials:[
+                id: 6,
+                height: 2300,
+                width: 1000,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 16920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:12,
-                height:2700,
-                width:1000,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
 
             {
-                id:13,
-                height:2800,
-                width:800,
-                materials:[
+                id: 7,
+                height: 2500,
+                width: 800,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:14,
-                height:2800,
-                width:900,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:15,
-                height:2800,
-                width:1000,
-                materials:[
+                id: 8,
+                height: 2500,
+                width: 900,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 9,
+                height: 2500,
+                width: 1000,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
 
             {
-                id:16,
-                height:3000,
-                width:800,
-                materials:[
+                id: 10,
+                height: 2700,
+                width: 800,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
-                    },
-                ]
-            },
-            {
-                id:17,
-                height:3000,
-                width:900,
-                materials:[
-                    {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
-                    },
-                    {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
-                    },
-                    {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
-                    },
-                    {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
-                    },
-                    {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
-                    },
-                    {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
-                    },
-                    {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
-                    },
-                    {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
             {
-                id:18,
-                height:3000,
-                width:1000,
-                materials:[
+                id: 11,
+                height: 2700,
+                width: 900,
+                materials: [
                     {
-                        id:1,
-                        title:"Стекло крашенное",
-                        price:12920
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
                     },
                     {
-                        id:2,
-                        title:"Зеркало",
-                        price:8740
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
                     },
                     {
-                        id:3,
-                        title:"Стекло цветное",
-                        price:8740
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
                     },
                     {
-                        id:4,
-                        title:"Шпон",
-                        price:8740
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
                     },
                     {
-                        id:5,
-                        title:"Мультишпон",
-                        price:9040
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
                     },
                     {
-                        id:6,
-                        title:"Натуральный шпон",
-                        price:23504
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
                     },
                     {
-                        id:7,
-                        title:"Натуральный шпон",
-                        price:6600
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
                     },
                     {
-                        id:8,
-                        title:"Стекло",
-                        price:6600
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 12,
+                height: 2700,
+                width: 1000,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+
+            {
+                id: 13,
+                height: 2800,
+                width: 800,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 14,
+                height: 2800,
+                width: 900,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 15,
+                height: 2800,
+                width: 1000,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+
+            {
+                id: 16,
+                height: 3000,
+                width: 800,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 17,
+                height: 3000,
+                width: 900,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
+                    },
+                ]
+            },
+            {
+                id: 18,
+                height: 3000,
+                width: 1000,
+                materials: [
+                    {
+                        id: 1,
+                        title: "Стекло крашенное",
+                        price: 12920
+                    },
+                    {
+                        id: 2,
+                        title: "Зеркало",
+                        price: 8740
+                    },
+                    {
+                        id: 3,
+                        title: "Стекло цветное",
+                        price: 8740
+                    },
+                    {
+                        id: 4,
+                        title: "Шпон",
+                        price: 8740
+                    },
+                    {
+                        id: 5,
+                        title: "Мультишпон",
+                        price: 9040
+                    },
+                    {
+                        id: 6,
+                        title: "Натуральный шпон",
+                        price: 23504
+                    },
+                    {
+                        id: 7,
+                        title: "Натуральный шпон",
+                        price: 6600
+                    },
+                    {
+                        id: 8,
+                        title: "Стекло",
+                        price: 6600
                     },
                 ]
             },
         ],
-        purpose_variants:[
-          'Входная','В спальню', 'В детскую', 'Офисная','В санузел'
+        purpose_variants: [
+            'Входная', 'В спальню', 'В детскую', 'Офисная', 'В санузел'
         ],
         opening_variants: [
             {
                 id: 1,
                 title: 'НА СЕБЯ',
-                depth: 43,
+                depth: 45,
                 direction: 'on',
+                price: 0,
             },
             {
                 id: 2,
                 title: 'НА СЕБЯ',
                 depth: 57,
                 direction: 'on',
+                price: 0,
             },
             {
                 id: 3,
                 title: 'ОТ СЕБЯ',
                 depth: 57,
                 direction: 'from',
+                price: 0,
             }
         ],
         door_variants: [
@@ -934,62 +937,62 @@ const state = {
             {
                 id: 2,
                 title: 'шпон',
-                wrapper_variants:[
+                wrapper_variants: [
                     {
-                        id:1,
-                        path:'/images/шпон/3 Albero 372S.png'
+                        id: 1,
+                        path: '/images/шпон/3 Albero 372S.png'
                     },
                     {
-                        id:2,
-                        path:'/images/шпон/5 Bianche notti Crossing grey C.png'
+                        id: 2,
+                        path: '/images/шпон/5 Bianche notti Crossing grey C.png'
                     },
                     {
-                        id:3,
-                        path:'/images/шпон/7 Bianche notti 7064S.png'
+                        id: 3,
+                        path: '/images/шпон/7 Bianche notti 7064S.png'
                     },
                 ],
-                door_variants:[
+                door_variants: [
                     {
-                       id:1,
-                        path:'/images/шпон/4 Albero 372S.png'
+                        id: 1,
+                        path: '/images/шпон/4 Albero 372S.png'
                     },
                     {
-                        id:2,
-                        path:'/images/шпон/6 Bianche notti Crossing grey C.png'
+                        id: 2,
+                        path: '/images/шпон/6 Bianche notti Crossing grey C.png'
                     },
                     {
-                        id:3,
-                        path:'/images/шпон/8 Bianche notti 7064S.png'
+                        id: 3,
+                        path: '/images/шпон/8 Bianche notti 7064S.png'
                     },
                     {
-                        key:'серебро',
-                        path:'/images/зеркало/01 Silver.jpg'
+                        key: 'серебро',
+                        path: '/images/зеркало/01 Silver.jpg'
                     },
                     {
-                        key:'серый',
-                        path:'/images/зеркало/02 Gray.jpg'
+                        key: 'серый',
+                        path: '/images/зеркало/02 Gray.jpg'
                     },
                     {
-                        key:'бронза',
-                        path:'/images/зеркало/03 Bronze.jpg'
+                        key: 'бронза',
+                        path: '/images/зеркало/03 Bronze.jpg'
                     }
                 ]
             },
             {
                 id: 3,
                 title: 'зеркало',
-                door_variants:[
+                door_variants: [
                     {
-                        key:'серебро',
-                        path:'/images/зеркало/01 Silver.jpg'
+                        key: 'серебро',
+                        path: '/images/зеркало/01 Silver.jpg'
                     },
                     {
-                        key:'серый',
-                        path:'/images/зеркало/02 Gray.jpg'
+                        key: 'серый',
+                        path: '/images/зеркало/02 Gray.jpg'
                     },
                     {
-                        key:'бронза',
-                        path:'/images/зеркало/03 Bronze.jpg'
+                        key: 'бронза',
+                        path: '/images/зеркало/03 Bronze.jpg'
                     }
                 ]
             },
@@ -1018,76 +1021,209 @@ const state = {
             {
                 id: 1,
                 title: 'Слева',
-                type:'left'
+                type: 'left'
             },
             {
                 id: 2,
                 title: 'Справа',
-                type:'right'
+                type: 'right'
             },
         ], //петли
         size_variants: [
             {
                 width: 800,
                 height: 2100,
-                loops_count:2,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
+                // loops_count:2,
             },
             {
                 width: 1000,
                 height: 2100,
-                loops_count:2,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 800,
                 height: 2300,
-                loops_count:3,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 1000,
                 height: 2300,
-                loops_count:3,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 800,
                 height: 2500,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 1000,
                 height: 2500,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 800,
                 height: 2700,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 1000,
                 height: 2700,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 800,
                 height: 2800,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 1000,
                 height: 2800,
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 800,
                 height: 3000,
 
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
             {
                 width: 1000,
                 height: 3000,
 
-                loops_count:4,
+                loops: [
+                    {
+                        material_id: 1,
+                        loops_count: 3,
+                        price: {
+                            wholesale: 0,
+                            dealer: 0,
+                            retail: 0,
+                            cost: 0,
+                        }
+                    }
+                ],
             },
         ], //варианты размеров
         color_variants: [
@@ -1159,17 +1295,17 @@ const state = {
             {
                 id: 1,
                 title: 'Опт',
-                key:'wholesale'
+                key: 'wholesale'
             },
             {
                 id: 2,
                 title: 'Розница',
-                key:'dealer'
+                key: 'dealer'
             },
             {
                 id: 3,
                 title: 'Цена дилера',
-                key:'retail'
+                key: 'retail'
             }
         ], //типы цен
     }
@@ -1194,7 +1330,7 @@ const actions = {
         let _axios = util.makeAxiosFactory(link, method)
 
         return _axios.then((response) => {
-            context.commit("setDictionarySizes",  response.data || [])
+            context.commit("setDictionarySizes", response.data || [])
         }).catch(err => {
             context.commit("setErrors", err.response.data.errors || [])
             return Promise.reject(err);
@@ -1210,41 +1346,41 @@ const mutations = {
 
         state.dictionary.size_variants = []
 
-        payload.prices.forEach(item=>{
+        payload.prices.forEach(item => {
             state.dictionary.size_variants.push({
                 width: item.width,
                 height: item.height,
-                loops_count:item.loops_count,
+                loops: item.loops || [],
             })
         })
 
         state.dictionary.finishes_variants = []
 
-        payload.materials.forEach(item=>{
+        payload.materials.forEach(item => {
 
             state.dictionary.finishes_variants.push({
                 id: item.id,
                 title: item.title,
                 wrapper_variants: item.wrapper_variants,
-                door_variants:item.door_variants,
+                door_variants: item.door_variants,
             })
         })
 
         state.dictionary.handle_holes_type_variants = []
 
-        payload.handles.forEach(item=>{
+        payload.handles.forEach(item => {
             state.dictionary.handle_holes_type_variants.push({
                 id: item.id,
                 title: item.title,
                 price: item.price,
                 color: item.color,
-                variants:item.variants,
+                variants: item.variants,
             })
         })
 
         state.dictionary.hinge_manufacturer_variants = []
 
-        payload.hinges.forEach(item=>{
+        payload.hinges.forEach(item => {
             state.dictionary.hinge_manufacturer_variants.push({
                 id: item.id,
                 title: item.title,
@@ -1252,9 +1388,35 @@ const mutations = {
             })
         })
 
+
+        let directions = [
+            {
+                title: 'На себя',
+                direction: 'on'
+            },
+            {
+                title: 'От себя',
+                direction: 'from'
+            }
+        ];
+
+        state.dictionary.opening_variants = []
+
+        directions.forEach(item => {
+            Object.keys(payload.depth).forEach(key => {
+                state.dictionary.opening_variants.push({
+                    title: item.title,
+                    direction: item.direction,
+                    depth: key,
+                    sizes: payload.depth[key]
+                })
+            })
+
+        })
+
         state.dictionary.door_variants = []
 
-        payload.door_variants.forEach(item=>{
+        payload.door_variants.forEach(item => {
             state.dictionary.door_variants.push({
                 id: item.id,
                 title: item.title,
@@ -1265,11 +1427,12 @@ const mutations = {
 
         state.dictionary.color_variants = []
 
-        payload.colors.forEach(item=>{
+        payload.colors.forEach(item => {
             state.dictionary.color_variants.push({
                 id: item.id,
                 title: item.title,
-                price: item.price,
+                assign_with_size: item.assign_with_size || false,
+                sizes: item.sizes,
                 code: item.code,
                 type: item.type,
             })

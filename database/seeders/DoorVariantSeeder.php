@@ -18,22 +18,42 @@ class DoorVariantSeeder extends Seeder
 
         DoorVariant::query()->create([
             'title'=>'Комплект двери скрытого монтажа',
-            'price'=>1000,
+             'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
         ]);
 
         DoorVariant::query()->create([
             'title'=>'Короб',
-            'price'=>2000,
+             'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
         ]);
 
         DoorVariant::query()->create([
             'title'=>'Дверь Magic',
-            'price'=>3000,
+             'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
         ]);
 
         DoorVariant::query()->create([
             'title'=>'Полотно',
-            'price'=>4000,
+             'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
         ]);
     }
 }

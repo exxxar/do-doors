@@ -5,8 +5,8 @@
 
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link"
+                    <li class="page-item ">
+                        <a class="page-link rounded-0"
                            v-bind:class="{'disabled':pagination.links.prev===null}"
                            @click="prevPage" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
@@ -16,18 +16,18 @@
                         :key="'paginate'+index"
                         v-for="(item, index) in filteredLinks"
                         @click="page(index)"
-                        v-bind:class="{'active':index===pagination.meta.current_page }">
-                        <a class="page-link"
-
+                        v-bind:class="{'active-dark':index===pagination.meta.current_page }">
+                        <a class="page-link rounded-0"
+                            v-bind:class="{'text-secondary':index!==pagination.meta.current_page}"
                            v-if="index!==0&&index!==filteredLinks.length-1"
                            href="#">{{item.label}}</a>
                     </li>
 
                     <li class="page-item">
-                        <a class="page-link"
+                        <a class="page-link rounded-0 text-secondary"
                            v-bind:class="{'disabled':pagination.links.next===null}"
                            @click="nextPage"
-                           aria-label="Next">
+                           aria-label="Next ">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -98,8 +98,16 @@ export default {
 
 }
 </script>
-<style>
+<style lang="scss">
 .page-item {
     height: 100%;
+}
+
+.active-dark {
+    .page-link {
+        background-color: black !important;
+        color:white;
+    }
+
 }
 </style>

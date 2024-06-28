@@ -1,10 +1,58 @@
 <script setup>
 import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
+import SizeControls from "@/Components/Admin/Sizes/SizeControls.vue";
 </script>
 <template>
 
+    <div class="row">
+        <div class="col-md-6 col-12">
+            <SizeControls></SizeControls>
+        </div>
+    </div>
     <form action="" v-on:submit.prevent="submit">
 
+
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <select class="form-select rounded-0"
+                            id="floatingSelect"
+                            v-model="form.type"
+                            aria-label="Floating label select example">
+                        <option value="sizes">Размеры</option>
+                        <option value="loops">Петли</option>
+                        <option value="colors">Цвета</option>
+                        <option value="depth">Толщина</option>
+                    </select>
+                    <label for="floatingSelect">Выбор типа</label>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6" v-if="form.type==='sizes'||form.type==='loops'">
+                <div class="form-floating mb-3">
+                    <button type="button" class="btn btn-outline-secondary rounded-0 w-100 p-3 text-left">
+                        <i class="fa-solid fa-scroll mr-2"></i>
+                        <span
+                            @click="openMaterialModal"
+                            v-if="!selectedMaterial">  Выберите материал</span>
+                        <span class="mb-2" v-if="selectedMaterial">
+                            <strong @click="openMaterialModal">{{
+                                    selectedMaterial.title || '-'
+                                }}</strong>
+                            <a href="javascript:void(0)" @click="removeSelectedMaterial"><i
+                                class="fa-solid fa-xmark ml-1 text-danger"></i></a>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-12 col-md-6" v-else>
+                <div class="card rounded-0">
+                    <div class="card-body">
+                        <p class="text-secondary">Выбор материала не предусмотрен</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12 col-md-6">
                 <div class="form-floating mb-3">
@@ -87,27 +135,35 @@ import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
                     <label for="size-price-koef">Ценовой коэффициент</label>
                 </div>
             </div>
+
+            <div class="col-12 col-md-6">
+                <div class="form-floating mb-3" v-if="form.type==='loops'">
+                    <input type="text"
+                           v-model="form.value"
+                           class="form-control" id="size-loops-count"
+                           placeholder="name@example.com">
+                    <label for="size-loops-count">Число петель</label>
+                </div>
+
+                <div class="form-floating mb-3" v-if="form.type==='depth'">
+                    <input type="number"
+                           v-model="form.value"
+                           class="form-control" id="size-loops-count"
+                           placeholder="name@example.com">
+                    <label for="size-loops-count">Толщина</label>
+                </div>
+
+                <div class="form-floating mb-3" v-if="form.type==='colors'">
+                    <input type="text"
+                           v-model="form.value"
+                           class="form-control" id="size-loops-count"
+                           placeholder="name@example.com">
+                    <label for="size-loops-count">Цвет</label>
+                </div>
+            </div>
+
+
         </div>
-
-
-        <div class="form-floating mb-3">
-            <input type="number"
-                   v-model="form.loops_count"
-                   class="form-control" id="size-loops-count"
-                   placeholder="name@example.com">
-            <label for="size-loops-count">Число петель</label>
-        </div>
-
-        <p class="mb-2" v-if="selectedMaterial">Вы выбрали материал: <strong>{{
-                selectedMaterial.title || '-'
-            }}</strong>
-            <a href="javascript:void(0)" @click="removeSelectedMaterial"><i
-                class="fa-solid fa-xmark ml-1 text-danger"></i></a>
-        </p>
-        <button type="button" class="btn btn-outline-primary" @click="openMaterialModal">
-            <i class="fa-solid fa-scroll mr-2"></i> Выберите материал
-        </button>
-
 
         <div class="row mt-2">
             <div class="col-12">
@@ -148,16 +204,18 @@ import MaterialTable from "@/Components/Admin/Materials/MaterialTable.vue";
     <!-- Modal -->
     <div class="modal fade" id="select-material-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+        <div class="modal-dialog modal-md ">
+            <div class="modal-content rounded-0">
 
-                <div class="modal-body">
+                <div class="modal-body ">
                     <MaterialTable
+                        :simple="true"
                         v-on:select="selectMaterial"
                         v-if="!loadingMaterial"></MaterialTable>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Закрыть
+                    </button>
                 </div>
             </div>
         </div>
@@ -168,6 +226,7 @@ export default {
     props: ["item"],
     data() {
         return {
+            tab: 0,
             materialModal: null,
             messages: [],
             loading: false,
@@ -185,9 +244,21 @@ export default {
                     cost: 0,
                 },
                 price_koef: 0,
-                loops_count: 0,
+                value: null,
+                type: "sizes",
             }
         }
+    },
+    watch: {
+
+        'form.type': {
+            handler(val) {
+                this.form.value = null
+                this.form.material_id = null
+                this.selectedMaterial = null
+            },
+            deep: true
+        },
     },
     computed: {
         needClearForm() {

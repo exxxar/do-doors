@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title', 255)->nullable();
             $table->string('color', 50)->nullable();
-            $table->double('price')->default('0');
+            $table->json('price')->nullable();
             $table->json('variants');
             $table->timestamps();
         });

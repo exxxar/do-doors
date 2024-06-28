@@ -17,10 +17,15 @@ return new class extends Migration
             $table->id();
             $table->integer('width')->default(0);
             $table->integer('height')->default(0);
-            $table->foreignId('material_id')->constrained('materials');
+            $table->foreignId('material_id')->nullable()->constrained('materials');
             $table->json('price')->nullable();
             $table->double('price_koef')->default(0);
-            $table->integer('loops_count')->default(0);
+
+
+          //  $table->integer('loops_count')->default(0);
+            $table->string('value')->nullable();
+
+            $table->enum('type',['sizes', 'loops','depth','colors'])->default('sizes');
             $table->timestamps();
         });
 

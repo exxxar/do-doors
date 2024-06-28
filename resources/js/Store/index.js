@@ -7,6 +7,7 @@ import handles from './modules/handles.js'
 import hinges from './modules/hinges.js'
 import colors from './modules/colors.js'
 import door_variants from './modules/door_variants.js'
+
 import clients from './modules/clients.js'
 import orders from './modules/orders.js'
 import orderDetails from './modules/order_details.js'

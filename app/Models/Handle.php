@@ -16,6 +16,7 @@ class Handle extends Model
      */
     protected $fillable = [
         'title',
+        'order_position',
         'color',
         'price',
         'variants',
@@ -29,7 +30,8 @@ class Handle extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'price' => 'double',
+        'order_position' => 'integer',
+        'price' => 'json',
         'variants' => 'array',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

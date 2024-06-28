@@ -3,6 +3,42 @@ import Pagination from "@/Components/Pagination.vue";
 import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue";
 </script>
 <template>
+
+<!--    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a
+                        @click="tab=0"
+                        v-bind:class="{'active':tab===0,'text-secondary':tab!==0}"
+                        class="nav-link rounded-0 "
+                        href="javascript:void(0)">Размеры</a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        @click="tab=1"
+                        v-bind:class="{'active':tab===1,'text-secondary':tab!==1}"
+                        class="nav-link rounded-0"
+                        href="javascript:void(0)">Петли</a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        @click="tab=2"
+                        v-bind:class="{'active':tab===2,'text-secondary':tab!==2}"
+                        class="nav-link rounded-0"
+                        href="javascript:void(0)">Цвета</a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        @click="tab=3"
+                        v-bind:class="{'active':tab===3,'text-secondary':tab!==3}"
+                        class="nav-link rounded-0"
+                        href="javascript:void(0)">Ширина</a>
+                </li>
+            </ul>
+        </div>
+    </div>-->
+
     <form class="row">
         <div class="col-12">
 
@@ -12,10 +48,12 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                            v-model="search"
                            class="form-control" id="search-sizes">
                     <label
-                        @click="sortAndLoad('id')"
-                        for="search-sizes">Поиск по размерам и материалам</label>
+
+                        for="search-sizes">Поиск</label>
                 </div>
-                <button type="submit" class="btn btn-outline-primary">
+                <button
+                    @click="sortAndLoad('id')"
+                    type="button" class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
@@ -25,31 +63,37 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
     </form>
     <!-- Button trigger modal -->
 
+
+
+
     <div class="row">
-        <div class="col-12 d-flex">
-
-            <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="fa-solid fa-bars mr-2"></i>Управление разделом
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/sizes/export-prices">Скачать шаблон таблицы</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные из Excel или Google таблицы</a></li>
-
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openConfirmModal">Обновить JSON</a>
-                    </li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="recountModalShow">Пересчет
-                        показателей</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="generateModalShow"> Генерация
-                        размеров</a></li>
-                </ul>
+        <div class="col-12">
+            <h4>Выбор типа данных</h4>
+            <div class="d-flex py-2">
+                <button
+                    v-bind:class="{'btn-dark text-white':sort.type === null}"
+                    @click="sort.type = null"
+                    class="btn btn-outline-secondary mr-2 rounded-0">Всё</button>
+                <button
+                    v-bind:class="{'btn-dark text-white':sort.type === 'sizes'}"
+                    @click="sort.type = 'sizes'"
+                    class="btn btn-outline-secondary mr-2 rounded-0">Размеры</button>
+                <button
+                    v-bind:class="{'btn-dark text-white':sort.type === 'loops'}"
+                    @click="sort.type = 'loops'"
+                    class="btn btn-outline-secondary mr-2 rounded-0">Петли</button>
+                <button
+                    v-bind:class="{'btn-dark text-white':sort.type === 'colors'}"
+                    @click="sort.type = 'colors'"
+                    class="btn btn-outline-secondary mr-2 rounded-0">Цвет</button>
+                <button
+                    v-bind:class="{'btn-dark text-white':sort.type === 'depth'}"
+                    @click="sort.type = 'depth'"
+                    class="btn btn-outline-secondary mr-2 rounded-0">Толщина</button>
             </div>
 
         </div>
     </div>
-
-
     <div class="d-flex scrollable-area">
         <table class="table table-responsive" v-if="items.length>0">
             <thead>
@@ -88,6 +132,13 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         class="fa-solid fa-caret-up"></i></span>
 
                 </th>
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('type')">Тип данных
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'type'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'type'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+                </th>
+
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('loops_count')">Число петель
                     <span v-if="sort.direction === 'desc'&&sort.column === 'loops_count'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -158,6 +209,15 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         placeholder="name@example.com">
 
                 </td>
+
+                <td class="text-center">
+
+                   <span v-if="item.type==='sizes'">Размеры</span>
+                   <span v-if="item.type==='loops'">Петли</span>
+                   <span v-if="item.type==='colors'">Цвета</span>
+                   <span v-if="item.type==='depth'">Толщина</span>
+
+                </td>
                 <td class="text-center">
                     {{ item.loops_count || 0 }}
 
@@ -219,331 +279,6 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="import-prices-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Форма загрузки таблицы</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input"
-                               v-model="need_import_from_google"
-                               type="checkbox" role="switch" id="need_rewrite">
-                        <label class="form-check-label" for="need_rewrite">
-                            <span v-if="need_import_from_google">Загрузить из Google-таблицы</span>
-                            <span v-else>Загрузить из Excel-файла</span>
-
-                        </label>
-                    </div>
-                    <form
-                        v-if="!need_import_from_google"
-                        v-on:submit.prevent="importSubmit">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="importForm.need_rewrite"
-                                   type="checkbox" role="switch" id="need_rewrite">
-                            <label class="form-check-label" for="need_rewrite">
-                                <span v-if="importForm.need_rewrite">Перезаписать старые значения</span>
-                                <span v-else>Добавить новые значения</span>
-
-                            </label>
-                        </div>
-
-                        <div class="form-floating my-3 border-gray-100 border">
-                            <input type="file" class="form-control"
-                                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                   id="excel-file-for-import"
-                                   ref="importPriceFromExcel"
-                                   @change="onChangeFile($event)">
-                            <label for="excel-file-for-import">Файл-эксель</label>
-                        </div>
-
-                        <button type="submit"
-                                :disabled="timer!=null"
-                                class="btn btn-outline-primary w-100 p-3">Загрузить
-                            <span v-if="timer!=null">{{timer}} сек</span>
-                        </button>
-                    </form>
-                    <form
-                        v-else
-                        v-on:submit.prevent="importFromGoogleSubmit">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="importGoogleForm.need_rewrite"
-                                   type="checkbox" role="switch" id="need_rewrite_google">
-                            <label class="form-check-label" for="need_rewrite_google">
-                                <span v-if="importGoogleForm.need_rewrite">Перезаписать старые значения</span>
-                                <span v-else>Добавить новые значения</span>
-
-                            </label>
-                        </div>
-
-                        <div class="form-floating my-3 border-gray-100 border">
-                            <input type="text" class="form-control"
-                                   v-model="importGoogleForm.sheet_id"
-                                   id="sheet-id" placeholder="name@example.com">
-                            <label for="sheet-id">Идентификатор таблицы</label>
-                        </div>
-
-                        <div class="form-floating my-3 border-gray-100 border">
-                            <input type="text"
-                                   v-model="importGoogleForm.sheet_title"
-                                   class="form-control" id="sheet-title" placeholder="name@example.com">
-                            <label for="sheet-title">Название листа</label>
-                        </div>
-
-                        <button type="submit"
-                                :disabled="timer!=null"
-                                class="btn btn-outline-primary w-100 p-3">Загрузить
-                            <span v-if="timer!=null">{{timer}} сек</span>
-                        </button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="recount-prices" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Форма пересчета показателей</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form v-on:submit.prevent="submitRecountForm">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="recountForm.need_recount_by_width"
-                                   type="checkbox" role="switch" id="recount-by-width">
-                            <label class="form-check-label" for="recount-by-width">
-                                Пересчитать по ширине
-                            </label>
-                        </div>
-
-                        <div class="form-floating mb-3" v-if="recountForm.need_recount_by_width">
-                            <input type="number"
-                                   v-model="recountForm.base_width"
-                                   class="form-control" id="base-width" required>
-                            <label for="base-width">Базовая ширина</label>
-                        </div>
-
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="recountForm.need_recount_by_height"
-                                   type="checkbox" role="switch" id="recount-by-height">
-                            <label class="form-check-label" for="recount-by-height">
-                                Пересчитать по высоте
-                            </label>
-                        </div>
-
-                        <div class="form-floating mb-3" v-if="recountForm.need_recount_by_height">
-                            <input type="number"
-                                   v-model="recountForm.base_height"
-                                   class="form-control" id="base-height" required>
-                            <label for="base-height">Базовая высота</label>
-                        </div>
-
-                        <MaterialDropdown v-on:select="selectMaterialForRecount" class="mb-3">
-                            <template v-slot:default>
-                                <span v-if="recountForm.selected_material==null">Выбор материала</span>
-                                <span v-else>{{ recountForm.selected_material.title || '-' }}</span>
-                            </template>
-                        </MaterialDropdown>
-
-                        <div class="form-floating mb-3">
-                            <input type="number"
-                                   v-model="recountForm.recount_price"
-                                   class="form-control" id="base-price" required>
-                            <label for="base-price">Цена для пересчета</label>
-                        </div>
-
-                        <div class="alert alert-success mb-3" v-if="affected" role="alert">
-                            Выполнен перерасчет. Затронуто {{ affected }} строк.
-                        </div>
-
-                        <button type="submit"
-                                :disabled="recountForm.selected_material==null"
-                                class="btn btn-outline-primary w-100 p-3">Выполнить пересчет
-                        </button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="generate-sizes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Форма генерации размерности</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form v-on:submit.prevent="submitGenerateForm">
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.base_width"
-                                           class="form-control" id="generate-base-width" required>
-                                    <label for="generate-base-width">Базовая ширина</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.width_step"
-                                           class="form-control" id="generate-step-width" required>
-                                    <label for="generate-step-width">Шаг генерации ширины</label>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.base_height"
-                                           class="form-control" id="generate-base-width" required>
-                                    <label for="generate-base-width">Базовая высота</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.height_step"
-                                           class="form-control" id="generate-step-width" required>
-                                    <label for="generate-step-width">Шаг генерации высоты</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.base_koef"
-                                           class="form-control" id="generate-base-width" required>
-                                    <label for="generate-base-width">Базовый коэффициент</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           step="0.1"
-                                           v-model="generateForm.koef_step"
-                                           class="form-control" id="generate-step-width" required>
-                                    <label for="generate-step-width">Шаг генерации коэффициента</label>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.base_loops"
-                                           class="form-control" id="generate-base-loops" required>
-                                    <label for="generate-base-loops">Базовое число петель</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           step="0.1"
-                                           v-model="generateForm.loops_step"
-                                           class="form-control" id="generate-step-width" required>
-                                    <label for="generate-step-width">Шаг генерации петель</label>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           v-model="generateForm.base_price"
-                                           class="form-control" id="generate-base-price" required>
-                                    <label for="generate-base-price">Базовая цена</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating mb-3">
-                                    <input type="number"
-                                           step="0.1"
-                                           v-model="generateForm.price_step"
-                                           class="form-control" id="generate-step-width" required>
-                                    <label for="generate-step-width">Шаг генерации цены</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            <input type="number"
-                                   v-model="generateForm.steps"
-                                   class="form-control" id="generate-step-width" required>
-                            <label for="generate-step-width">Число шагов генерации</label>
-                        </div>
-
-                        <MaterialDropdown v-on:select="selectMaterialForGeneration" class="mb-3">
-                            <template v-slot:default>
-                                <span v-if="generateForm.selected_material==null">Выбор материала</span>
-                                <span v-else>{{ generateForm.selected_material.title || '-' }}</span>
-                            </template>
-                        </MaterialDropdown>
-
-                        <div class="alert alert-success mb-3" v-if="affected" role="alert">
-                            Выполнен перерасчет. Затронуто {{ affected }} строк.
-                        </div>
-
-                        <button type="submit"
-                                :disabled="generateForm.selected_material==null"
-                                class="btn btn-outline-primary w-100 p-3">Выполнить генерацию
-                        </button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog ">
-            <div class="modal-content rounded-0">
-
-                <div class="modal-body">
-                    <p>Вы хотите обновить JSON-файл с размерами?</p>
-                   <div class="row">
-                       <div class="col-6">
-                           <button class="btn btn-dark rounded-0 w-100" type="button" @click="saveFormattedSizes">Да, продолжить</button>
-                       </div>
-                       <div class="col-6">
-                           <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет, отменить</button>
-                       </div>
-                   </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
 </template>
 <script>
@@ -552,49 +287,12 @@ import {mapGetters} from "vuex";
 export default {
     data() {
         return {
-            timer:null,
-            affected: null,
             sort: {
                 column: null,
-                direction: "desc"
+                direction: "desc",
+                type:"sizes"
             },
             search: null,
-            generateForm: {
-                base_width: 0,
-                base_height: 0,
-                base_koef: 0,
-                base_loops: 0,
-                base_price: 0,
-                width_step: 0,
-                height_step: 0,
-                koef_step: 0,
-                loops_step: 0,
-                price_step: 0,
-                selected_material: null,
-                steps: 0
-            },
-            need_import_from_google:false,
-            importGoogleForm:{
-                sheet_id: null,
-                sheet_title:null,
-                need_rewrite:false,
-            },
-            importForm:{
-                need_rewrite: false,
-                files:[],
-            },
-            recountForm: {
-                selected_material: null,
-                need_recount_by_width: false,
-                need_recount_by_height: false,
-                base_width: null,
-                base_height: null,
-                recount_price: null,
-            },
-            recountModal: null,
-            confirmModal: null,
-            importPricesModal: null,
-            generateModal: null,
             current_page: 0,
             paginate_object: null,
             items: [
@@ -604,24 +302,20 @@ export default {
     computed: {
         ...mapGetters(['getSizesPaginateObject', 'getSizes']),
     },
+    watch: {
+        'sort.type': {
+            handler: function (newValue) {
+                this.loadSizes();
+            },
+            deep: true
+        }
+    },
     mounted() {
         this.loadSizes();
 
-        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
-        this.recountModal = new bootstrap.Modal(document.getElementById('recount-prices'), {})
-        this.importPricesModal = new bootstrap.Modal(document.getElementById('import-prices-form'), {})
-        this.generateModal = new bootstrap.Modal(document.getElementById('generate-sizes'), {})
-    },
+          },
     methods: {
-        openConfirmModal(){
-            this.confirmModal.show()
-        },
-        onChangeFile( e) {
-            const files = e.target.files
-            for (let i = 0; i < files.length; i++)
-               this.importForm.files.push(files[i])
 
-        },
         saveFormattedSizes() {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
                 this.confirmModal.hide()
@@ -638,184 +332,6 @@ export default {
                 });
             })
         },
-        openImportFormModal(){
-            this.importPricesModal.show()
-        },
-        generateModalShow() {
-            this.generateModal.show()
-        },
-        recountModalShow() {
-
-            this.affected = null
-            this.recountForm.recount_price = 0
-            this.recountForm.need_recount_by_height = false
-            this.recountForm.need_recount_by_width = false
-            this.recountForm.base_height = 0
-            this.recountForm.base_width = 0
-            this.recountForm.selected_material = null
-
-            this.recountModal.show()
-
-        },
-        recountByKoef(item) {
-            this.affected = null
-
-            this.recountForm.recount_price = item.price
-            this.recountForm.need_recount_by_height = true
-            this.recountForm.need_recount_by_width = true
-            this.recountForm.base_height = item.height
-            this.recountForm.base_width = item.width
-            this.recountForm.selected_material = item.material
-
-            this.recountModal.show()
-        },
-        importFromGoogleSubmit(){
-            let data = new FormData();
-
-
-            this.timer = 0
-            let tmpTimer = setInterval(()=>{
-                this.timer++
-            }, 1000)
-
-            Object.keys(this.importGoogleForm)
-                .forEach(key => {
-                    const item = this.importGoogleForm[key] || ''
-                    if (typeof item === 'object')
-                        data.append(key, JSON.stringify(item))
-                    else
-                        data.append(key, item)
-                });
-
-            this.$store.dispatch("importSizesFromGoogle", {
-                importForm: data
-            }).then((response) => {
-
-                window.open(response.url, '_blank').focus();
-
-                this.loadSizes()
-                this.importPricesModal.hide()
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Вы успешно загрузили данные",
-                });
-
-                clearInterval(tmpTimer)
-                this.timer = null
-                this.confirmModal.show()
-            }).catch(()=>{
-                clearInterval(tmpTimer)
-                this.timer = null
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Ошибка загрузки данных",
-                    type: "error"
-                });
-            })
-        },
-        importSubmit(){
-            let data = new FormData();
-
-
-            this.timer = 0
-            let tmpTimer = setInterval(()=>{
-                this.timer++
-            }, 1000)
-
-            Object.keys(this.importForm)
-                .forEach(key => {
-                    const item = this.importForm[key] || ''
-                    if (typeof item === 'object')
-                        data.append(key, JSON.stringify(item))
-                    else
-                        data.append(key, item)
-                });
-
-            if (this.importForm.files.length>0) {
-
-                data.delete("files")
-
-                for (let i = 0; i < this.importForm.files.length; i++) {
-                    data.append('files[]', this.importForm.files[i]);
-                }
-            }
-
-            this.$store.dispatch("importSizes", {
-                importForm: data
-            }).then((response) => {
-
-
-                this.loadSizes()
-                this.importPricesModal.hide()
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Вы успешно загрузили данные",
-                });
-
-                clearInterval(tmpTimer)
-                this.timer = null
-                this.confirmModal.show()
-            }).catch(()=>{
-                clearInterval(tmpTimer)
-                this.timer = null
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Ошибка загрузки данных",
-                    type: "error"
-                });
-            })
-        },
-        submitRecountForm() {
-            this.affected = null
-
-            let data = new FormData();
-
-            data.append("material_id", this.recountForm.selected_material.id)
-
-            Object.keys(this.recountForm)
-                .forEach(key => {
-                    const item = this.recountForm[key] || ''
-                    if (typeof item === 'object')
-                        data.append(key, JSON.stringify(item))
-                    else
-                        data.append(key, item)
-                });
-
-            this.$store.dispatch("recountPrice", {
-                recountForm: data
-            }).then((response) => {
-                this.affected = response.affected || 0
-                this.loadSizes()
-
-            })
-        },
-        submitGenerateForm() {
-            let data = new FormData();
-
-            data.append("material_id", this.generateForm.selected_material.id)
-
-            Object.keys(this.generateForm)
-                .forEach(key => {
-                    const item = this.generateForm[key] || ''
-                    if (typeof item === 'object')
-                        data.append(key, JSON.stringify(item))
-                    else
-                        data.append(key, item)
-                });
-
-            this.$store.dispatch("generateSizes", {
-                generateForm: data
-            }).then((response) => {
-                this.loadSizes()
-                this.generateModal.hide();
-            })
-        },
-        selectMaterialForRecount(item) {
-            this.recountForm.selected_material = item
-        },
-        selectMaterialForGeneration(item) {
-            this.generateForm.selected_material = item
-        },
         sortAndLoad(column) {
             this.sort.column = column
             this.sort.direction = this.sort.direction === "desc" ? "asc" : "desc"
@@ -828,6 +344,7 @@ export default {
                 dataObject: {
                     search: this.search,
                     order: this.sort.column,
+                    type: this.sort.type,
                     direction: this.sort.direction
                 },
                 page: this.current_page

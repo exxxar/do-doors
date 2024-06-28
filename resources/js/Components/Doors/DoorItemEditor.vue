@@ -365,7 +365,6 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     </div>
 
 
-
                     <div class="col-md-6 col-12">
                         <div class="input-group mb-3 ">
                  <span class="input-group-text border-secondary"
@@ -506,7 +505,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                     @invalid="alert('Вы не выбрали отверстие под ручку!')"
                                     v-model="doorForm.handle_holes"
                                     id="floatingSelect" aria-label="Floating label select example" required>
-<!--                                <option :value="{title:null}">Выберите один из вариантов</option>-->
+                                <!--                                <option :value="{title:null}">Выберите один из вариантов</option>-->
                                 <option :value="item" v-for="item in getDictionary.handle_holes_variants">{{
                                         item.title
                                     }}
@@ -586,7 +585,6 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                         </div>
 
                     </div>
-
 
 
                     <div class="col-12 d-flex align-items-center">
@@ -684,7 +682,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                         v-model="doorForm.price_type"
                                         @invalid="alert('Вы не выбрали тип цены!')"
                                         id="door-type" aria-label="door-type" required>
-                                    <option :value="{title:null}">Выберите один из вариантов</option>
+
                                     <option :value="item"
                                             v-for="item in getDictionary.price_type_variants">{{
                                             item.title
@@ -822,8 +820,8 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     <div class="d-flex justify-center p-3">
                         <img src="/images/logo.png" style="width: 100px;" alt="">
                     </div>
-                    <h3 class="font-bold text-center py-3">{{ confirm.title||'-' }}</h3>
-                    <p class="text-center pb-3">{{confirm.message||'-'}}</p>
+                    <h3 class="font-bold text-center py-3">{{ confirm.title || '-' }}</h3>
+                    <p class="text-center pb-3">{{ confirm.message || '-' }}</p>
                     <div class="row">
                         <div class="col-6">
                             <button class="btn btn-dark rounded-0 w-100" type="button" @click="clearForm">Да,
@@ -831,7 +829,8 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет, не очищать
+                            <button class="btn btn-outline-secondary rounded-0 w-100" @click="confirmModal.hide()">Нет,
+                                не очищать
                             </button>
                         </div>
                     </div>
@@ -1010,11 +1009,38 @@ export default {
 
             Object.keys(this.doorForm).forEach(item => {
 
+                let find = false
                 if (item) {
-
                     if (typeof this.doorForm[item] === "object" && this.doorForm[item] != null) {
+                        if (item === "opening_type"&& this.doorForm[item].sizes) {
+                            find = true
+                            let index = this.doorForm[item].sizes.findIndex(c =>
+                                c.width == this.doorForm.width &&
+                                c.height == this.doorForm.height)
 
-                        if (this.doorForm[item].price) {
+                            let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
+                            sum += price || 0
+                        }
+
+                        if (item.indexOf("_color") !== -1 && this.doorForm[item].sizes && !find) {
+                            find = true
+
+                            console.log("color=>>",this.doorForm[item])
+                            let price = 0;
+                            if (!this.doorForm[item].assign_with_size)
+                                price = this.doorForm[item].sizes[0].price[type]
+                            else {
+                                let index = this.doorForm[item].sizes.findIndex(c =>
+                                    c.width == this.doorForm.width &&
+                                    c.height == this.doorForm.height)
+
+                                price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
+                            }
+
+                            sum += price || 0
+                        }
+
+                        if (this.doorForm[item].price && !find) {
                             sum += (typeof this.doorForm[item].price === "object") ?
                                 (this.doorForm[item].price[type] || 0) :
                                 (this.doorForm[item].price || 0)
@@ -1152,7 +1178,6 @@ export default {
                 let search = this.doorForm.front_side_finish_color.title
 
                 if ((this.doorForm.front_side_finish_color.title || '').length === 4) {
-                    console.log((this.doorForm.front_side_finish_color.title || '').length)
                     Object.keys(this.colors).forEach(key => {
                         if (this.colors[key].code === search) {
                             const color = this.colors[key]
@@ -1168,7 +1193,7 @@ export default {
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
-                    this.doorForm.handle_holes =  this.getDictionary.handle_holes_variants[0]
+                    this.doorForm.handle_holes = this.getDictionary.handle_holes_variants[0]
                     this.doorForm.handle_holes_type = {title: null}
                 }
 
@@ -1254,7 +1279,7 @@ export default {
         this.doorForm.purpose = "Дверь " + (this.cartProducts.length + 1)
     },
     methods: {
-        openConfirmModal(title,message) {
+        openConfirmModal(title, message) {
             this.confirm.title = title || null
             this.confirm.message = message || null
 
@@ -1326,8 +1351,9 @@ export default {
             this.doorForm[param] = {
                 title: item.code || null,
                 code: item.code || null,
-                price: item.price || 0,
+                sizes: item.sizes,
                 type: item.type || 'all',
+                assign_with_size: item.assign_with_size || false,
             }
 
             if (item.title === "RAL") {
@@ -1336,8 +1362,9 @@ export default {
                 this.doorForm[param] = {
                     title: 'RAL',
                     code: 'RAL',
-                    price: item.price || 0,
+                    sizes: item.sizes,
                     type: item.type || 'all',
+                    assign_with_size: item.assign_with_size || false,
                 }
 
                 this.colorModal = new bootstrap.Modal(document.getElementById('choose-color-' + this.doorForm.id), {})
@@ -1370,7 +1397,7 @@ export default {
                     fittings_color: {title: null},
                     loops: this.getDictionary.loops_variants[0],//расположение петель
                     loops_count: 2,
-                    price_type: this.getDictionary.price_type_variants[0],
+                    price_type: this.getDictionary.price_type_variants[1],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
                     need_handle_holes: true, //нужна дверная ручка
                     need_upper_jumper: false, //Верхняя перемычка
@@ -1385,8 +1412,8 @@ export default {
             } else
                 this.doorForm = {
                     id: uuid.v1(),
-                    width: 0,
-                    height: 0,
+                    width: this.getDictionary.size_variants[0].width || 0,
+                    height: this.getDictionary.size_variants[0].height || 0,
                     depth: 0,
                     count: 1,
                     price: 0,
@@ -1404,7 +1431,7 @@ export default {
                     fittings_color: {title: null},
                     loops: {title: null}, //расположение петель
                     loops_count: 0,
-                    price_type: {title: null}, //Тип цены
+                    price_type: this.getDictionary.price_type_variants[1],
                     hinge_manufacturer: {title: null}, //Производитель петель
                     handle_holes: this.getDictionary.handle_holes_variants[0],
                     handle_holes_type: {title: null},
@@ -1479,7 +1506,7 @@ export default {
                 this.$notify({
                     title: "DoDoors",
                     text: "Дверь успешно добавлена в корзину",
-                    type:"success"
+                    type: "success"
                 });
             })
         }

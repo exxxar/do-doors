@@ -1,4 +1,3 @@
-
 <template>
 
     <form action="" v-on:submit.prevent="submit">
@@ -10,12 +9,51 @@
             <label for="hinge-title">Наименование производителя петель</label>
         </div>
 
-        <div class="form-floating mb-3">
-            <input type="number"
-                   v-model="form.price"
-                   class="form-control" id="hinge-price"
-                   required>
-            <label for="hinge-title">Цена петель</label>
+        <div class="card rounded-0 mb-3 border-black">
+            <div class="card-header bg-dark text-white rounded-0 ">
+                <h6>Настройка цены</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input type="number"
+                                   v-model="form.price.wholesale"
+                                   class="form-control" id="price-wholesale"
+                                   required>
+                            <label for="price-wholesale">Опт</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input type="number"
+                                   v-model="form.price.retail"
+                                   class="form-control" id="price-retail"
+                                   required>
+                            <label for="price-retail">Розница</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="number"
+                                   v-model="form.price.dealer"
+                                   class="form-control" id="price-dealer"
+                                   required>
+                            <label for="price-dealer">Дилер</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="number"
+                                   v-model="form.price.cost"
+                                   class="form-control" id="price-cost"
+                                   required>
+                            <label for="price-cost">Себестоимость</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -36,7 +74,7 @@
             <div class="col-12 d-flex justify-content-center">
                 <button
                     :disabled="!needClearForm"
-                    class="btn btn-outline-success rounded-5">
+                    class="btn btn-dark rounded-0">
                     <i class="fa-regular fa-floppy-disk mr-1" v-if="!loading"></i>
                     <span class="spinner-border spinner-border-sm  text-success"
                           role="status" v-else></span>
@@ -46,7 +84,7 @@
                     v-if="needClearForm&&!loading"
                     type="button"
                     @click="resetForm"
-                    class="btn btn-outline-danger rounded-5 ml-2">
+                    class="btn btn-outline-secondary rounded-0 ml-2">
                     <i class="fa-solid fa-xmark mr-1"></i>
                     Очистить форму
                 </button>
@@ -69,8 +107,12 @@ export default {
             form: {
                 id: null,
                 title: null,
-                price: null,
-
+                price: {
+                    wholesale: 0,
+                    dealer: 0,
+                    retail: 0,
+                    cost: 0,
+                },
 
             }
         }
@@ -91,7 +133,12 @@ export default {
                 this.form = {
                     id: this.item.id || null,
                     title: this.item.title || null,
-                    price: this.item.price || 0,
+                    price: this.item.price || {
+                        wholesale: 0,
+                        dealer: 0,
+                        retail: 0,
+                        cost: 0,
+                    },
 
 
                 }
@@ -107,7 +154,12 @@ export default {
 
             this.form.id = null
             this.form.title = null
-            this.form.price = 0
+            this.form.price =   {
+                wholesale: 0,
+                dealer: 0,
+                retail: 0,
+                cost: 0,
+            }
 
             this.$emit("callback")
 

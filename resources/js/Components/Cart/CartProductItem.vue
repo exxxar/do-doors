@@ -25,7 +25,7 @@
         </div>
 <!--        {{item.product}}-->
         <div class="col-md-3 col-lg-3 col-xl-3 d-flex">
-            <button class="btn btn-link px-2"
+            <button class="btn btn-outline-secondary rounded-0 px-2"
                     type="button"
                     @click="changeQuantityProductInCart('decrement')">
                 <i class="fas fa-minus"></i>
@@ -33,9 +33,9 @@
 
             <input id="form1" min="0" name="quantity" :value="item.quantity"
                    type="text" readonly
-                   class="form-control form-control-sm text-center border rounded-md"/>
+                   class="form-control form-control-sm text-center border-none rounded-md"/>
 
-            <button class="btn btn-link px-2"
+            <button class="btn btn-dark rounded-0 px-2"
                     type="button"
                     @click="changeQuantityProductInCart('increment')">
                 <i class="fas fa-plus"></i>

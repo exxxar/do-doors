@@ -1,6 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
-import Contracts from "@/Components/Admin/Clients/Contracts.vue";
+
 </script>
 <template>
     <form class="row">
@@ -17,7 +17,7 @@ import Contracts from "@/Components/Admin/Clients/Contracts.vue";
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
-                        class="btn btn-outline-primary">
+                        class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
@@ -211,7 +211,7 @@ import Contracts from "@/Components/Admin/Clients/Contracts.vue";
         </div>
     </div>
 
-    <Contracts/>
+
 </template>
 <script>
 import {mapGetters} from "vuex";

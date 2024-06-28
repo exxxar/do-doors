@@ -62,6 +62,7 @@ Route::get('/permissions', function () {
     return Inertia::render('Permissions/Index');
 })->middleware(['auth', 'verified'])->name('permissions.index');
 
+
 Route::get('/permissions/create', function () {
     return Inertia::render('Permissions/Create');
 })->middleware(['auth', 'verified'])->name('permissions.create');
@@ -73,6 +74,11 @@ Route::get('/permissions/edit', function () {
 Route::get('/calc', function () {
     return Inertia::render('CalcPage');
 })->middleware(['auth', 'verified'])->name('calc');
+
+Route::get('/documents', function () {
+    return Inertia::render('Admin/DocumentsPage');
+})->middleware(['auth', 'verified'])->name('documents');
+
 
 Route::get('/clients', function () {
     return Inertia::render('Admin/ClientsPage');
@@ -125,6 +131,9 @@ Route::prefix("/door-variants")
         Route::post("/store", "store");
         Route::delete("/{id}", "destroy");
     });
+
+
+
 
 Route::prefix("/colors")
     ->middleware(['auth', 'verified'])
@@ -256,3 +265,6 @@ Route::prefix("/users")
         Route::delete("/{id}", "destroy");
     });
 
+
+
+Route::resource('opening-variant', App\Http\Controllers\OpeningVariantController::class);

@@ -173,6 +173,9 @@ class CalcController extends Controller
                 $templateProcessor->setValue('info', $info);
                 $templateProcessor->setValue('total_price', $totalPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
+                $templateProcessor->setValue('current_payed', 0);
+                $templateProcessor->setValue('payed_percent', 0);
+                $templateProcessor->setValue('delivery_terms', 0);
                 $templateProcessor->saveAs($path . "/demo.docx");
             } catch (CopyFileException $e) {
             } catch (CreateTemporaryFileException $e) {

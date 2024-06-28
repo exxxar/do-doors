@@ -1,19 +1,17 @@
 created:
-    - app/Http/Controllers/PromoCodeController.php
-    - database/factories/PromoCodeFactory.php
-    - database/factories/PromoCodeHistoryFactory.php
-    - database/migrations/2024_04_27_164015_create_promo_codes_table.php
-    - database/migrations/2024_04_27_164016_create_promo_code_histories_table.php
-    - app/Models/PromoCode.php
-    - app/Models/PromoCodeHistory.php
-    - database/seeders/PromoCodeSeeder.php
-    - tests/Feature/Http/Controllers/PromoCodeControllerTest.php
-    - app/Http/Requests/PromoCodeStoreRequest.php
-    - app/Http/Requests/PromoCodeUpdateRequest.php
-    - app/Http/Resources/PromoCodeCollection.php
-    - app/Http/Resources/PromoCodeResource.php
+    - app/Http/Controllers/OpeningVariantController.php
+    - database/factories/OpeningVariantFactory.php
+    - database/migrations/2024_06_01_091148_create_opening_variants_table.php
+    - app/Models/OpeningVariant.php
+    - tests/Feature/Http/Controllers/OpeningVariantControllerTest.php
+    - app/Http/Requests/OpeningVariantStoreRequest.php
+    - app/Http/Requests/OpeningVariantUpdateRequest.php
+    - resources/views/openingVariant/index.blade.php
+    - resources/views/openingVariant/create.blade.php
+    - resources/views/openingVariant/show.blade.php
+    - resources/views/openingVariant/edit.blade.php
 updated:
-    - routes/api.php
+    - routes/web.php
 models:
     Material: { title: 'string:255 nullable', wrapper_variants: 'json nullable', door_variants: 'json nullable', relationships: { hasMany: Size } }
     Handle: { title: 'string:255 nullable', price: 'double default:0', variants: json }
@@ -26,3 +24,4 @@ models:
     OrderDetail: { order_id: "id foreign:orders nullable comment:'Сам заказ'", door_type: "string:255 nullable comment:'Тип двери'", count: "integer default:0 comment:'Количество'", price: "double default:0 comment:'цена за единицу'", comment: 'longtext nullable', purpose: 'longtext nullable', door: "json nullable comment:'параметры двери в json'", relationships: { belongsTo: Order } }
     PromoCode: { code: 'string:255 unique', discount: 'double default:0', description: 'longtext nullable', end_at: 'timestamp nullable', is_active: 'boolean default:false' }
     PromoCodeHistory: { client_id: 'id foreign:clients', promo_code_id: 'id foreign:promo_codes', relationships: { belongsTo: 'Client, PromoCode' } }
+    OpeningVariant: { title: 'string:255 nullable', order_position: 'integer default:0', price: 'double default:0', depth: 'double default:0', direction: 'string:10 nullable' }

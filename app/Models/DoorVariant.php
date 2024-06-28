@@ -26,7 +26,7 @@ class DoorVariant extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'price' => 'double',
+        'price' => 'json',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 }

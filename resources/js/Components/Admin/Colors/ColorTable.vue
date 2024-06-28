@@ -16,7 +16,7 @@ import Pagination from "@/Components/Pagination.vue";
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
-                        class="btn btn-outline-primary">
+                        class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
@@ -58,6 +58,15 @@ import Pagination from "@/Components/Pagination.vue";
 
                 </th>
 
+
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('assign_with_size')">Привязан к размеру
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'assign_with_size'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'assign_with_size'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+
+                </th>
+
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('type')">Тип
                     <span v-if="sort.direction === 'desc'&&sort.column === 'type'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -84,11 +93,35 @@ import Pagination from "@/Components/Pagination.vue";
                     {{ item.title || '-' }}
                 </td>
                 <td class="text-center">
-                    {{ item.price || 0 }}
+                    <table class="w-100" v-if="!item.assign_with_size">
+                        <thead>
+                        <th>опт</th>
+                        <th>дилер</th>
+                        <th>розница</th>
+                        <th>себестоимость</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}</td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                    <p v-else>
+                        Цены к цвету указаны в таблице размеров
+                    </p>
                 </td>
 
                 <td class="text-center">
                     {{ item.code || 'Не задан' }}
+                </td>
+
+                <td class="text-center">
+                    {{ item.assign_with_size ? "Да":"Нет"}}
                 </td>
 
                 <td class="text-center">

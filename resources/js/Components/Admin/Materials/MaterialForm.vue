@@ -1,13 +1,30 @@
 <template>
 
     <form action="" v-on:submit.prevent="submit">
-        <div class="form-floating mb-3">
-            <input type="text"
-                   v-model="form.title"
-                   class="form-control" id="material-title"
-                   placeholder="name@example.com" required>
-            <label for="material-title">Название материала</label>
+
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                    <input type="text"
+                           v-model="form.title"
+                           class="form-control" id="material-title"
+                           placeholder="name@example.com" required>
+                    <label for="material-title">Название материала</label>
+                </div>
+            </div>
+            <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                    <input type="text"
+                           v-model="form.order_position"
+                           class="form-control" id="material-order-position"
+                           placeholder="name@example.com" required>
+                    <label for="material-order-position">Позиция материала в выдаче</label>
+                </div>
+            </div>
         </div>
+
+
+
 
         <div class="form-check form-switch">
             <input class="form-check-input"
@@ -215,7 +232,7 @@
             <div class="col-12 d-flex justify-content-center">
                 <button
                     :disabled="!needClearForm"
-                    class="btn btn-outline-success rounded-5">
+                    class="btn btn-dark rounded-0 ">
                     <i class="fa-regular fa-floppy-disk mr-1" v-if="!loading"></i>
                     <span class="spinner-border spinner-border-sm  text-success"
                           role="status" v-else></span>
@@ -225,7 +242,7 @@
                     v-if="needClearForm&&!loading"
                     type="button"
                     @click="resetForm"
-                    class="btn btn-outline-danger rounded-5 ml-2">
+                    class="btn btn-outline-danger rounded-0 ml-2">
                     <i class="fa-solid fa-xmark mr-1"></i>
                     Очистить форму
                 </button>
@@ -246,6 +263,7 @@ export default {
             form: {
                 id: null,
                 title: null,
+                order_position: 0,
                 need_generate_sizes: false,
                 wrapper_variants: [],
                 door_variants: []
@@ -268,6 +286,7 @@ export default {
               this.form = {
                   id: this.item.id || null,
                   title: this.item.title || null,
+                  order_position: this.item.order_position || 0,
                   wrapper_variants: this.item.wrapper_variants || [],
                   door_variants: this.item.door_variants || [],
               }
@@ -283,6 +302,7 @@ export default {
 
             this.form.id = null
             this.form.title = null
+            this.form.order_position = 0
             this.form.wrapper_variants = []
             this.form.door_variants = []
 

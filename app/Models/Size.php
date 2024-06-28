@@ -20,8 +20,9 @@ class Size extends Model
         'height',
         'material_id',
         'price',
+        'type',
         'price_koef',
-        'loops_count',
+        'value',
     ];
 
     /**

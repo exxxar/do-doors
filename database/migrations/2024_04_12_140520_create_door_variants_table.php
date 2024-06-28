@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('door_variants', function (Blueprint $table) {
             $table->id();
             $table->string('title', 255)->nullable();
-            $table->double('price')->default('0');
+            $table->json('price')->nullable();
             $table->timestamps();
         });
     }

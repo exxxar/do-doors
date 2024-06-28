@@ -84,5 +84,12 @@ class PermissionSeeder extends Seeder
         $permission->name = 'Работа с промокодами';
         $permission->slug = 'manage-promo-codes';
         $permission->save();
+
+        $permission = new Permission();
+        $permission->name = 'Просмотр административного меню';
+        $permission->slug = 'manage-views-adminmenu';
+        $permission->save();
+
+
     }
 }

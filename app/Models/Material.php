@@ -17,6 +17,7 @@ class Material extends Model
      */
     protected $fillable = [
         'title',
+        'order_position',
         'wrapper_variants',
         'door_variants',
     ];
@@ -28,6 +29,7 @@ class Material extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'order_position' => 'integer',
         'wrapper_variants' => 'array',
         'door_variants' => 'array',
         'updated_at' => 'datetime:Y-m-d H:i:s',

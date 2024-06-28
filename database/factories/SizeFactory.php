@@ -33,7 +33,7 @@ class SizeFactory extends Factory
                 "cost"=>$this->faker->randomFloat(0, 1000, 10000.),
             ],
             'price_koef' => $this->faker->randomFloat(0, 1.1, 1.9),
-            'loops_count' => $this->faker->numberBetween(2, 4),
+            'type' => "sizes",
         ];
     }
 }

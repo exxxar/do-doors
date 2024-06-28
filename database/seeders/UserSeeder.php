@@ -31,6 +31,7 @@ class UserSeeder extends Seeder
         $managerPromoCodes= Permission::where('slug','manage-promo-codes')->first();
         $managerRoles = Permission::where('slug','manage-roles')->first();
         $managerPermissions = Permission::where('slug','manage-permissions')->first();
+        $managerViewsAdminmenu= Permission::where('slug','manage-views-adminmenu')->first();
 
         $user = new User();
         $user->name = 'Admin';
@@ -53,7 +54,8 @@ class UserSeeder extends Seeder
         $user->permissions()->attach($managerPromoCodes);
         $user->permissions()->attach($managerPermissions);
         $user->permissions()->attach($managerRoles);
-
+        $user->permissions()->attach($managerViewsAdminmenu);
+        $user->save();
 
     }
 }

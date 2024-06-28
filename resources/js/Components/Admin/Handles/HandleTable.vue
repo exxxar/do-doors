@@ -16,7 +16,7 @@ import Pagination from "@/Components/Pagination.vue";
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
-                        class="btn btn-outline-primary">
+                        class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>

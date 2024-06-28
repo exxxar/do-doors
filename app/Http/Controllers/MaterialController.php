@@ -107,6 +107,7 @@ class MaterialController extends Controller
                     "title" => $request->title ?? null,
                     'wrapper_variants' => $wrapper,
                     'door_variants' => $door,
+                    'order_position' => $request->order_position ?? 0,
                 ]);
 
             $generateData = ($request->need_generate_sizes ?? false) == "true";
@@ -132,6 +133,7 @@ class MaterialController extends Controller
                 "title" => $request->title ?? null,
                 'wrapper_variants' => $wrapper,
                 'door_variants' => $door,
+                'order_position' => $request->order_position ?? 0,
             ]);
 
         }

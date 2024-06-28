@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('colors', function (Blueprint $table) {
             $table->id();
             $table->string('title', 255)->nullable();
-            $table->double('price')->default('0');
+            $table->json('price')->nullable();
             $table->string('type', 50)->nullable();
             $table->string('code', 50)->nullable();
+            $table->boolean('assign_with_size')->default(false);
             $table->timestamps();
         });
     }

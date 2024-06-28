@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\ImportDataTrait;
+use App\Models\Color;
 use App\Models\Material;
 use App\Models\Size;
 use App\Models\User;
 use Exception;
 use Google\Client;
 use Google\Service\Sheets;
-use HttpException;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,10 +20,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GoogleLoginController extends Controller
 {
-    protected $materials = [];
+    use ImportDataTrait;
 
     /**
      * Create a new controller instance.
@@ -34,85 +36,85 @@ class GoogleLoginController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function onRow($row, $rowIndex)
-    {
+    /*   public function onRow($row, $rowIndex)
+       {
 
-        if ($rowIndex == 0) {
-            unset($row[0]);
-            unset($row[1]);
-            unset($row[2]);
-            foreach (array_values($row) as $item)
-                if (!empty($item)) {
+           if ($rowIndex == 0) {
+               unset($row[0]);
+               unset($row[1]);
+               unset($row[2]);
+               foreach (array_values($row) as $item)
+                   if (!empty($item)) {
 
-                    $this->materials[] = $item;
+                       $this->materials[] = $item;
 
-                    $hasMaterial = count(Material::query()
-                            ->where("title", $item)
-                            ->get() ?? []) > 0;
+                       $hasMaterial = count(Material::query()
+                               ->where("title", $item)
+                               ->get() ?? []) > 0;
 
-                    if (!$hasMaterial)
-                        Material::query()->create([
-                            "title" => $item
-                        ]);
+                       if (!$hasMaterial)
+                           Material::query()->create([
+                               "title" => $item
+                           ]);
 
-                }
+                   }
 
-            return null;
-        }
-        if ($rowIndex <= 1) {
-            return null;
-        }
-
-
-        if (is_null($row[0] ?? null) || empty($row[0] ?? ''))
-            return null;
+               return null;
+           }
+           if ($rowIndex <= 1) {
+               return null;
+           }
 
 
-        $width = (int)filter_var($row[1] ?? 0, FILTER_SANITIZE_NUMBER_INT);// str_replace(" ","",$row[1] ?? 0);
-        $height = (int)filter_var($row[0] ?? 0, FILTER_SANITIZE_NUMBER_INT);
-        $loopsCount = (int)filter_var($row[2] ?? 0, FILTER_SANITIZE_NUMBER_INT);
-
-        $materialIndex = 0;
-
-        for ($i = 3; $i < count($row); $i += 5) {
+           if (is_null($row[0] ?? null) || empty($row[0] ?? ''))
+               return null;
 
 
-            $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
+           $width = (int)filter_var($row[1] ?? 0, FILTER_SANITIZE_NUMBER_INT);// str_replace(" ","",$row[1] ?? 0);
+           $height = (int)filter_var($row[0] ?? 0, FILTER_SANITIZE_NUMBER_INT);
+           $loopsCount = (int)filter_var($row[2] ?? 0, FILTER_SANITIZE_NUMBER_INT);
 
-            $price_wholesale = (float)filter_var($row[$i] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_dealer = (float)filter_var($row[$i + 1] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_retail = (float)filter_var($row[$i + 2] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_cost = (float)filter_var($row[$i + 3] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $priceKoef = floatval($row[$i + 4] ?? 0);
+           $materialIndex = 0;
+
+           for ($i = 3; $i < count($row); $i += 5) {
 
 
-            Size::query()->create([
-                'width' => $width ?? 0,
-                'height' => $height ?? 0,
-                'material_id' => $material->id,
-                'price' => (object)[
-                    "wholesale" => $price_wholesale,
-                    "dealer" => $price_dealer,
-                    "retail" => $price_retail,
-                    "cost" => $price_cost,
-                ],
-                'price_koef' => $priceKoef,
-                'loops_count' => $loopsCount,
-            ]);
+               $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
-            $materialIndex++;
+               $price_wholesale = (float)filter_var($row[$i] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
+               $price_dealer = (float)filter_var($row[$i + 1] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
+               $price_retail = (float)filter_var($row[$i + 2] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
+               $price_cost = (float)filter_var($row[$i + 3] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
+               $priceKoef = floatval($row[$i + 4] ?? 0);
 
-            if (count($this->materials) == $materialIndex)
-                break;
-        }
 
-    }
+               Size::query()->create([
+                   'width' => $width ?? 0,
+                   'height' => $height ?? 0,
+                   'material_id' => $material->id,
+                   'price' => (object)[
+                       "wholesale" => $price_wholesale,
+                       "dealer" => $price_dealer,
+                       "retail" => $price_retail,
+                       "cost" => $price_cost,
+                   ],
+                   'price_koef' => $priceKoef,
+                   'loops_count' => $loopsCount,
+               ]);
 
-    public function getGoogleLink(Request $request)
+               $materialIndex++;
+
+               if (count($this->materials) == $materialIndex)
+                   break;
+           }
+
+       }*/
+
+
+    protected function getGoogleLink(Request $request)
     {
         $request->validate([
             "sheet_id" => "required",
-            "sheet_title" => "required"
         ]);
         $client = new Client();
         $client->setAuthConfig((array)json_decode(file_get_contents(storage_path("app/credentials.json"))));
@@ -121,15 +123,11 @@ class GoogleLoginController extends Controller
         $client->setClientSecret(env("GOOGLE_CLIENT_SECRET"));
         $client->setRedirectUri(env("GOOGLE_REDIRECT"));
         $client->setAccessType("offline");
-
-        Session::remove("sheet_id");
-        Session::remove("sheet_title");
-        Session::remove("need_rewrite");
-
-        Session::put("sheet_id", $request->sheet_id);
-        Session::put("sheet_title", $request->sheet_title);
-        Session::put("need_rewrite", ($request->need_rewrite ?? false) == "true");
-
+        $client->setState(base64_encode(json_encode([
+            "need_rewrite" => ($request->need_rewrite ?? false) == "true",
+            "use_price_koef" => ($request->use_price_koef ?? false) == "true",
+            "sheet_id" => $request->sheet_id,
+        ])));
 
         return response()->json(["url" => $client->createAuthUrl()]);
     }
@@ -143,6 +141,20 @@ class GoogleLoginController extends Controller
 
         $code = $request->all()["code"] ?? null;
 
+        $state = $request->all()["state"] ?? null;
+
+        if (is_null($state))
+            return response()->noContent(400);
+
+        $state = base64_decode($state);
+        $state = json_decode($state);
+
+        $sheetId = $state->sheet_id ?? null;
+        $needRewrite = $state->need_rewrite ?? false;
+        $usePriceKoef = $state->use_price_koef ?? false;
+
+        // 1_WidWiOLk9FANYSJdcyo32OFGq48QEAZCqJ4rMKrFQo
+
         $client = new Client();
         $client->setAuthConfig((array)json_decode(file_get_contents(storage_path("app/credentials.json"))));
         $client->setScopes([Sheets::DRIVE, Sheets::SPREADSHEETS]);
@@ -154,12 +166,16 @@ class GoogleLoginController extends Controller
 
         if (!is_null($code)) {
 
-            $sheetId = Session::get("sheet_id", null);
-            $sheetTitle = Session::get("sheet_title", null);
-            $needRewrite = Session::get("need_rewrite", false);
+            if ($needRewrite) {
+                Schema::disableForeignKeyConstraints();
+                Size::query()->truncate();
+                //Material::query()->truncate();
+                Schema::enableForeignKeyConstraints();
+            }
 
-            if (is_null($sheetId) || is_null($sheetTitle))
-                throw new HttpException("Идентификатор таблицы или название листа не верные", 400);
+
+            if (is_null($sheetId))
+                throw new HttpException(404, "Идентификатор таблицы или название листа не верные");
 
             try {
                 $client->fetchAccessTokenWithAuthCode($code);
@@ -167,25 +183,52 @@ class GoogleLoginController extends Controller
                 $sheets = new RSheets();
                 $sheets->setService($service);
 
-                $values = $sheets->spreadsheet($sheetId)
-                    ->sheet($sheetTitle)
-                    ->all();
+                $sheetList = $sheets
+                    ->spreadsheet($sheetId)
+                    ->sheetList();
+                //->sheet($sheetTitle)
+                //->all();
 
-                if ($needRewrite) {
-                    Schema::disableForeignKeyConstraints();
-                    Size::query()->truncate();
-                    //Material::query()->truncate();
-                    Schema::enableForeignKeyConstraints();
+                $sheetList = array_values($sheetList);
+
+                foreach ($sheetList as $sheet) {
+                    $values = $sheets
+                        ->spreadsheet($sheetId)
+                        ->sheet($sheet)
+                        ->all();
+
+                    foreach ($values as $value) {
+                        switch ($value) {
+                            case "Размеры":
+                                for ($i = 0; $i < count($values); $i++)
+                                    $this->importSizeLoopsRow($values[$i], $i, "sizes");
+                                break;
+                            case "Петли":
+                                for ($i = 0; $i < count($values); $i++)
+                                    $this->importSizeLoopsRow($values[$i], $i, "loops");
+                                break;
+                            case "Цвета":
+                                for ($i = 0; $i < count($values); $i++)
+                                    $this->importColorsRow($values[$i], $i);
+                                break;
+                            case "Толщина":
+                                for ($i = 0; $i < count($values); $i++)
+                                    $this->importDepthRow($values[$i], $i);
+                                break;
+                        }
+                    }
                 }
 
-                for ($i = 0; $i < count($values); $i++)
-                    $this->onRow($values[$i], $i);
-            }catch (Exception $exception){
+
+            } catch (Exception $exception) {
+
                 return view("error", [
-                    "message"=>"Неверный идентификатор листа или название листа"
+                    "message" => "Неверный идентификатор листа или название листа"
                 ]);
             }
 
+            if ($usePriceKoef)
+                $this->importRecountPrice();
 
             return view("success");
             // Log::info(print_r($result,true));
@@ -206,7 +249,7 @@ class GoogleLoginController extends Controller
         try {
 
             $user = Socialite::driver('google')->user();
-            dd($user);
+
             $finduser = User::where('google_id', $user->id)->first();
 
             if ($finduser) {

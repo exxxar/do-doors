@@ -40,7 +40,7 @@ const showingNavigationDropdown = ref(false);
                                     href="#main-side-admin-menu"
                                     role="button"
                                     aria-controls="main-side-admin-menu"
-                                    v-if="can('manage-vies-adminmenu')">
+                                    v-if="can('manage-views-adminmenu')">
                                     Админ.меню
                                 </NavLink>
 
@@ -224,6 +224,8 @@ const showingNavigationDropdown = ref(false);
                             </ResponsiveNavLink>
 
 
+
+
                         </div>
                     </div>
                 </div>
@@ -310,6 +312,14 @@ const showingNavigationDropdown = ref(false);
                         :href="route('clients')" :active="route().current('clients')">
                         Клиенты
                     </NavLink>
+
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-clients')"
+                        :href="route('documents')" :active="route().current('documents')">
+                        Договора (Документы)
+                    </NavLink>
+
                     <NavLink
                         class="p-3"
                         v-if="can('manage-orders')"
@@ -369,6 +379,7 @@ const showingNavigationDropdown = ref(false);
                         :href="route('door-variants')" :active="route().current('door-variants')">
                         Типы дверей
                     </NavLink>
+
                     <NavLink
                         class="p-3"
                         v-if="can('manage-colors')"
@@ -410,6 +421,7 @@ export default {
             return (this.$page.props.auth.roles || []).includes(role)
         },
         can(permission) {
+            console.log(this.$page.props.auth.permissions )
             return (this.$page.props.auth.permissions || []).includes(permission)
         }
     }

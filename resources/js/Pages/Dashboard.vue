@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import CalcForm from "@/Components/Calc/CalcForm.vue";
+import CalcSwitch from "@/Components/Calc/CalcSwitch.vue";
 </script>
 
 <template>
@@ -16,7 +17,7 @@ import CalcForm from "@/Components/Calc/CalcForm.vue";
             <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm rounded-0">
                     <div class="p-6 text-gray-900">
-                        <CalcForm></CalcForm>
+                     <CalcSwitch></CalcSwitch>
                     </div>
                 </div>
             </div>

@@ -16,12 +16,22 @@ class HingeSeeder extends Seeder
 
         Hinge::query()->create([
             'title'=>'Стандарт',
-            'price'=>1000,
+             'price'=>(object)[
+                    "wholesale" => 0,
+                    "dealer" => 0,
+                    "retail" => 0,
+                    "cost" => 0,
+                ],
         ]);
 
         Hinge::query()->create([
             'title'=>'AGB',
-            'price'=>2000,
+             'price'=>(object)[
+                    "wholesale" => 800,
+                    "dealer" => 800,
+                    "retail" => 800,
+                    "cost" => 800,
+                ],
         ]);
 
 

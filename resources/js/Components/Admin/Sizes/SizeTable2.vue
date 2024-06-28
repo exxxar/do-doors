@@ -5,6 +5,14 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
 <template>
     <div class="row">
         <div class="col-12">
+            <button @click="switchData('sizes')">Размеры</button>
+            <button @click="switchData('loops')">Петли</button>
+            <button @click="switchData('colors')">Цвет</button>
+            <button @click="switchData('variants')">Толщина</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <span class="badge  mr-2 cursor-pointer"
                   @click="toggleMaterialId(material.id)"
                   v-bind:class="{'bg-primary':selectedMaterials.indexOf(material.id)!=-1,'bg-secondary':selectedMaterials.indexOf(material.id)==-1}"
@@ -22,7 +30,7 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
 
 
                 <template v-for="material in materials">
-                    <td colspan="5" width="200px" style="font-weight: bold;text-align: center;border:1px solid #dadada;"
+                    <td colspan="6" width="200px" style="font-weight: bold;text-align: center;border:1px solid #dadada;"
                         v-if="selectedMaterials.indexOf(material.id)!=-1"
                     > {{ material.title }}
                     </td>
@@ -32,6 +40,7 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
             <tr>
                 <template v-for="material in materials">
                     <template v-if="selectedMaterials.indexOf(material.id)!=-1">
+                        <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Число петель</td>
                         <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Опт</td>
                         <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Дилер</td>
                         <td width="100px" style="font-weight: bold;text-align: center;border:1px solid #dadada; min-width: 100px;">Розница</td>
@@ -55,9 +64,9 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
 
                     <template v-if="selectedMaterials.indexOf(price.material_id)!=-1">
 
-
-
-
+                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                            {{ item.prices[priceIndex].value || 0}}
+                        </td>
                         <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                            {{ item.prices[priceIndex].price.wholesale}}
                         </td>
@@ -104,8 +113,8 @@ export default {
         return {
             materials: [],
             prices: [],
-            selectedMaterials: []
-
+            selectedMaterials: [],
+            table:null,
         }
     },
 
@@ -113,6 +122,9 @@ export default {
         this.loadSizes();
     },
     methods: {
+        switchData(data){
+            this.prices = this.table[data]
+        },
         toggleMaterialId(id) {
             let index = this.selectedMaterials.findIndex(item => item === id)
 
@@ -123,8 +135,9 @@ export default {
         },
         loadSizes(page = 0) {
             this.$store.dispatch("loadPreparedPrices").then(resp => {
+                this.table = resp
                 this.materials = resp.materials
-                this.prices = resp.prices
+                this.prices = resp.loops
                 this.selectedMaterials =    this.materials.map(o => o["id"]);
 
             }).catch(() => {

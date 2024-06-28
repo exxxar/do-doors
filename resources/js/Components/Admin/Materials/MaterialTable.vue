@@ -16,7 +16,7 @@ import Pagination from "@/Components/Pagination.vue";
                 </div>
                 <button type="button"
                         @click="sortAndLoad('id')"
-                        class="btn btn-outline-primary">
+                        class="btn btn-outline-secondary rounded-0">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
@@ -42,36 +42,64 @@ import Pagination from "@/Components/Pagination.vue";
                         class="fa-solid fa-caret-up"></i></span>
 
                 </th>
-                <th scope="col" class="text-center">Варианты двери</th>
-                <th scope="col" class="text-center">Варианты контура вокруг</th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center cursor-pointer" @click="sortAndLoad('order_position')">Позиция в
+                    выдаче
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'order_position'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'order_position'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+
+                </th>
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center">Варианты двери</th>
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center">Варианты контура вокруг</th>
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
                     <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center">Действие</th>
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center">Действие</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center"  @click="selectItem(item)">
+                <td class="text-center cursor-pointer" @click="selectItem(item)">
                     {{ item.title || '-' }}
                 </td>
-                <td class="text-center">
-                    {{ (item.door_variants||[]).length }}
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ item.order_position || 0 }}
 
                 </td>
-                <td class="text-center">
-                    {{ (item.wrapper_variants||[]).length }}
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ (item.door_variants || []).length }}
 
                 </td>
-                <td class="text-center">
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ (item.wrapper_variants || []).length }}
+
+                </td>
+                <td class="text-center"
+                    v-if="!simple">
                     {{ item.updated_at || '-' }}
                 </td>
-                <td class="text-center">
+                <td class="text-center"
+                    v-if="!simple">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-bars"></i>
@@ -117,6 +145,7 @@ import Pagination from "@/Components/Pagination.vue";
 import {mapGetters} from "vuex";
 
 export default {
+    props:["simple"],
     data() {
         return {
             sort: {

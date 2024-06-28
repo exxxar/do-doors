@@ -1,0 +1,59 @@
+models:
+  Client:
+    status: string:50 nullable
+    phone: string:255 nullable
+    fax: string:255 nullable
+    email: string:255 nullable
+    fact_address: string:255 nullable
+    fact_address_comment: longtext nullable
+    comment: longtext nullable
+    code: string:255 nullable
+    external_code: string:255 nullable
+    user_id: id foreign:users
+    title: string:255 nullable
+    law_address: string:255 nullable
+    inn: string:20 nullable
+    kpp: string:50 nullable
+    ogrn: string:50 nullable
+    okpo: string:50 nullable
+    requisites: json nullable
+    relationships:
+      belongsTo: User
+
+  Order:
+    contract_number: string:255 nullable comment:'номер договора'
+    contract_date: datetime nullable comment:'дата договора'
+    completion_at: datetime nullable comment:'Предпологаемая дата сдачи'
+    client_id: id foreign:clients nullable comment:'Заказчик'
+    status: integer default:0
+    source: string:255 nullable comment:'источник'
+    contact_person: string:255 nullable comment:'контактное лицо'
+    phone: string:255 nullable comment:'номер телефона'
+    organizational_form: string:255 nullable comment:'Форма организации:ООО, ИП, ЗАО, ПАО'
+    contract_amount: double default:0 comment:'сумма договора'
+    paid: double default:0 comment:'оплачено'
+    debt: double default:0 comment:'Задолженность'
+    profit: double default:0 comment:'прибыль'
+    relationships:
+      belongsTo: Client
+
+  OrderDetail:
+    order_id: id foreign:orders nullable comment:'Сам заказ'
+    door_type: string:255 nullable comment:'Тип двери'
+    count: integer default:0 comment:'Количество'
+    price: double default:0 comment:'цена за единицу'
+    comment: longtext nullable
+    purpose: longtext nullable
+    door: json nullable comment:'параметры двери в json'
+    relationships:
+      belongsTo: Order
+
+seeds:   Client,   Order,  OrderDetail
+
+controllers:
+  Client:
+    resource
+  Order:
+    resource
+  OrderDetail:
+    resource

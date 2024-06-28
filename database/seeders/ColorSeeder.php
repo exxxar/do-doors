@@ -22,28 +22,48 @@ class ColorSeeder extends Seeder
         {
             Color::query()->create([
                 'title'=>'Серебряный',
-                'price'=>0,
+                'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
                 'type'=>$type,
                 'code'=> "#C0C0C0"
             ]);
 
             Color::query()->create([
                 'title'=>'Золотой',
-                'price'=>0,
+                 'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
                 'type'=>$type,
                 'code'=> "#ffd700"
             ]);
 
             Color::query()->create([
                 'title'=>'Черный',
-                'price'=>0,
+                 'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
                 'type'=>$type,
                 'code'=> "#000000"
             ]);
 
             Color::query()->create([
                 'title'=>'RAL',
-                'price'=>0,
+                 'price'=>(object)[
+                    "wholesale" => 100,
+                    "dealer" => 200,
+                    "retail" => 300,
+                    "cost" => 400,
+                ],
                 'type'=>$type,
                 'code'=> null
             ]);

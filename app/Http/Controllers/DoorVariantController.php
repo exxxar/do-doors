@@ -52,11 +52,18 @@ class DoorVariantController extends Controller
 
         $id = $request->id ?? null;
 
+        $priceData = json_decode($request->price ?? '[]');
+
         if (is_null($id))
             $doorVariant = DoorVariant::query()
                 ->create([
                     "title" => $request->title ?? null,
-                    'price' => $request->price ?? 0,
+                    'price' => (object)[
+                        "wholesale" => $priceData->wholesale ?? 0,
+                        "dealer" => $priceData->dealer ?? 0,
+                        "retail" => $priceData->retail ?? 0,
+                        "cost" => $priceData->cost ?? 0,
+                    ],
                 ]);
         else {
             $doorVariant = DoorVariant::query()->find($id);
@@ -66,7 +73,12 @@ class DoorVariantController extends Controller
 
             $doorVariant->update([
                 "title" => $request->title ?? null,
-                'price' => $request->price ?? 0,
+                'price' => (object)[
+                    "wholesale" => $priceData->wholesale ?? 0,
+                    "dealer" => $priceData->dealer ?? 0,
+                    "retail" => $priceData->retail ?? 0,
+                    "cost" => $priceData->cost ?? 0,
+                ],
             ]);
 
         }

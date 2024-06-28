@@ -16,6 +16,7 @@ class Hinge extends Model
      */
     protected $fillable = [
         'title',
+        'order_position',
         'price',
     ];
 
@@ -26,7 +27,8 @@ class Hinge extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'price' => 'double',
+        'order_position' => 'integer',
+        'price' => 'json',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 }
