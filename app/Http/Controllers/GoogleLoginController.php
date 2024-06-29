@@ -201,19 +201,19 @@ class GoogleLoginController extends Controller
                             case "Размеры":
 
                                 for ($i = 0; $i < count($values); $i++)
-                                    $this->importSizeLoopsRow($values[$i], $i);
+                                    $this->importSizeLoopsRow($values[$i], $i, "sizes",true);
                                 break;
                             case "Петли":
                                 for ($i = 0; $i < count($values); $i++)
-                                    $this->importSizeLoopsRow($values[$i], $i, "loops");
+                                    $this->importSizeLoopsRow($values[$i], $i, "loops", true);
                                 break;
-                            case "Цвета":
+                            case "Цвет":
                                 for ($i = 0; $i < count($values); $i++)
-                                    $this->importColorsRow($values[$i], $i);
+                                    $this->importColorsRow($values[$i], $i, true);
                                 break;
                             case "Толщина":
                                 for ($i = 0; $i < count($values); $i++)
-                                    $this->importDepthRow($values[$i], $i);
+                                    $this->importDepthRow($values[$i], $i , true);
                                 break;
                         }
 

@@ -143,10 +143,10 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('loops_count')">Число петель
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'loops_count'"><i
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('value')">Значение параметра
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'value'"><i
                         class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'loops_count'"><i
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'value'"><i
                         class="fa-solid fa-caret-up"></i></span>
 
                 </th>

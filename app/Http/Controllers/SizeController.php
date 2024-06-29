@@ -400,6 +400,8 @@ class SizeController extends Controller
 
         ]));
 
+        return response()->noContent();
+
     }
 
     public function duplicate(Request $request, $id)

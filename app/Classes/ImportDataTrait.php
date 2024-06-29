@@ -13,9 +13,9 @@ trait ImportDataTrait
     protected $materials = [];
     protected $depth = [];
 
-    public function importSizeLoopsRow($row, $rowIndex, $type = "sizes")
+    public function importSizeLoopsRow($row, $rowIndex, $type = "sizes", $zeroStart = false)
     {
-        if ($rowIndex == 1) {
+        if ($rowIndex == $zeroStart ? 0 : 1) {
             unset($row[0]);
             unset($row[1]);
             //dd($row);
@@ -89,10 +89,10 @@ trait ImportDataTrait
 
     }
 
-    public function importColorsRow($row, $rowIndex)
+    public function importColorsRow($row, $rowIndex,$zeroStart = false)
     {
         $colors = ["Black" => "#000", "Silver" => "#111", "Gold" => "#f10", "RAL" => null];
-        if ($rowIndex == 1) {
+        if ($rowIndex ==  $zeroStart ? 0 : 1) {
             unset($row[0]);
             unset($row[1]);
             //unset($row[2]);
@@ -124,8 +124,9 @@ trait ImportDataTrait
 
             return null;
         }
-        if ($rowIndex <= 2)
+        if ($rowIndex <=  2)
             return null;
+
 
         if (is_null($row[0] ?? null) || empty($row[0] ?? ''))
             return null;
@@ -164,6 +165,7 @@ trait ImportDataTrait
                 'value' => $this->colors[$colorIndex] ?? '-',
             ]);
 
+
             $title = $this->colors[$colorIndex];
 
             $code = $colors[$title] ?? null;
@@ -189,9 +191,9 @@ trait ImportDataTrait
                     ]);
             }
 
-
             $colorIndex++;
             /*  $materialIndex++;
+
 
               if (count($this->depth) == $materialIndex)
                   break;*/
@@ -199,13 +201,14 @@ trait ImportDataTrait
 
     }
 
-    public function importDepthRow($row, $rowIndex)
+    public function importDepthRow($row, $rowIndex,$zeroStart = false)
     {
 
-        if ($rowIndex == 1) {
+        if ($rowIndex == $zeroStart ? 0 : 1) {
             unset($row[0]);
             unset($row[1]);
             //unset($row[2]);
+
 
             foreach (array_values($row) as $item)
                 if (!is_null($item)) {
@@ -232,11 +235,14 @@ trait ImportDataTrait
 
                 }
 
-            //dd($this->depth);
+
             return null;
         }
         if ($rowIndex <= 2)
+        {
             return null;
+        }
+
 
         if (is_null($row[0] ?? null) || empty($row[0] ?? ''))
             return null;
@@ -276,6 +282,8 @@ trait ImportDataTrait
             ]);
 
             $depthIndex++;
+
+
             /*  $materialIndex++;
 
               if (count($this->depth) == $materialIndex)
