@@ -4,40 +4,40 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
 </script>
 <template>
 
-<!--    <div class="row">
-        <div class="col-12">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a
-                        @click="tab=0"
-                        v-bind:class="{'active':tab===0,'text-secondary':tab!==0}"
-                        class="nav-link rounded-0 "
-                        href="javascript:void(0)">Размеры</a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        @click="tab=1"
-                        v-bind:class="{'active':tab===1,'text-secondary':tab!==1}"
-                        class="nav-link rounded-0"
-                        href="javascript:void(0)">Петли</a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        @click="tab=2"
-                        v-bind:class="{'active':tab===2,'text-secondary':tab!==2}"
-                        class="nav-link rounded-0"
-                        href="javascript:void(0)">Цвета</a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        @click="tab=3"
-                        v-bind:class="{'active':tab===3,'text-secondary':tab!==3}"
-                        class="nav-link rounded-0"
-                        href="javascript:void(0)">Ширина</a>
-                </li>
-            </ul>
-        </div>
-    </div>-->
+    <!--    <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a
+                            @click="tab=0"
+                            v-bind:class="{'active':tab===0,'text-secondary':tab!==0}"
+                            class="nav-link rounded-0 "
+                            href="javascript:void(0)">Размеры</a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            @click="tab=1"
+                            v-bind:class="{'active':tab===1,'text-secondary':tab!==1}"
+                            class="nav-link rounded-0"
+                            href="javascript:void(0)">Петли</a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            @click="tab=2"
+                            v-bind:class="{'active':tab===2,'text-secondary':tab!==2}"
+                            class="nav-link rounded-0"
+                            href="javascript:void(0)">Цвета</a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            @click="tab=3"
+                            v-bind:class="{'active':tab===3,'text-secondary':tab!==3}"
+                            class="nav-link rounded-0"
+                            href="javascript:void(0)">Ширина</a>
+                    </li>
+                </ul>
+            </div>
+        </div>-->
 
     <form class="row">
         <div class="col-12">
@@ -64,8 +64,6 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
     <!-- Button trigger modal -->
 
 
-
-
     <div class="row">
         <div class="col-12">
             <h4>Выбор типа данных</h4>
@@ -73,23 +71,28 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                 <button
                     v-bind:class="{'btn-dark text-white':sort.type === null}"
                     @click="sort.type = null"
-                    class="btn btn-outline-secondary mr-2 rounded-0">Всё</button>
+                    class="btn btn-outline-secondary mr-2 rounded-0">Всё
+                </button>
                 <button
                     v-bind:class="{'btn-dark text-white':sort.type === 'sizes'}"
                     @click="sort.type = 'sizes'"
-                    class="btn btn-outline-secondary mr-2 rounded-0">Размеры</button>
+                    class="btn btn-outline-secondary mr-2 rounded-0">Размеры
+                </button>
                 <button
                     v-bind:class="{'btn-dark text-white':sort.type === 'loops'}"
                     @click="sort.type = 'loops'"
-                    class="btn btn-outline-secondary mr-2 rounded-0">Петли</button>
+                    class="btn btn-outline-secondary mr-2 rounded-0">Петли
+                </button>
                 <button
                     v-bind:class="{'btn-dark text-white':sort.type === 'colors'}"
                     @click="sort.type = 'colors'"
-                    class="btn btn-outline-secondary mr-2 rounded-0">Цвет</button>
+                    class="btn btn-outline-secondary mr-2 rounded-0">Цвет
+                </button>
                 <button
                     v-bind:class="{'btn-dark text-white':sort.type === 'depth'}"
                     @click="sort.type = 'depth'"
-                    class="btn btn-outline-secondary mr-2 rounded-0">Толщина</button>
+                    class="btn btn-outline-secondary mr-2 rounded-0">Толщина
+                </button>
             </div>
 
         </div>
@@ -125,7 +128,8 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         class="fa-solid fa-caret-up"></i></span>
 
                 </th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price_koef')">Ценовой коэффициент
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price_koef')">Ценовой
+                    коэффициент
                     <span v-if="sort.direction === 'desc'&&sort.column === 'price_koef'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'price_koef'"><i
@@ -183,10 +187,11 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                         </thead>
                         <tbody>
                         <tr>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{ items[index].price.wholesale || 0 }}
+                            </td>
+                            <td style="min-width: 100px; text-align: center;">{{ items[index].price.dealer || 0 }}</td>
+                            <td style="min-width: 100px; text-align: center;">{{ items[index].price.retail || 0 }}</td>
+                            <td style="min-width: 100px; text-align: center;">{{ items[index].price.cost || 0 }}</td>
                         </tr>
 
 
@@ -212,10 +217,10 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
 
                 <td class="text-center">
 
-                   <span v-if="item.type==='sizes'">Размеры</span>
-                   <span v-if="item.type==='loops'">Петли</span>
-                   <span v-if="item.type==='colors'">Цвета</span>
-                   <span v-if="item.type==='depth'">Толщина</span>
+                    <span v-if="item.type==='sizes'">Размеры</span>
+                    <span v-if="item.type==='loops'">Петли</span>
+                    <span v-if="item.type==='colors'">Цвета</span>
+                    <span v-if="item.type==='depth'">Толщина</span>
 
                 </td>
                 <td class="text-center">
@@ -290,13 +295,12 @@ export default {
             sort: {
                 column: null,
                 direction: "desc",
-                type:"sizes"
+                type: "sizes"
             },
             search: null,
             current_page: 0,
             paginate_object: null,
-            items: [
-            ]
+            items: []
         }
     },
     computed: {
@@ -313,7 +317,11 @@ export default {
     mounted() {
         this.loadSizes();
 
-          },
+        window.addEventListener("load-sizes", () => {
+            this.loadSizes();
+            console.log("load-sizes-event")
+        })
+    },
     methods: {
 
         saveFormattedSizes() {
@@ -328,7 +336,7 @@ export default {
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибка обновления данных",
-                    type:'error'
+                    type: 'error'
                 });
             })
         },

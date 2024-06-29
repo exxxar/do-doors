@@ -64,7 +64,7 @@ trait ImportDataTrait
             $price_cost = (float)filter_var($row[$i + 3 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
             $priceKoef = floatval($row[$i + 4 + $stepKoef] ?? 0);
 
-            Size::query()->create([
+            $s = Size::query()->create([
                 'width' => $width ?? 0,
                 'height' => $height ?? 0,
                 'material_id' => $material->id,

@@ -224,7 +224,9 @@ export default {
         saveFormattedSizes() {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
                 this.confirmModal.hide()
-                this.loadSizes();
+                window.dispatchEvent(new CustomEvent("load-sizes", {
+                    detail: null
+                }));
                 this.$notify({
                     title: "DoDoors",
                     text: "Вы успешно обновили данные",
@@ -266,7 +268,10 @@ export default {
 
                 window.open(response.url, '_blank').focus();
 
-                this.loadSizes()
+                window.dispatchEvent(new CustomEvent("load-sizes", {
+                    detail: null
+                }));
+
                 this.importPricesModal.hide()
                 this.$notify({
                     title: "DoDoors",
@@ -318,7 +323,10 @@ export default {
             }).then((response) => {
 
 
-                this.loadSizes()
+                window.dispatchEvent(new CustomEvent("load-sizes", {
+                    detail: null
+                }));
+
                 this.importPricesModal.hide()
                 this.$notify({
                     title: "DoDoors",

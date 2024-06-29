@@ -197,11 +197,11 @@ class GoogleLoginController extends Controller
                         ->sheet($sheet)
                         ->all();
 
-                    foreach ($values as $value) {
-                        switch ($value) {
+                    switch ($sheet) {
                             case "Размеры":
+
                                 for ($i = 0; $i < count($values); $i++)
-                                    $this->importSizeLoopsRow($values[$i], $i, "sizes");
+                                    $this->importSizeLoopsRow($values[$i], $i);
                                 break;
                             case "Петли":
                                 for ($i = 0; $i < count($values); $i++)
@@ -216,7 +216,7 @@ class GoogleLoginController extends Controller
                                     $this->importDepthRow($values[$i], $i);
                                 break;
                         }
-                    }
+
                 }
 
 
