@@ -83,7 +83,7 @@ export default {
                 behavior: "smooth"
             })
 
-            console.log("Test")
+
 
             this.$emit('pagination_page', index)
         },

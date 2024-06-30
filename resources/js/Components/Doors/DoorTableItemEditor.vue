@@ -806,7 +806,7 @@ export default {
                 let search = this.doorForm.front_side_finish_color.title
 
                 if ((this.doorForm.front_side_finish_color.title || '').length === 4) {
-                    console.log((this.doorForm.front_side_finish_color.title || '').length)
+
                     Object.keys(this.colors).forEach(key => {
                         if (this.colors[key].code === search) {
                             const color = this.colors[key]

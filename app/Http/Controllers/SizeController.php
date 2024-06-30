@@ -278,16 +278,36 @@ class SizeController extends Controller
         $sizes = Size::query()
             ->where("type", "sizes")
             ->get();
+        $loops = Size::query()
+            ->where("type", "loops")
+            ->get();
 
         $tmp = [];
 
         foreach ($sizes as $size) {
+
+            $size = (object)$size;
+
+            $loop = Collection::make($loops)
+                ->where("width", $size->width)
+                ->where("height", $size->height)
+                ->where("material_id", $size->material->id)
+                ->first() ?? null;
+
             if (empty($tmp)) {
                 $tmp[] = (object)[
                     "id" => $size->id,
                     "width" => $size->width,
                     "height" => $size->height,
-                    "loops_count" => $size->value,
+                    "loops" => (object)[
+                        "count" =>  (int)($loop->value ?? 0),
+                        "price" => $loop->price ?? [
+                                "wholesale" => 0,
+                                "dealer" => 0,
+                                "retail" => 0,
+                                "cost" => 0,
+                            ],
+                    ],
                     "materials" => [
                         (object)[
                             "id" => $size->material->id,
@@ -296,6 +316,7 @@ class SizeController extends Controller
                         ]
                     ],
                 ];
+
             } else {
                 $sub = array_filter($tmp, function ($item) use ($size) {
                     return $item->width == $size->width && $item->height == $size->height;
@@ -306,7 +327,15 @@ class SizeController extends Controller
                         "id" => $size->id,
                         "width" => $size->width,
                         "height" => $size->height,
-                        "loops_count" => $size->value,
+                        "loops" => (object)[
+                            "count" => (int)($loop->value ?? 0),
+                            "price" => $loop->price ?? [
+                                    "wholesale" => 0,
+                                    "dealer" => 0,
+                                    "retail" => 0,
+                                    "cost" => 0,
+                                ],
+                        ],
                         "materials" => [
                             (object)[
                                 "id" => $size->material->id,
@@ -382,7 +411,7 @@ class SizeController extends Controller
 
         }
 
-        file_put_contents(public_path() . '\sizes.json', json_encode([
+        $response = [
             "prices" => $tmp,
             "depth" => $tmpDepth,
             "materials" => Material::query()
@@ -398,9 +427,11 @@ class SizeController extends Controller
                 ->get(),
             "colors" => $tmpColors
 
-        ]));
+        ];
 
-        return response()->noContent();
+        file_put_contents(public_path() . '\sizes.json', json_encode($response));
+
+        return response()->json($response);
 
     }
 

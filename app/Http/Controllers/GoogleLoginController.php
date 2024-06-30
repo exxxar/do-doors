@@ -169,7 +169,7 @@ class GoogleLoginController extends Controller
             if ($needRewrite) {
                 Schema::disableForeignKeyConstraints();
                 Size::query()->truncate();
-                //Material::query()->truncate();
+                Material::query()->truncate();
                 Schema::enableForeignKeyConstraints();
             }
 

@@ -1350,7 +1350,15 @@ const mutations = {
             state.dictionary.size_variants.push({
                 width: item.width,
                 height: item.height,
-                loops: item.loops || [],
+                loops: item.loops || {
+                    count: 0,
+                    price: {
+                        wholesale: 0,
+                        dealer: 0,
+                        retail: 0,
+                        cost: 0,
+                    }
+                },
             })
         })
 

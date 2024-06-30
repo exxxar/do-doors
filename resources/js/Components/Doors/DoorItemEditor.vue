@@ -1,7 +1,7 @@
 <script setup>
-import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
+import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 </script>
 
 <template>
@@ -170,12 +170,14 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     </div>
 
                     <div class="col-md-6 col-12">
+
+
                         <div class="form-floating mb-3">
+
                             <select class="form-select"
                                     v-model="doorForm.door_type"
                                     @invalid="alert('Вы не выбрали тип двери!')"
                                     id="door-type" aria-label="door-type" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
                                 <option :value="item" v-for="item in getDictionary.door_variants">{{
                                         item.title
                                     }}
@@ -192,7 +194,6 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                     v-model="doorForm.hinge_manufacturer"
                                     @invalid="alert('Вы не выбрали расположение петель!')"
                                     id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
                                 <option :value="item" v-for="item in getDictionary.hinge_manufacturer_variants">{{
                                         item.title
                                     }}
@@ -209,7 +210,6 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                                     v-model="doorForm.loops"
                                     @invalid="alert('Вы не выбрали сторону петель!')"
                                     id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
                                 <option :value="item" v-for="item in getDictionary.loops_variants">{{
                                         item.title
                                     }}
@@ -221,6 +221,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 
 
                     <div class="col-md-6 col-12  mb-3">
+
                         <div class="input-group">
 
                             <div class="form-floating">
@@ -259,40 +260,18 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 
 
                     <div class="col-md-6 col-12">
-
-                        <div class="input-group mb-3">
-                <span class="input-group-text border-secondary"
-                      v-if="isHex(doorForm.front_side_finish_color.title)"
-                      v-bind:style="{'background-color':doorForm.front_side_finish_color.title}"
-                      id="basic-addon1" style="width: 40px;border-radius: 0px;">
-                </span>
-                            <div class="form-floating">
-                                <input type="text"
-                                       v-model="doorForm.front_side_finish_color.title"
-                                       @invalid="alert('Вы не указали лицевую отделку двери!')"
-                                       class="form-control" id="front_side_finish_color" required>
-                                <label for="front_side_finish_color"><i class="fa-solid fa-palette"></i> Цвет отделки
-                                    первой
-                                    стороны</label>
+                        <ColorSelector
+                            v-if="doorForm.front_side_finish.title!=='Под покраску'"
+                            @invalid="alert('Вы не выбрали цвет отделки первой стороны')"
+                            v-model="doorForm.front_side_finish_color">
+                            <template #name>
+                                Цвет отделки первой стороны
+                            </template>
+                        </ColorSelector>
+                        <div class="card rounded-0" v-else>
+                            <div class="card-body p-3 disabled-element">
+                                <p class="text-center">Выбрано "Под покраску"</p>
                             </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)"
-                                       @click="doorForm.front_side_finish_color = {title:null}">Не
-                                    выбрано</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       @click="selectColor('front_side_finish_color',item)"
-                                       v-bind:class="{'bg-primary text-white':doorForm.front_side_finish_color.title===item.title}"
-                                       href="javascript:void(0)" v-for="item in filteredSideFinishColors">{{
-                                        item.title
-                                    }}</a></li>
-                            </ul>
                         </div>
                     </div>
 
@@ -327,149 +306,62 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
-                 <span class="input-group-text border-secondary"
-                       v-if="isHex(doorForm.back_side_finish_color.title)"
-                       v-bind:style="{'background-color':doorForm.back_side_finish_color.title}"
-                       id="basic-addon1" style="width: 40px;border-radius: 0;">
-                </span>
-                            <div class="form-floating">
-                                <input type="text"
-                                       @invalid="alert('Вы не указали внутреннюю отделку двери!')"
-                                       v-model="doorForm.back_side_finish_color.title"
-                                       class="form-control" id="back_side_finish_color" required>
-                                <label for="back_side_finish_color"><i class="fa-solid fa-palette"></i> Цвет отделки
-                                    второй
-                                    стороны</label>
+                        <ColorSelector
+                            v-if="doorForm.back_side_finish.title!=='Под покраску'"
+                            @invalid="alert('Вы не выбрали цвет отделки второй стороны')"
+                            v-model="doorForm.back_side_finish_color">
+                            <template #name>
+                                Цвет отделки второй стороны
+                            </template>
+                        </ColorSelector>
+                        <div class="card rounded-0" v-else>
+                            <div class="card-body p-3 disabled-element">
+                                <p class="text-center">Выбрано "Под покраску"</p>
                             </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)"
-                                       @click="doorForm.back_side_finish_color = {title:null}">Не
-                                    выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       @click="selectColor('back_side_finish_color',item)"
-                                       v-bind:class="{'bg-primary text-white':doorForm.back_side_finish_color.title===item.title }"
-                                       href="javascript:void(0)" v-for="item in filteredSideFinishColors">{{
-                                        item.title
-                                    }}</a></li>
-                            </ul>
                         </div>
                     </div>
 
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3 ">
-                 <span class="input-group-text border-secondary"
-                       v-if="isHex(doorForm.box_and_frame_color.title)"
-                       v-bind:style="{'background-color':doorForm.box_and_frame_color.title}"
-                       id="basic-addon1" style="width: 40px;border-radius: 0;">
-                </span>
-                            <div class="form-floating">
-                                <input type="text"
-                                       @invalid="alert('Вы не выбрали цвет короба и каркаса')"
-                                       v-model="doorForm.box_and_frame_color.title"
-                                       class="form-control" id="box_and_frame_color" required>
-                                <label for="box_and_frame_color"><i class="fa-solid fa-palette"></i> Цвет короба и
-                                    каркаса</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)"
-                                       @click="doorForm.box_and_frame_color = {title:null}">Не
-                                    выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       v-bind:class="{'bg-primary text-white':doorForm.box_and_frame_color.title===item.title }"
-                                       @click="selectColor('box_and_frame_color',item)"
-                                       href="javascript:void(0)" v-for="item in filteredBoxAndFrameColors">{{
-                                        item.title
-                                    }}</a></li>
-                            </ul>
-                        </div>
+
+                        <ColorSelector
+                            v-if="!color_sync_update"
+                            v-on:change="syncColors('box_and_frame_color',$event)"
+                            @invalid="alert('Вы не выбрали цвет короба и каркаса')"
+                            v-model="doorForm.box_and_frame_color">
+                            <template #name>
+                                Цвет короба и каркаса
+                            </template>
+                        </ColorSelector>
+
+
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
-                   <span class="input-group-text border-secondary"
-                         v-if="isHex(doorForm.seal_color.title)"
-                         v-bind:style="{'background-color':doorForm.seal_color.title}"
-                         id="basic-addon1" style="width: 40px;border-radius: 0px;">
-                </span>
-                            <div class="form-floating">
-                                <input type="text"
-                                       @invalid="alert('Вы не выбрали цвет уплотнителя')"
-                                       v-model="doorForm.seal_color.title"
-                                       class="form-control" id="seal_color" required>
-                                <label for="seal_color"><i class="fa-solid fa-palette"></i> Цвет уплотнителя</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)"
-                                       @click="doorForm.seal_color = {title:null}">Не выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       v-bind:class="{'bg-primary text-white':doorForm.seal_color.title===item.title }"
-                                       @click="selectColor('seal_color',item)"
-                                       href="javascript:void(0)" v-for="item in filteredSealColors">{{ item.title }}</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <ColorSelector
+                            v-if="!color_sync_update"
+                            v-on:change="syncColors('seal_color',$event)"
+                            @invalid="alert('Вы не выбрали цвет уплотнителя')"
+                            v-model="doorForm.seal_color">
+                            <template #name>
+                                Цвет уплотнителя
+                            </template>
+                        </ColorSelector>
+
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
-                <span class="input-group-text border-secondary"
-                      v-if="isHex(doorForm.fittings_color.title)"
-                      v-bind:style="{'background-color':doorForm.fittings_color.title}"
-                      id="basic-addon1" style="width: 40px;border-radius: 0px;">
-                </span>
-                            <div class="form-floating">
-                                <input type="text"
-                                       @invalid="alert('Вы не выбрали цвет фурнитуры')"
-                                       v-model="doorForm.fittings_color.title"
-                                       class="form-control" id="fittings_color" required>
-                                <label for="fittings_color"><i class="fa-solid fa-palette"></i> Цвет фурнитуры</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)"
-                                       @click="doorForm.fittings_color = {title:null}">Не выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       v-bind:class="{'bg-primary text-white':doorForm.fittings_color.title===item.title }"
-                                       @click="selectColor('fittings_color',item)"
-                                       href="javascript:void(0)" v-for="item in filteredFittingsColors">{{
-                                        item.title
-                                    }}</a>
-                                </li>
-                            </ul>
-                        </div>
+
+                        <ColorSelector
+                            v-if="!color_sync_update"
+                            v-on:change="syncColors('fittings_color',$event)"
+                            @invalid="alert('Вы не выбрали цвет фурнитуры')"
+                            v-model="doorForm.fittings_color">
+                            <template #name>
+                                Цвет фурнитуры
+                            </template>
+                        </ColorSelector>
+
                     </div>
 
 
@@ -741,7 +633,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
         <div class="col-md-6">
             <div class="preview">
                 <DoorPreview
-                    :door="doorForm">
+                    v-model="doorForm">
                 </DoorPreview>
                 <div class="card rounded-0 mt-3">
                     <div class="card-body">
@@ -840,24 +732,6 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" :id="'choose-color-'+doorForm.id" tabindex="-1" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog ">
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор цвета RAL</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-
-                    <RalColorSelector v-on:select="callbackSelectColor"></RalColorSelector>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     <!-- Modal -->
     <div class="modal fade" :id="'finish-front-variant-modal-'+doorForm.id" tabindex="-1"
@@ -928,7 +802,7 @@ export default {
             filterHeight: null,
             filterWidth: null,
             selectedColorParam: null,
-            colorModal: null,
+
             confirmModal: null,
             finishFrontVariantModal: null,
             finishBackVariantModal: null,
@@ -938,6 +812,7 @@ export default {
                 title: null,
                 message: null,
             },
+            color_sync_update: false,
             doorForm: {
                 id: null,
                 width: 0,
@@ -965,13 +840,13 @@ export default {
                 handle_holes: {title: null}, //отверстие для ручек
                 handle_holes_type: {title: null}, //тип ручки
                 need_handle_holes: true, //нужна дверная ручка
-                need_upper_jumper: false, //Верхняя перемычка
+                need_upper_jumper: true, //Верхняя перемычка
                 need_automatic_doorstep: false, //Автоматический порог
                 need_hidden_stopper: false, //Скрытый стопор
                 need_hidden_door_closer: false, //Скрытый доводчик
                 need_hidden_skirting_board: false, //нужен плинтус
                 need_door_install: false, //нужна установка двери
-                need_wrapper: false //нужна упаковка двери
+                need_wrapper: true //нужна упаковка двери
             }
         }
     },
@@ -1001,6 +876,7 @@ export default {
         summaryPriceWithDealer() {
             return Math.round((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
         },
+
         summaryPrice() {
             let sum = 0;
 
@@ -1012,7 +888,7 @@ export default {
                 let find = false
                 if (item) {
                     if (typeof this.doorForm[item] === "object" && this.doorForm[item] != null) {
-                        if (item === "opening_type"&& this.doorForm[item].sizes) {
+                        if (item === "opening_type" && this.doorForm[item].sizes) {
                             find = true
                             let index = this.doorForm[item].sizes.findIndex(c =>
                                 c.width == this.doorForm.width &&
@@ -1025,7 +901,6 @@ export default {
                         if (item.indexOf("_color") !== -1 && this.doorForm[item].sizes && !find) {
                             find = true
 
-                            console.log("color=>>",this.doorForm[item])
                             let price = 0;
                             if (!this.doorForm[item].assign_with_size)
                                 price = this.doorForm[item].sizes[0].price[type]
@@ -1039,6 +914,13 @@ export default {
 
                             sum += price || 0
                         }
+
+                        if (item === "size" && this.doorForm[item].loops && !find) {
+                            find = true
+
+                            sum += this.doorForm[item].loops.price[type] || 0
+                        }
+
 
                         if (this.doorForm[item].price && !find) {
                             sum += (typeof this.doorForm[item].price === "object") ?
@@ -1125,71 +1007,8 @@ export default {
         }
     },
     watch: {
-        'doorForm.box_and_frame_color': {
-            handler(val) {
-                let search = this.doorForm.box_and_frame_color.title
 
-                if ((this.doorForm.box_and_frame_color.title || '').length === 4) {
-                    Object.keys(this.colors).forEach(key => {
-                        if (this.colors[key].code === search) {
-                            this.doorForm.box_and_frame_color.code = this.colors[key].code
-                            this.doorForm.box_and_frame_color.title = this.colors[key].color.hex
-                        }
 
-                    })
-                }
-            },
-            deep: true
-        },
-        'doorForm.fittings_color': {
-            handler(val) {
-                let search = this.doorForm.fittings_color.title
-
-                if ((this.doorForm.fittings_color.title || '').length === 4) {
-                    Object.keys(this.colors).forEach(key => {
-                        if (this.colors[key].code === search) {
-                            this.doorForm.fittings_color.code = this.colors[key].code
-                            this.doorForm.fittings_color.title = this.colors[key].color.hex
-                        }
-
-                    })
-                }
-            },
-            deep: true
-        },
-        'doorForm.back_side_finish_color': {
-            handler(val) {
-                let search = this.doorForm.back_side_finish_color.title
-
-                if ((this.doorForm.back_side_finish_color.title || '').length === 4) {
-                    Object.keys(this.colors).forEach(key => {
-                        if (this.colors[key].code === search) {
-                            this.doorForm.back_side_finish_color.code = this.colors[key].code
-                            this.doorForm.back_side_finish_color.title = this.colors[key].color.hex
-                        }
-
-                    })
-                }
-            },
-            deep: true
-        },
-        'doorForm.front_side_finish_color': {
-            handler(val) {
-                let search = this.doorForm.front_side_finish_color.title
-
-                if ((this.doorForm.front_side_finish_color.title || '').length === 4) {
-                    Object.keys(this.colors).forEach(key => {
-                        if (this.colors[key].code === search) {
-                            const color = this.colors[key]
-                            this.doorForm.front_side_finish_color.code = color.code
-                            this.doorForm.front_side_finish_color.title = color.color.hex
-                        }
-
-                    })
-                }
-            },
-            deep: true
-        },
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
@@ -1230,13 +1049,17 @@ export default {
     },
 
     mounted() {
-        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
 
         this.loadRalColors()
 
+        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
+
         if (!this.door) {
             this.doorForm.id = uuid.v1()
-            this.clearForm(false)
+
+            this.$nextTick(() => {
+                this.clearForm(false)
+            })
         } else {
             this.$nextTick(() => {
                 this.doorForm = {
@@ -1263,13 +1086,13 @@ export default {
                     price_type: this.door.product.price_type || null,
                     hinge_manufacturer: this.door.product.hinge_manufacturer || null,
                     need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: false, //Верхняя перемычка
+                    need_upper_jumper: true, //Верхняя перемычка
                     need_automatic_doorstep: false, //Автоматический порог
                     need_hidden_stopper: false, //Скрытый стопор
                     need_hidden_door_closer: false, //Скрытый доводчик
                     need_hidden_skirting_board: false, //нужен плинтус
                     need_door_install: false,//нужна установка двери
-                    need_wrapper: false //нужна упаковка двери
+                    need_wrapper: true //нужна упаковка двери
 
                 }
             })
@@ -1279,18 +1102,17 @@ export default {
         this.doorForm.purpose = "Дверь " + (this.cartProducts.length + 1)
     },
     methods: {
+
+        loadRalColors() {
+            this.$store.dispatch("loadRalColors")
+        },
         openConfirmModal(title, message) {
             this.confirm.title = title || null
             this.confirm.message = message || null
 
             this.confirmModal.show()
         },
-        loadRalColors() {
-            axios.get("/ral_pretty.json").then(resp => {
-                this.colors = resp.data
-            })
 
-        },
         selectSideFinish(section, param, index) {
 
             let isSelected = this.doorForm[section][param][index].selected || false
@@ -1337,41 +1159,7 @@ export default {
 
             return price
         },
-        isHex(num) {
-            return /^#[0-9A-F]{6}$/i.test(num)
-        },
-        callbackSelectColor(item) {
-            this.doorForm[this.selectedColorParam].title = item.color.hex
-            this.doorForm[this.selectedColorParam].code = item.color.code || item.color.hex || null
 
-            this.colorModal.hide()
-        },
-        selectColor(param, item) {
-
-            this.doorForm[param] = {
-                title: item.code || null,
-                code: item.code || null,
-                sizes: item.sizes,
-                type: item.type || 'all',
-                assign_with_size: item.assign_with_size || false,
-            }
-
-            if (item.title === "RAL") {
-                this.selectedColorParam = param
-
-                this.doorForm[param] = {
-                    title: 'RAL',
-                    code: 'RAL',
-                    sizes: item.sizes,
-                    type: item.type || 'all',
-                    assign_with_size: item.assign_with_size || false,
-                }
-
-                this.colorModal = new bootstrap.Modal(document.getElementById('choose-color-' + this.doorForm.id), {})
-                this.colorModal.show()
-            }
-
-        },
         clearForm(needTestData = false) {
 
             this.confirmModal.hide()
@@ -1400,13 +1188,13 @@ export default {
                     price_type: this.getDictionary.price_type_variants[1],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
                     need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: false, //Верхняя перемычка
+                    need_upper_jumper: true, //Верхняя перемычка
                     need_automatic_doorstep: false, //Автоматический порог
                     need_hidden_stopper: false, //Скрытый стопор
                     need_hidden_door_closer: false, //Скрытый доводчик
                     need_hidden_skirting_board: false, //нужен плинтус
                     need_door_install: false, //нужна установка двери
-                    need_wrapper: false //нужна упаковка двери
+                    need_wrapper: true //нужна упаковка двери
 
                 }
             } else
@@ -1422,27 +1210,27 @@ export default {
                     dealer_percent: 0,
                     opening_type: {title: null},
                     box_and_frame_color: {title: null},
-                    door_type: {title: null},
+                    door_type: this.getDictionary.door_variants[0],
                     front_side_finish: {title: null},
                     back_side_finish: {title: null},
                     front_side_finish_color: {title: null},
                     back_side_finish_color: {title: null},
                     seal_color: {title: null},
                     fittings_color: {title: null},
-                    loops: {title: null}, //расположение петель
+                    loops: this.getDictionary.loops_variants[0], //расположение петель
                     loops_count: 0,
                     price_type: this.getDictionary.price_type_variants[1],
-                    hinge_manufacturer: {title: null}, //Производитель петель
+                    hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0], //Производитель петель
                     handle_holes: this.getDictionary.handle_holes_variants[0],
                     handle_holes_type: {title: null},
                     need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: false, //Верхняя перемычка
+                    need_upper_jumper: true, //Верхняя перемычка
                     need_automatic_doorstep: false, //Автоматический порог
                     need_hidden_stopper: false, //Скрытый стопор
                     need_hidden_door_closer: false, //Скрытый доводчик
                     need_hidden_skirting_board: false, //нужен плинтус
                     need_door_install: false, //нужна установка двери
-                    need_wrapper: false //нужна упаковка двери
+                    need_wrapper: true //нужна упаковка двери
                 }
 
 
@@ -1456,10 +1244,14 @@ export default {
                 this.doorForm.loops_count = 0
                 return
             }
+
+
             this.doorForm.width = item.width
             this.doorForm.height = item.height
             this.doorForm.size = item
-            this.doorForm.loops_count = item.loops_count
+
+            this.doorForm.loops_count = item.loops.count
+            // this.doorForm.loops = item.loops.count
         },
         changeDoorCount(direction) {
             if (direction === 'add')
@@ -1491,6 +1283,28 @@ export default {
         },
         removeMessage(index) {
             this.messages.splice(index, 1)
+        },
+        syncColors(name, color) {
+
+              if (color.title == 'RAL')
+                  return;
+
+            this.color_sync_update = true
+            this.$nextTick(() => {
+                this.color_sync_update = false
+
+                if (this.doorForm.box_and_frame_color.title == null)
+                    this.doorForm.box_and_frame_color = color
+
+                if (this.doorForm.seal_color.title == null)
+                    this.doorForm.seal_color = color
+
+                if (this.doorForm.fittings_color.title == null)
+                    this.doorForm.fittings_color = color
+
+            })
+
+
         },
         submitForm() {
             this.messages = []
@@ -1565,5 +1379,9 @@ export default {
     left: 0;
     padding: 20px;
     box-sizing: border-box;
+}
+
+.disabled-element {
+    background-image: repeating-linear-gradient(-45deg, #eeeeee 0, #eeeeee 15px, #ffffff 15px, #ffffff 25px);
 }
 </style>

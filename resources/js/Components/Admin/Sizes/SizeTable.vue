@@ -319,7 +319,7 @@ export default {
 
         window.addEventListener("load-sizes", () => {
             this.loadSizes();
-            console.log("load-sizes-event")
+
         })
     },
     methods: {

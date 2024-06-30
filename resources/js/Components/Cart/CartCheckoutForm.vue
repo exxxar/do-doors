@@ -146,6 +146,9 @@ export default {
         this.loadSelfClients()
     },
     methods: {
+        hasRoles(role) {
+            return (this.$page.props.auth.roles || []).includes(role)
+        },
         back() {
           this.$emit("back")
         },
@@ -157,7 +160,6 @@ export default {
         },
         selectInfo(client) {
 
-            console.log(client)
 
             if (client == null) {
                 this.clientForm.id = null

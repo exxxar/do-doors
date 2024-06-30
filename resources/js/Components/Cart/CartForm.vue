@@ -47,6 +47,7 @@ export default {
 
     },
     methods:{
+
         goToCheckout(){
             this.$emit("callback")
         },

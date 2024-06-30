@@ -414,14 +414,14 @@ export default {
 
     },
     mounted() {
-        console.log(this.$page.props.auth)
+
     },
     methods: {
         hasRoles(role) {
             return (this.$page.props.auth.roles || []).includes(role)
         },
         can(permission) {
-            console.log(this.$page.props.auth.permissions )
+
             return (this.$page.props.auth.permissions || []).includes(permission)
         }
     }

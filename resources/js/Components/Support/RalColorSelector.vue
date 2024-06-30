@@ -36,6 +36,8 @@
     </table>
 </template>
 <script>
+import {mapGetters} from "vuex";
+
 export default {
     data() {
         return {
@@ -44,7 +46,16 @@ export default {
             colors: [],
         }
     },
+    watch: {
+        'getRalColors': {
+            handler(val) {
+                this.colors = this.getRalColors
+            },
+            deep: true,
+        },
+    },
     computed: {
+        ...mapGetters(['getRalColors']),
         filteredColor() {
             let search = this.search || ''
 
@@ -88,7 +99,7 @@ export default {
         }
     },
     mounted() {
-        this.loadColorsJSON()
+
     },
     methods: {
         addFilter(item) {
@@ -100,11 +111,7 @@ export default {
                 this.color_blocks.push(item)
 
         },
-        loadColorsJSON() {
-            axios.get("/ral_pretty.json").then(resp => {
-                this.colors = resp.data
-            })
-        },
+
         selectColor(color) {
             this.$emit("select", color)
         }

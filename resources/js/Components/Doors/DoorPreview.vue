@@ -1,6 +1,6 @@
 <template>
 
-    <div class="row">
+    <div class="row" v-if="door">
         <div class="col-12 mb-2">
             <button class="btn mr-2 rounded-0 "
                     v-bind:class="{'btn-dark':side===0,'btn-outline-secondary':side!==0}"
@@ -14,7 +14,7 @@
         </div>
 
     </div>
-    <div class="row">
+    <div class="row" v-if="door">
         <div class="col-12 col-md-8">
             <div class="stage w-100"
                  v-bind:style="{/*'background-color':sideColor || 'transparent',*/ 'background-image':'url('+selectedSideFinishImageForWrapper+')'}">
@@ -35,11 +35,13 @@
                         <div class="height"><span>{{ door.height }}</span></div>
                         <div class="width"><span>{{ door.width }}</span></div>
                         <div class="handle"
+                             style="background-size: cover;"
                              v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
-                             v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent'}"
-                             v-if="door.handle_holes.id!==3">6
+                             v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-left.png)':'url(images/handle-right.png)'}"
+                             v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
                         </div>
                         <div class="loops"
+                             v-if="door.loops.type"
                              v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}">
                             <span v-for="loop in door.loops_count">7</span>
                         </div>
@@ -71,7 +73,8 @@
                         4
                     </div>
 
-                    <div class="door-closer d-flex justify-content-center align-items-center"
+                    <div
+                        class="door-closer d-flex justify-content-center align-items-center"
                          style="font-size: 12px;"
                          v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
                          v-if="door.need_hidden_door_closer">
@@ -83,14 +86,33 @@
             </div>
         </div>
         <div class="col-md-4 col-12">
-            <ul class="list-group list-group-numbered rounded-0">
-                <li class="list-group-item">Верхняя перемычка</li>
-                <li class="list-group-item">Скрытый порог</li>
-                <li class="list-group-item">Скрытый плинтус</li>
-                <li class="list-group-item">Скрытый стопор</li>
-                <li class="list-group-item">Скрытый доводчик</li>
-                <li class="list-group-item">Дверная ручка</li>
+            <ul class="list-group list-group-numbered rounded-0 cursor-pointer">
+                <li
+                    @click="door.need_upper_jumper=!door.need_upper_jumper"
+                    v-bind:class="{'bg-dark text-white':door.need_upper_jumper}"
+                    class="list-group-item">Верхняя перемычка</li>
+                <li
+                    @click="door.need_automatic_doorstep=!door.need_automatic_doorstep"
+                    v-bind:class="{'bg-dark text-white':door.need_automatic_doorstep}"
+                    class="list-group-item">Скрытый порог</li>
+                <li
+                    @click="door.need_hidden_skirting_board=!door.need_hidden_skirting_board"
+                    v-bind:class="{'bg-dark text-white':door.need_hidden_skirting_board}"
+                    class="list-group-item">Скрытый плинтус</li>
+                <li
+                    @click="door.need_hidden_stopper=!door.need_hidden_stopper"
+                    v-bind:class="{'bg-dark text-white':door.need_hidden_stopper}"
+                    class="list-group-item">Скрытый стопор</li>
+                <li
+                    @click="door.need_hidden_door_closer=!door.need_hidden_door_closer"
+                    v-bind:class="{'bg-dark text-white':door.need_hidden_door_closer}"
+                    class="list-group-item">Скрытый доводчик</li>
+                <li
+                    @click="door.need_handle_holes=!door.need_handle_holes"
+                    v-bind:class="{'bg-dark text-white':door.need_handle_holes&&door.loops.type}"
+                    class="list-group-item">Дверная ручка</li>
                 <li class="list-group-item">Петли</li>
+
             </ul>
 
 
@@ -102,11 +124,23 @@
 </template>
 <script>
 export default {
-    props: ["door"],
+    props: ["modelValue"],
     data() {
         return {
-            side: 0
+            side: 0,
+            door:null
         }
+    },
+    watch: {
+        'door': {
+            handler(val){
+                this.$emit('update:modelValue', this.door)
+            },
+            deep: true
+        }
+    },
+    mounted() {
+      this.door = this.modelValue
     },
     computed: {
         sideColor() {
@@ -138,7 +172,7 @@ export default {
                 return null;
             return this.door[param].wrapper_variants[index].image
         }
-    }
+    },
 }
 </script>
 <style lang="scss">
@@ -462,7 +496,7 @@ export default {
             position: absolute;
             z-index: 3;
             width: 50px;
-            height: 20px;
+            height: 27px;
             top: 209px;
 
             border: 1px dashed black;

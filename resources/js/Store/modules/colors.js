@@ -5,11 +5,13 @@ const BASE_COLORS_LINK = '/colors'
 
 let state = {
     colors: [],
+    ral_colors:[],
     colors_paginate_object: null,
 }
 
 const getters = {
     getColors: state => state.colors || [],
+    getRalColors: state => state.ral_colors || [],
     getColorById: (state) => (id) => {
         return state.colors.find(item => item.id === id)
     },
@@ -17,6 +19,22 @@ const getters = {
 }
 
 const actions = {
+    async loadRalColors(context) {
+
+        let link = `/ral_pretty.json`
+        let method = 'GET'
+
+        let _axios = util.makeAxiosFactory(link, method)
+
+        return _axios.then((response) => {
+            let dataObject = response.data
+            context.commit("setRalColors", dataObject)
+            return Promise.resolve();
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadColors(context, payload = {dataObject: null, page: 0, size: 50}) {
         let page = payload.page || 0
         let size = payload.size || 50
@@ -82,6 +100,10 @@ const mutations = {
     setColors(state, payload) {
         state.colors = payload || [];
         localStorage.setItem('dodoors_colors', JSON.stringify(payload));
+    },
+    setRalColors(state, payload) {
+        state.ral_colors = payload || [];
+        localStorage.setItem('dodoors_ral_colors', JSON.stringify(payload));
     },
     setColorsPaginateObject(state, payload) {
         state.colors_paginate_object = payload || [];

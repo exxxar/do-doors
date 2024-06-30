@@ -21,7 +21,7 @@ trait ImportDataTrait
             //dd($row);
             // unset($row[2]);
             foreach (array_values($row) as $item)
-                if (!is_null($item)) {
+                if (!is_null($item ?? null) && !empty($item ?? "")) {
 
                     $this->materials[] = $item;
 
@@ -37,11 +37,15 @@ trait ImportDataTrait
                 }
             return null;
         }
-        if ($rowIndex <= 2)
+
+
+        if ($rowIndex <= ($zeroStart ? 1 : 2))
             return null;
+
 
         if (is_null($row[0] ?? null) || empty($row[0] ?? ''))
             return null;
+
 
         $width = (int)filter_var($row[1] ?? 0, FILTER_SANITIZE_NUMBER_INT);// str_replace(" ","",$row[1] ?? 0);
         $height = (int)filter_var($row[0] ?? 0, FILTER_SANITIZE_NUMBER_INT);
@@ -82,17 +86,16 @@ trait ImportDataTrait
             $materialIndex++;
 
 
-            if (count($this->materials)==$materialIndex)
-                break;
-            ;
+            if (count($this->materials) == $materialIndex)
+                break;;
         }
 
     }
 
-    public function importColorsRow($row, $rowIndex,$zeroStart = false)
+    public function importColorsRow($row, $rowIndex, $zeroStart = false)
     {
-        $colors = ["Black" => "#000", "Silver" => "#111", "Gold" => "#f10", "RAL" => null];
-        if ($rowIndex ==  $zeroStart ? 0 : 1) {
+        $colors = ["Black" => "#2E3032", "Silver" => "#8F999F", "Gold" => "#E2B007", "RAL" => null];
+        if ($rowIndex == $zeroStart ? 0 : 1) {
             unset($row[0]);
             unset($row[1]);
             //unset($row[2]);
@@ -124,7 +127,7 @@ trait ImportDataTrait
 
             return null;
         }
-        if ($rowIndex <=  2)
+        if ($rowIndex <= ($zeroStart ? 1 : 2))
             return null;
 
 
@@ -186,7 +189,7 @@ trait ImportDataTrait
                             "cost" => 0,
                         ],
                         'type' => "all",
-                        'code' =>$code,
+                        'code' => $code,
                         'assign_with_size' => true,
                     ]);
             }
@@ -201,7 +204,7 @@ trait ImportDataTrait
 
     }
 
-    public function importDepthRow($row, $rowIndex,$zeroStart = false)
+    public function importDepthRow($row, $rowIndex, $zeroStart = false)
     {
 
         if ($rowIndex == $zeroStart ? 0 : 1) {
@@ -215,8 +218,8 @@ trait ImportDataTrait
 
                     $pattern = "/.*([0-9]{2}).*/i";
 
-                    $matches=[];
-                    $depthVal = preg_match($pattern,$item, $matches);
+                    $matches = [];
+                    $depthVal = preg_match($pattern, $item, $matches);
 
                     if (!$depthVal)
                         continue;
@@ -238,8 +241,7 @@ trait ImportDataTrait
 
             return null;
         }
-        if ($rowIndex <= 2)
-        {
+        if ($rowIndex <= ($zeroStart ? 1 : 2)) {
             return null;
         }
 
@@ -254,7 +256,7 @@ trait ImportDataTrait
 
         $depthIndex = 0;
 
-        for ($i = 2; $i < count($row); $i += 5 ) {
+        for ($i = 2; $i < count($row); $i += 5) {
 
             // $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
@@ -292,42 +294,42 @@ trait ImportDataTrait
 
     }
 
-    public function importRecountPrice(){
+    public function importRecountPrice()
+    {
         ini_set('max_execution_time', '3000');
 
 
+        // $materials = Material::query()->get();
 
-            // $materials = Material::query()->get();
+        // foreach ($materials as $material) {
+        $sizes = Size::query()
+            ->get();
 
-            // foreach ($materials as $material) {
-            $sizes = Size::query()
-                ->get();
+        $consumeBasePrice = [];
 
-            $consumeBasePrice = [];
+        $pricesKoefItems = Collection::make($sizes->toArray())
+            ->where("price_koef", 1)
+            ->all();
 
-            $pricesKoefItems = Collection::make($sizes->toArray())
-                ->where("price_koef", 1)
-                ->all();
+        foreach ($pricesKoefItems as $priceKoefItem)
+            $consumeBasePrice[$priceKoefItem["width"]][$priceKoefItem["material_id"] ?? $priceKoefItem["type"]] = $priceKoefItem["price"];
 
-            foreach ($pricesKoefItems as $priceKoefItem)
-                $consumeBasePrice[$priceKoefItem["width"]][$priceKoefItem["material_id"] ?? $priceKoefItem["type"]] = $priceKoefItem["price"];
+        foreach ($sizes as $size) {
 
-            foreach ($sizes as $size) {
-
-                if (!isset($consumeBasePrice[$size->width][$size->material_id??$size->type])) {
-                    continue;
-                }
-
-                $size->price = (object)[
-                    "wholesale" => $consumeBasePrice[$size->width][$size->material_id??$size->type]["wholesale"] * ($size->price_koef ?? 1),
-                    "dealer" => $consumeBasePrice[$size->width][$size->material_id??$size->type]["dealer"] * ($size->price_koef ?? 1),
-                    "retail" => $consumeBasePrice[$size->width][$size->material_id??$size->type]["retail"] * ($size->price_koef ?? 1),
-                    "cost" => $consumeBasePrice[$size->width][$size->material_id??$size->type]["cost"] * ($size->price_koef ?? 1),
-                ];
-
-
-                $size->save();
+            if (!isset($consumeBasePrice[$size->width][$size->material_id ?? $size->type])) {
+                continue;
             }
+
+            $size->price = (object)[
+                "wholesale" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["wholesale"] * ($size->price_koef ?? 1),
+                "dealer" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["dealer"] * ($size->price_koef ?? 1),
+                "retail" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["retail"] * ($size->price_koef ?? 1),
+                "cost" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["cost"] * ($size->price_koef ?? 1),
+            ];
+
+
+            $size->save();
+        }
 
     }
 }
