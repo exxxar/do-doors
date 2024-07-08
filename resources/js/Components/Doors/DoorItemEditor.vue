@@ -633,6 +633,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
         <div class="col-md-6">
             <div class="preview">
                 <DoorPreview
+                    v-if="loadedParams"
                     v-model="doorForm">
                 </DoorPreview>
                 <div class="card rounded-0 mt-3">
@@ -802,7 +803,7 @@ export default {
             filterHeight: null,
             filterWidth: null,
             selectedColorParam: null,
-
+            loadedParams:true,
             confirmModal: null,
             finishFrontVariantModal: null,
             finishBackVariantModal: null,
@@ -1008,7 +1009,16 @@ export default {
     },
     watch: {
 
+        'doorForm': {
+            handler(val) {
+                this.loadedParams = false
+                this.$nextTick(()=>{
+                    this.loadedParams = true
+                })
 
+            },
+            deep: true
+        },
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
