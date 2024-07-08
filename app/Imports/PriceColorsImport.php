@@ -26,6 +26,6 @@ class PriceColorsImport implements OnEachRow
         $rowIndex = $row->getIndex();
         $row = $row->toArray();
 
-        $this->importColorsRow($row, $rowIndex);
+        return $this->importColorsRow($row, $rowIndex);
     }
 }

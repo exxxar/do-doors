@@ -28,6 +28,6 @@ class PriceSizeLoopsImport implements OnEachRow
         $rowIndex = $row->getIndex();
         $row = $row->toArray();
 
-        $this->importSizeLoopsRow($row, $rowIndex, $this->type);
+        return $this->importSizeLoopsRow($row, $rowIndex, $this->type);
     }
 }

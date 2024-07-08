@@ -15,10 +15,10 @@ trait ImportDataTrait
 
     public function importSizeLoopsRow($row, $rowIndex, $type = "sizes", $zeroStart = false)
     {
-        if ($rowIndex == $zeroStart ? 0 : 1) {
+        if ($rowIndex == ($zeroStart ? 0 : 1)) {
             unset($row[0]);
             unset($row[1]);
-            //dd($row);
+
             // unset($row[2]);
             foreach (array_values($row) as $item)
                 if (!is_null($item ?? null) && !empty($item ?? "")) {
@@ -35,6 +35,8 @@ trait ImportDataTrait
                         ]);
 
                 }
+
+
             return null;
         }
 
@@ -52,6 +54,9 @@ trait ImportDataTrait
         $materialIndex = 0;
 
         for ($i = 2; $i < count($row); $i += $type == "sizes" ? 5 : 6) {
+
+            if ($materialIndex == count($this->materials))
+                break;
 
             $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
@@ -95,7 +100,7 @@ trait ImportDataTrait
     public function importColorsRow($row, $rowIndex, $zeroStart = false)
     {
         $colors = ["Black" => "#2E3032", "Silver" => "#8F999F", "Gold" => "#E2B007", "RAL" => null];
-        if ($rowIndex == $zeroStart ? 0 : 1) {
+        if ($rowIndex == ($zeroStart ? 0 : 1)) {
             unset($row[0]);
             unset($row[1]);
             //unset($row[2]);
@@ -143,6 +148,8 @@ trait ImportDataTrait
 
         for ($i = 2; $i < count($row); $i += 5) {
 
+            if ($colorIndex == count($this->colors))
+                break;
             // $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
             $stepKoef = 0;
@@ -167,6 +174,8 @@ trait ImportDataTrait
                 "type" => "colors",
                 'value' => $this->colors[$colorIndex] ?? '-',
             ]);
+
+
 
 
             $title = $this->colors[$colorIndex];
@@ -207,7 +216,7 @@ trait ImportDataTrait
     public function importDepthRow($row, $rowIndex, $zeroStart = false)
     {
 
-        if ($rowIndex == $zeroStart ? 0 : 1) {
+        if ($rowIndex == ($zeroStart ? 0 : 1)) {
             unset($row[0]);
             unset($row[1]);
             //unset($row[2]);
@@ -258,6 +267,8 @@ trait ImportDataTrait
 
         for ($i = 2; $i < count($row); $i += 5) {
 
+            if ($depthIndex == count($this->depth))
+                break;
             // $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
             $stepKoef = 0;
@@ -298,21 +309,42 @@ trait ImportDataTrait
     {
         ini_set('max_execution_time', '3000');
 
+        $minHeight = Size::query()
+            ->where("type","sizes")
+            ->min("height");
+
+        $uniqWidth =    Size::query()
+            ->where("type","sizes")
+            ->get()->unique("width");
+
 
         // $materials = Material::query()->get();
 
         // foreach ($materials as $material) {
         $sizes = Size::query()
+            //->where("type","sizes")
+        //    ->whereIn("width",array_values($uniqWidth->pluck("width")->toArray()))
+         //   ->where("height", $minHeight)
             ->get();
 
         $consumeBasePrice = [];
 
-        $pricesKoefItems = Collection::make($sizes->toArray())
+        $pricesKoefItems = Size::query()
+          //  ->where("type","sizes")
+            ->whereIn("width",array_values($uniqWidth->pluck("width")->toArray()))
+            ->where("height", $minHeight)
             ->where("price_koef", 1)
-            ->all();
+            ->get();
 
         foreach ($pricesKoefItems as $priceKoefItem)
-            $consumeBasePrice[$priceKoefItem["width"]][$priceKoefItem["material_id"] ?? $priceKoefItem["type"]] = $priceKoefItem["price"];
+            $consumeBasePrice[$priceKoefItem["width"]][$priceKoefItem["material_id"] ?? $priceKoefItem["type"]] = $priceKoefItem["price"] ?? [
+                "wholesale"=>0,
+                "dealer"=>0,
+                "retail"=>0,
+                "cost"=>0,
+            ];
+
+
 
         foreach ($sizes as $size) {
 
@@ -321,10 +353,10 @@ trait ImportDataTrait
             }
 
             $size->price = (object)[
-                "wholesale" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["wholesale"] * ($size->price_koef ?? 1),
-                "dealer" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["dealer"] * ($size->price_koef ?? 1),
-                "retail" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["retail"] * ($size->price_koef ?? 1),
-                "cost" => $consumeBasePrice[$size->width][$size->material_id ?? $size->type]["cost"] * ($size->price_koef ?? 1),
+                "wholesale" => round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["wholesale"] * ($size->price_koef ?? 1), 2),
+                "dealer" =>  round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["dealer"] * ($size->price_koef ?? 1),2),
+                "retail" =>  round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["retail"] * ($size->price_koef ?? 1),2),
+                "cost" =>  round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["cost"] * ($size->price_koef ?? 1),2),
             ];
 
 

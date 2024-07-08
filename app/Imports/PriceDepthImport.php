@@ -20,6 +20,6 @@ class PriceDepthImport implements OnEachRow
         $rowIndex = $row->getIndex();
         $row = $row->toArray();
 
-        $this->importDepthRow($row, $rowIndex);
+        return $this->importDepthRow($row, $rowIndex);
     }
 }

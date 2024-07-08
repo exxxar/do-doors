@@ -652,6 +652,10 @@ class SizeController extends Controller
             DB::table('sizes')->truncate();
         }
 
+        Material::query()->truncate();
+
+
+
         foreach ($tmp as $file)
             Excel::import(new PriceMultiSheetImport($usePriceKoef), storage_path("app/public/documents/" . $file));
 

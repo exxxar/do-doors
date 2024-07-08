@@ -99,7 +99,7 @@ export default {
         }
     },
     mounted() {
-
+        this.colors = this.getRalColors
     },
     methods: {
         addFilter(item) {
