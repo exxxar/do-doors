@@ -687,6 +687,19 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
                 </div>
+
+                <div class="card rounded-0 mt-3" v-if="tmp_prices.length>0">
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                <tr v-for="item in tmp_prices">
+                                    <td>{{type_dictionary[item.type]||'-'}}</td>
+                                    <td>{{item.price||0}} руб.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -798,6 +811,21 @@ export default {
     props: ['door'],
     data() {
         return {
+            type_dictionary:{
+                handle_holes_type:'Отверстие под ручку',
+                opening_type:'Тип открытия двери и толщина',
+                box_and_frame_color:'Цвет короба и каркаса',
+                door_type:'Тип двери',
+                front_side_finish_color:'Цвет отделки внешней стороны',
+                back_side_finish_color:'Цвет отделки внутренней стороны',
+                seal_color:'Цвет уплотнителя',
+                fittings_color:'Цвет фурнитуры',
+                hinge_manufacturer:'Производитель петель',
+                front_side_finish:'Отделка внешней стороны',
+                back_side_finish:'Отделка внутренней стороны',
+
+            },
+            tmp_prices:[],
             need_addition: true,
             messages: [],
             filterHeight: null,
@@ -881,6 +909,7 @@ export default {
         summaryPrice() {
             let sum = 0;
 
+            this.tmp_prices = []
 
             let type = this.doorForm.price_type.key
 
@@ -897,6 +926,11 @@ export default {
 
                             let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
                             sum += price || 0
+
+                            this.tmp_prices.push({
+                                type:item,
+                                price: price
+                            })
                         }
 
                         if (item.indexOf("_color") !== -1 && this.doorForm[item].sizes && !find) {
@@ -914,19 +948,38 @@ export default {
                             }
 
                             sum += price || 0
+
+                            this.tmp_prices.push({
+                                type:item,
+                                price: price
+                            })
                         }
 
                         if (item === "size" && this.doorForm[item].loops && !find) {
                             find = true
 
-                            sum += this.doorForm[item].loops.price[type] || 0
+                            let price = this.doorForm[item].loops.price[type]
+                            sum += price || 0
+
+                            this.tmp_prices.push({
+                                type:item,
+                                price: price
+                            })
                         }
 
 
                         if (this.doorForm[item].price && !find) {
-                            sum += (typeof this.doorForm[item].price === "object") ?
+
+                            let price = (typeof this.doorForm[item].price === "object") ?
                                 (this.doorForm[item].price[type] || 0) :
                                 (this.doorForm[item].price || 0)
+
+                            sum += price || 0
+
+                            this.tmp_prices.push({
+                                type:item,
+                                price: price
+                            })
                         }
 
                     }
@@ -954,11 +1007,23 @@ export default {
             if (find) {
                 section.materials.forEach(sub => {
                     if (sub.id === this.doorForm.front_side_finish.id) {
-                        price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                        let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
+                        price += tmpPrice
+
+                        this.tmp_prices.push({
+                            type:'front_side_finish',
+                            price: tmpPrice
+                        })
                     }
 
                     if (sub.id === this.doorForm.back_side_finish.id) {
-                        price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                        let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
+                        price += tmpPrice
+
+                        this.tmp_prices.push({
+                            type:'back_side_finish',
+                            price: tmpPrice
+                        })
                     }
 
                 })
@@ -970,19 +1035,32 @@ export default {
                     if (basePrices[i].width >= this.doorForm.width && basePrices[i].height >= this.doorForm.height) {
 
                         basePrices[i].materials.forEach(sub => {
-                            if (sub.id === this.doorForm.front_side_finish.id)
-                                price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                            if (sub.id === this.doorForm.front_side_finish.id) {
+                                let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
+                                price += tmpPrice
+                                this.tmp_prices.push({
+                                    type:'front_side_finish',
+                                    price: tmpPrice
+                                })
+                            }
+
                         })
 
                         basePrices[i].materials.forEach(sub => {
-                            if (sub.id === this.doorForm.back_side_finish.id)
-                                price += typeof sub.price === "object" ? sub.price[type] : sub.price
+                            if (sub.id === this.doorForm.back_side_finish.id) {
+                                let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
+                                price += tmpPrice
+                                this.tmp_prices.push({
+                                    type:'back_side_finish',
+                                    price: tmpPrice
+                                })
+                            }
+
                         })
                         break;
                     }
                 }
             }
-
 
             return sum + price;//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
