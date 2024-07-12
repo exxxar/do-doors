@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use Google\Client;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Revolution\Google\Sheets\Sheets;
 
 /*
@@ -20,7 +23,44 @@ use Revolution\Google\Sheets\Sheets;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get("/test", function (){
+    $path = storage_path() . "\\app";
 
+  //  $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
+
+    /* dd([
+         "file_exist"=>file_exists($path . "/$fileName"),
+         "filename"=>$fileName,
+         "path"=>$path
+     ]);*/
+
+
+        try {
+            $templateProcessor = new TemplateProcessor($path . "\\demo.docx");
+            $templateProcessor->setValue('name', "1231231");
+            $templateProcessor->setValue('email', "dasdasd");
+            $templateProcessor->setValue('phone', "!23123");
+            $templateProcessor->setValue('order_id', "1");
+            $templateProcessor->setValue('info', "3123");
+            $templateProcessor->setValue('total_price', 1313);
+            $templateProcessor->setValue('total_count', 44);
+            $templateProcessor->setValue('current_payed', 44);
+            $templateProcessor->setValue('payed_percent', 5);
+            $templateProcessor->setValue('delivery_terms', "test");
+
+
+            $templateProcessor->saveAs($path . "/test.docx");
+
+
+        } catch (CopyFileException $e) {
+            dd($e);
+        } catch (CreateTemporaryFileException $e) {
+            dd($e);
+        }
+
+
+
+});
 
 
 
@@ -128,6 +168,16 @@ Route::prefix("/door-variants")
     ->group(function () {
         Route::get("/", "index")->name('door-variants');
         Route::post("/", "getDoorVariantList");
+        Route::post("/store", "store");
+        Route::delete("/{id}", "destroy");
+    });
+
+Route::prefix("/services")
+    ->middleware(['auth', 'verified'])
+    ->controller(App\Http\Controllers\ServiceController::class)
+    ->group(function () {
+        Route::get("/", "index")->name('services');
+        Route::post("/", "getServiceList");
         Route::post("/store", "store");
         Route::delete("/{id}", "destroy");
     });
@@ -268,3 +318,5 @@ Route::prefix("/users")
 
 
 Route::resource('opening-variant', App\Http\Controllers\OpeningVariantController::class);
+
+

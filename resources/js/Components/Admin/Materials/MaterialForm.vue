@@ -24,9 +24,16 @@
         </div>
 
 
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input"
+                   v-model="form.is_base"
+                   type="checkbox" role="switch" id="is-base">
+            <label class="form-check-label" for="is-base">
+                Является базой
+            </label>
+        </div>
 
-
-        <div class="form-check form-switch">
+        <div class="form-check form-switch mb-3">
             <input class="form-check-input"
                    v-model="form.need_generate_sizes"
                    type="checkbox" role="switch" id="recount-by-width">
@@ -263,6 +270,7 @@ export default {
             form: {
                 id: null,
                 title: null,
+                is_base: false,
                 order_position: 0,
                 need_generate_sizes: false,
                 wrapper_variants: [],
@@ -286,6 +294,7 @@ export default {
               this.form = {
                   id: this.item.id || null,
                   title: this.item.title || null,
+                  is_base: this.item.is_base || false,
                   order_position: this.item.order_position || 0,
                   wrapper_variants: this.item.wrapper_variants || [],
                   door_variants: this.item.door_variants || [],
@@ -303,6 +312,7 @@ export default {
             this.form.id = null
             this.form.title = null
             this.form.order_position = 0
+            this.form.is_base = false
             this.form.wrapper_variants = []
             this.form.door_variants = []
 

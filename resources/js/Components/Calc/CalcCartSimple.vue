@@ -108,6 +108,8 @@ export default {
                     type: 'success'
                 });
 
+                window.dispatchEvent(new CustomEvent("clear-cart"));
+
             }).catch(error => {
                 this.$notify({
                     title: "DoDoors",

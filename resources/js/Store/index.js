@@ -15,6 +15,7 @@ import promoCodes from './modules/promo_codes.js'
 import roles from './modules/roles.js'
 import permissions from './modules/permissions.js'
 import users from './modules/users.js'
+import services from './modules/services.js'
 
 export default createStore({
     state: {
@@ -46,6 +47,7 @@ export default createStore({
         roles,
         permissions,
         orderDetails,
-        users
+        users,
+        services
     }
 })

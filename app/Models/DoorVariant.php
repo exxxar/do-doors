@@ -17,6 +17,7 @@ class DoorVariant extends Model
     protected $fillable = [
         'title',
         'price',
+        'need_percent_price',
     ];
 
     /**
@@ -27,6 +28,7 @@ class DoorVariant extends Model
     protected $casts = [
         'id' => 'integer',
         'price' => 'json',
+        'need_percent_price' => 'boolean',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 }

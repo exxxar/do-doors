@@ -107,6 +107,7 @@ class MaterialController extends Controller
                     "title" => $request->title ?? null,
                     'wrapper_variants' => $wrapper,
                     'door_variants' => $door,
+                    'is_base' => ($request->is_base  ?? false)  == "true",
                     'order_position' => $request->order_position ?? 0,
                 ]);
 
@@ -133,6 +134,7 @@ class MaterialController extends Controller
                 "title" => $request->title ?? null,
                 'wrapper_variants' => $wrapper,
                 'door_variants' => $door,
+                'is_base' => ($request->is_base  ?? false)  == "true",
                 'order_position' => $request->order_position ?? 0,
             ]);
 

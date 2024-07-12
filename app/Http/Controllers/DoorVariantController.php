@@ -58,6 +58,7 @@ class DoorVariantController extends Controller
             $doorVariant = DoorVariant::query()
                 ->create([
                     "title" => $request->title ?? null,
+                    "need_percent_price" => ($request->need_percent_price ?? false) == "true",
                     'price' => (object)[
                         "wholesale" => $priceData->wholesale ?? 0,
                         "dealer" => $priceData->dealer ?? 0,
@@ -73,6 +74,7 @@ class DoorVariantController extends Controller
 
             $doorVariant->update([
                 "title" => $request->title ?? null,
+                "need_percent_price" => ($request->need_percent_price ?? false) == "true",
                 'price' => (object)[
                     "wholesale" => $priceData->wholesale ?? 0,
                     "dealer" => $priceData->dealer ?? 0,

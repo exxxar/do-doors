@@ -17,7 +17,8 @@ import CalcSwitch from "@/Components/Calc/CalcSwitch.vue";
             <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm rounded-0">
                     <div class="p-6 text-gray-900">
-                     <CalcSwitch></CalcSwitch>
+<!--                     <CalcSwitch></CalcSwitch>-->
+                        <CalcForm></CalcForm>
                     </div>
                 </div>
             </div>

@@ -19,6 +19,7 @@ use App\Models\DoorVariant;
 use App\Models\Handle;
 use App\Models\Hinge;
 use App\Models\Material;
+use App\Models\Service;
 use App\Models\Size;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -312,6 +313,7 @@ class SizeController extends Controller
                         (object)[
                             "id" => $size->material->id,
                             "title" => $size->material->title,
+                            "is_base" => $size->material->is_base ?? false,
                             "price" => $size->price ?? 0,
                         ]
                     ],
@@ -340,6 +342,7 @@ class SizeController extends Controller
                             (object)[
                                 "id" => $size->material->id,
                                 "title" => $size->material->title,
+                                "is_base" => $size->material->is_base ?? false,
                                 "price" => $size->price ?? 0,
                             ]
                         ],
@@ -356,6 +359,7 @@ class SizeController extends Controller
                             $item->materials[] = (object)[
                                 "id" => $size->material->id,
                                 "title" => $size->material->title,
+                                "is_base" => $size->material->is_base ?? false,
                                 "price" => $size->price ?? 0,
                             ];
                     }
@@ -424,6 +428,8 @@ class SizeController extends Controller
                 ->orderBy("order_position", "asc")
                 ->get(),
             "door_variants" => DoorVariant::query()
+                ->get(),
+            "services" => Service::query()
                 ->get(),
             "colors" => $tmpColors
 

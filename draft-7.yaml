@@ -1,0 +1,15 @@
+models:
+  Service:
+    title: string:255 nullable
+    type: string:255 nullable
+    order_position: integer default:0
+    is_active: boolean default:true
+    price: json
+
+
+seeds:   Service
+
+controllers:
+  Service:
+    resource
+

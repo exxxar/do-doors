@@ -1,15 +1,15 @@
 created:
-    - app/Http/Controllers/OpeningVariantController.php
-    - database/factories/OpeningVariantFactory.php
-    - database/migrations/2024_06_01_091148_create_opening_variants_table.php
-    - app/Models/OpeningVariant.php
-    - tests/Feature/Http/Controllers/OpeningVariantControllerTest.php
-    - app/Http/Requests/OpeningVariantStoreRequest.php
-    - app/Http/Requests/OpeningVariantUpdateRequest.php
-    - resources/views/openingVariant/index.blade.php
-    - resources/views/openingVariant/create.blade.php
-    - resources/views/openingVariant/show.blade.php
-    - resources/views/openingVariant/edit.blade.php
+    - app/Http/Controllers/ServiceController.php
+    - database/factories/ServiceFactory.php
+    - database/migrations/2024_07_11_184814_create_services_table.php
+    - app/Models/Service.php
+    - tests/Feature/Http/Controllers/ServiceControllerTest.php
+    - app/Http/Requests/ServiceStoreRequest.php
+    - app/Http/Requests/ServiceUpdateRequest.php
+    - resources/views/service/index.blade.php
+    - resources/views/service/create.blade.php
+    - resources/views/service/show.blade.php
+    - resources/views/service/edit.blade.php
 updated:
     - routes/web.php
 models:
@@ -25,3 +25,4 @@ models:
     PromoCode: { code: 'string:255 unique', discount: 'double default:0', description: 'longtext nullable', end_at: 'timestamp nullable', is_active: 'boolean default:false' }
     PromoCodeHistory: { client_id: 'id foreign:clients', promo_code_id: 'id foreign:promo_codes', relationships: { belongsTo: 'Client, PromoCode' } }
     OpeningVariant: { title: 'string:255 nullable', order_position: 'integer default:0', price: 'double default:0', depth: 'double default:0', direction: 'string:10 nullable' }
+    Service: { title: 'string:255 nullable', type: 'string:255 nullable', order_position: 'integer default:0', is_active: 'boolean default:true', price: json }

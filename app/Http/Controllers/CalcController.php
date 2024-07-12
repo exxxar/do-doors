@@ -52,7 +52,13 @@ class CalcController extends Controller
             "items" => "required",
         ]);
 
-        $clientId = $request->client_id ?? null;
+        $currentPayed = $request->current_payed ?? "________";
+        $payedPercent = $request->payed_percent ?? "________";
+        $deliveryTerms = $request->delivery_terms ?? "________";
+
+        $workWithNds = $request->work_with_nds ?? 1;
+
+        $clientId = $request->id ?? null;
 
         $name = $request->name;
         $email = $request->email ?? 'не указано';
@@ -163,24 +169,53 @@ class CalcController extends Controller
         ]);
 
         $path = storage_path() . "/app";
-        if (!file_exists($path . "/demo.docx")) {
+
+        $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
+
+       /* dd([
+            "file_exist"=>file_exists($path . "/$fileName"),
+            "filename"=>$fileName,
+            "path"=>$path
+        ]);*/
+
+        $newName = "/договор с клиентом №".$client->id." ".($workWithNds==1?"ООО":"ИП")." от".(Carbon::now()->format('Y-m-d h-i-s')).".docx";
+
+        if (file_exists($path . "/$fileName")) {
             try {
-                $templateProcessor = new TemplateProcessor($path . "/demo.docx");
-                $templateProcessor->setValue('name', $name);
+                $templateProcessor = new TemplateProcessor($path . "/$fileName");
+                $templateProcessor->setValue('title', $name);
                 $templateProcessor->setValue('email', $email);
                 $templateProcessor->setValue('phone', $phone);
-                $templateProcessor->setValue('order_id', $number);
+                $templateProcessor->setValue('fact_address', $client->fact_address ?? '-');
+                $templateProcessor->setValue('law_address', $client->law_address ?? '-');
+                $templateProcessor->setValue('inn', $client->inn ?? '-');
+                $templateProcessor->setValue('ogrn', $client->ogrn ?? '-');
+                $templateProcessor->setValue('kpp', $client->kpp ?? '-');
+                $templateProcessor->setValue('okpo', $client->okpo ?? '-');
+               // $templateProcessor->setValue('requisites', $client->requisites ?? '-');
+                $templateProcessor->setValue('order_id', $order->id);
                 $templateProcessor->setValue('info', $info);
                 $templateProcessor->setValue('total_price', $totalPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
-                $templateProcessor->setValue('current_payed', 0);
-                $templateProcessor->setValue('payed_percent', 0);
-                $templateProcessor->setValue('delivery_terms', 0);
-                $templateProcessor->saveAs($path . "/demo.docx");
+                $templateProcessor->setValue('current_payed', $currentPayed);
+                $templateProcessor->setValue('payed_percent', $payedPercent);
+                $templateProcessor->setValue('delivery_terms', $deliveryTerms);
+
+                $templateProcessor->saveAs($path . $newName);
+
+                $telegram->sendDocument([
+                    'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+                    "document" => InputFile::create($path . $newName),
+                    "parse_mode" => "HTML",
+                ]);
+
             } catch (CopyFileException $e) {
+
             } catch (CreateTemporaryFileException $e) {
+
             }
 
+            return response()->download(storage_path('app/' . $newName));
 
         }
     }

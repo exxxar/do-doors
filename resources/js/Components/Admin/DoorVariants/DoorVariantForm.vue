@@ -10,6 +10,15 @@
             <label for="door-variant-title">Наименование варианта двери</label>
         </div>
 
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input"
+                   v-model="form.need_percent_price"
+                   type="checkbox" role="switch" id="is-base">
+            <label class="form-check-label" for="is-base">
+               Использовать процент от базовой цены
+            </label>
+        </div>
+
         <div class="card rounded-0 mb-3 border-black">
             <div class="card-header bg-dark text-white rounded-0 ">
                 <h6>Настройка цены</h6>
@@ -23,7 +32,8 @@
                                    v-model="form.price.wholesale"
                                    class="form-control" id="price-wholesale"
                                    required>
-                            <label for="price-wholesale">Опт</label>
+                            <label for="price-wholesale">Опт<span v-if="form.need_percent_price">, %</span><span v-else>, руб</span>
+                            </label>
                         </div>
                     </div>
                     <div class="col-6">
@@ -32,7 +42,8 @@
                                    v-model="form.price.retail"
                                    class="form-control" id="price-retail"
                                    required>
-                            <label for="price-retail">Розница</label>
+                            <label for="price-retail">Розница<span v-if="form.need_percent_price">, %</span><span v-else>, руб</span>
+                            </label>
                         </div>
                     </div>
                     <div class="col-6">
@@ -41,7 +52,8 @@
                                    v-model="form.price.dealer"
                                    class="form-control" id="price-dealer"
                                    required>
-                            <label for="price-dealer">Дилер</label>
+                            <label for="price-dealer">Дилер<span v-if="form.need_percent_price">, %</span><span v-else>, руб</span>
+                            </label>
                         </div>
                     </div>
                     <div class="col-6">
@@ -50,7 +62,8 @@
                                    v-model="form.price.cost"
                                    class="form-control" id="price-cost"
                                    required>
-                            <label for="price-cost">Себестоимость</label>
+                            <label for="price-cost">Себестоимость<span v-if="form.need_percent_price">, %</span><span v-else>, руб</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -107,6 +120,7 @@ export default {
             form: {
                 id: null,
                 title: null,
+                need_percent_price: false,
                 price:  {
                     wholesale: 0,
                     dealer: 0,
@@ -134,6 +148,7 @@ export default {
                 this.form = {
                     id: this.item.id || null,
                     title: this.item.title || null,
+                    need_percent_price: this.item.need_percent_price || false,
                     price: this.item.price || {
                         wholesale: 0,
                         dealer: 0,
@@ -155,6 +170,7 @@ export default {
 
             this.form.id = null
             this.form.title = null
+            this.form.need_percent_price = false
             this.form.price =   {
                 wholesale: 0,
                 dealer: 0,

@@ -42,6 +42,14 @@ import Pagination from "@/Components/Pagination.vue";
 
                 </th>
 
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('need_percent_price')">%
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'need_percent_price'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'need_percent_price'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+
+                </th>
+
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('price')">Цена
                     <span v-if="sort.direction === 'desc'&&sort.column === 'price'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -51,13 +59,13 @@ import Pagination from "@/Components/Pagination.vue";
                 </th>
 
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+<!--                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
                     <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
-                </th>
+                </th>-->
                 <th scope="col" class="text-center">Действие</th>
             </tr>
             </thead>
@@ -67,20 +75,27 @@ import Pagination from "@/Components/Pagination.vue";
                 <td class="text-center" @click="selectItem(item)">
                     {{ item.title || '-' }}
                 </td>
+                <td class="text-center" style="width: 50px;">
+                    {{ item.need_percent_price ? "да":"нет" }}
+                </td>
                 <td class="text-center">
                     <table class="w-100">
                         <thead>
-                        <th>опт</th>
-                        <th>дилер</th>
-                        <th>розница</th>
-                        <th>себестоимость</th>
+                        <th>опт<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
+                        <th>дилер<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
+                        <th>розница<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
+                        <th>себестоимость<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
                         </thead>
                         <tbody>
                         <tr>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}</td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}</td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}
+                            </td>
+                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}
+                            </td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}
+                            </td>
+                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}
+                            </td>
                         </tr>
 
 
@@ -89,9 +104,9 @@ import Pagination from "@/Components/Pagination.vue";
                 </td>
 
 
-                <td class="text-center">
+<!--                <td class="text-center">
                     {{ item.updated_at || '-' }}
-                </td>
+                </td>-->
                 <td class="text-center">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">

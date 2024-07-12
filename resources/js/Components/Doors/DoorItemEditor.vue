@@ -6,7 +6,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
 <template>
 
-    <div class="row">
+    <div class="row" v-if="loaded">
 
         <div class="col-md-6">
             <form
@@ -189,6 +189,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
 
                     <div class="col-md-6 col-12">
+
                         <div class="form-floating mb-3">
                             <select class="form-select"
                                     v-model="doorForm.hinge_manufacturer"
@@ -364,6 +365,21 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
 
+                    <div class="col-md-6 col-12" v-if="doorForm.fittings_color.title!=null">
+
+                        <div class="form-floating w-100">
+                            <select class="form-select"
+                                    v-model="doorForm.service_painting"
+                                    id="door-service-painting" aria-label="Floating label select example">
+                                <option :value="service" v-for="service in getServiceByType('service_painting')">
+                                    {{ service.title || '-' }}
+                                </option>
+                            </select>
+                            <label for="door-service-painting">Выберите вариант</label>
+                        </div>
+
+                    </div>
+
 
                     <div class="col-12">
                         <div class="form-floating ">
@@ -403,12 +419,12 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                     }}
                                 </option>
                             </select>
-                            <label for="floatingSelect">Отверстий под ручку</label>
+                            <label for="floatingSelect">Отверстия под ручку</label>
                         </div>
                     </div>
 
                     <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating">
                             <select class="form-select"
                                     @invalid="alert('Вы не выбрали внешний вид ручки!')"
                                     v-model="doorForm.handle_holes_type"
@@ -421,6 +437,24 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             </select>
                             <label for="floatingSelect">Выбор ручки</label>
                         </div>
+                    </div>
+
+                    <div
+                        v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
+                        class="col-12 d-flex align-items-center">
+                        <div class="form-floating w-100 mb-3">
+                            <select class="form-select"
+                                    v-model="doorForm.service_handle"
+                                    id="door-service-door_closer"
+                                    aria-label="Floating label select example">
+                                <option :value="{title:null}">Не выбрано</option>
+                                <option :value="service" v-for="service in getServiceByType('service_handle')">
+                                    {{ service.title || '-' }}
+                                </option>
+                            </select>
+                            <label for="door-service-door_closer">Вариант дополнительного сервиса</label>
+                        </div>
+
                     </div>
 
                     <div class="col-12"
@@ -494,6 +528,23 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
 
+
+                    <div
+                        v-if="doorForm.need_automatic_doorstep"
+                        class="col-12 d-flex align-items-center">
+                        <div class="form-floating w-100 my-3">
+                            <select class="form-select"
+                                    v-model="doorForm.service_doorstep"
+                                    id="door-service-doorstep" aria-label="Floating label select example">
+                                <option :value="service" v-for="service in getServiceByType('service_doorstep')">
+                                    {{ service.title || '-' }}
+                                </option>
+                            </select>
+                            <label for="door-service-doorstep">Выберите вариант</label>
+                        </div>
+
+                    </div>
+
                     <div class="col-12 d-flex align-items-center">
                         <div class="form-check form-switch">
                             <input class="form-check-input"
@@ -504,9 +555,26 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                 Нужен скрытый стопор \ не нужен
                             </label>
                         </div>
+                    </div>
 
+
+                    <div
+                        v-if="doorForm.need_hidden_stopper"
+                        class="col-12 d-flex align-items-center">
+                        <div class="form-floating w-100 my-3">
+                            <select class="form-select"
+                                    v-model="doorForm.service_stopper"
+                                    id="door-service-stopper"
+                                    aria-label="Floating label select example">
+                                <option :value="service" v-for="service in getServiceByType('service_stopper')">
+                                    {{ service.title || '-' }}
+                                </option>
+                            </select>
+                            <label for="door-service-stopper">Выберите вариант</label>
+                        </div>
 
                     </div>
+
 
                     <div class="col-12 d-flex align-items-center">
                         <div class="form-check form-switch">
@@ -518,6 +586,23 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             </label>
                         </div>
 
+
+                    </div>
+
+                    <div
+                        v-if="doorForm.need_hidden_door_closer"
+                        class="col-12 d-flex align-items-center">
+                        <div class="form-floating w-100 my-3">
+                            <select class="form-select"
+                                    v-model="doorForm.service_door_closer"
+                                    id="door-service-door_closer"
+                                    aria-label="Floating label select example">
+                                <option :value="service" v-for="service in getServiceByType('service_door_closer')">
+                                    {{ service.title || '-' }}
+                                </option>
+                            </select>
+                            <label for="door-service-door_closer">Выберите вариант</label>
+                        </div>
 
                     </div>
 
@@ -533,6 +618,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
 
+
                     <div class="col-12 d-flex align-items-center">
                         <div class="form-check form-switch">
                             <input class="form-check-input"
@@ -540,7 +626,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                    v-model="doorForm.need_door_install"
                                    role="switch" id="need-door-install" checked>
                             <label class="form-check-label" for="need-door-install">
-                                Нужен установка двери \ не нужна
+                                Нужна установка двери \ не нужна
                             </label>
                         </div>
 
@@ -555,7 +641,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                    v-model="doorForm.need_wrapper"
                                    role="switch" id="need-door-wrapper" checked>
                             <label class="form-check-label" for="need-door-wrapper">
-                                Нужен упаковка двери \ не нужна
+                                Нужна упаковка двери \ не нужна
                             </label>
                         </div>
 
@@ -692,10 +778,23 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     <div class="card-body">
                         <table class="table">
                             <tbody>
-                                <tr v-for="item in tmp_prices">
-                                    <td>{{type_dictionary[item.type]||'-'}}</td>
-                                    <td>{{item.price||0}} руб.</td>
-                                </tr>
+                            <tr v-for="item in tmp_prices">
+                                <td>{{ type_dictionary[item.type] || item.type }}
+                                    <template v-if="doorForm[item.type]">
+                                        <br>
+                                        <small
+                                            v-if="doorForm[item.type].description">({{
+                                                doorForm[item.type].description
+                                            }})</small>
+                                    </template>
+                                </td>
+                                <td>{{ item.price || 0 }} руб.
+                                    <template v-if="item.full_price">
+                                        <br>
+                                        <small>({{ item.full_price || 0 }} руб.)</small>
+                                    </template>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -718,6 +817,16 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
     </div>
 
+    <div class="row" v-else>
+        <div class="col-12">
+            <div class="d-flex justify-content-center align-items-center flex-column" style="min-height: 500px;">
+                <h5>Загружаем страничку....</h5>
+                <div class="spinner-border my-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade  " id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0">
@@ -811,27 +920,35 @@ export default {
     props: ['door'],
     data() {
         return {
-            type_dictionary:{
-                handle_holes_type:'Отверстие под ручку',
-                opening_type:'Тип открытия двери и толщина',
-                box_and_frame_color:'Цвет короба и каркаса',
-                door_type:'Тип двери',
-                front_side_finish_color:'Цвет отделки внешней стороны',
-                back_side_finish_color:'Цвет отделки внутренней стороны',
-                seal_color:'Цвет уплотнителя',
-                fittings_color:'Цвет фурнитуры',
-                hinge_manufacturer:'Производитель петель',
-                front_side_finish:'Отделка внешней стороны',
-                back_side_finish:'Отделка внутренней стороны',
+            loaded: false,
+            type_dictionary: {
+                size: 'Петли',
+                handle_holes_type: 'Отверстие под ручку',
+                opening_type: 'Тип открытия двери и толщина',
+                box_and_frame_color: 'Цвет короба и каркаса',
+                door_type: 'Тип двери',
+                front_side_finish_color: 'Цвет отделки внешней стороны',
+                back_side_finish_color: 'Цвет отделки внутренней стороны',
+                seal_color: 'Цвет уплотнителя',
+                fittings_color: 'Цвет фурнитуры',
+                hinge_manufacturer: 'Производитель петель',
+                front_side_finish: 'Отделка внешней стороны',
+                back_side_finish: 'Отделка внутренней стороны',
+                base: 'База (под покраску)',
+                service_doorstep: 'Работа с порогом',
+                service_painting: 'Покраска фурнитуры',
+                service_door_closer: 'Работа с доводчиком',
+                service_handle: 'Работа с ручками',
+                service_stopper: 'Работа со стопором',
 
             },
-            tmp_prices:[],
+            tmp_prices: [],
             need_addition: true,
             messages: [],
             filterHeight: null,
             filterWidth: null,
             selectedColorParam: null,
-            loadedParams:true,
+            loadedParams: true,
             confirmModal: null,
             finishFrontVariantModal: null,
             finishBackVariantModal: null,
@@ -875,7 +992,13 @@ export default {
                 need_hidden_door_closer: false, //Скрытый доводчик
                 need_hidden_skirting_board: false, //нужен плинтус
                 need_door_install: false, //нужна установка двери
-                need_wrapper: true //нужна упаковка двери
+                need_wrapper: true, //нужна упаковка двери
+
+                service_doorstep: {title: null}, //работа с порогом
+                service_painting: {title: null}, //покраска фурнитуры
+                service_stopper: {title: null}, //работа со стопером
+                service_door_closer: {title: null}, //работа с доводчиком
+                service_handle: {title: null}, //работа с ручками
             }
         }
     },
@@ -909,6 +1032,8 @@ export default {
         summaryPrice() {
             let sum = 0;
 
+            let base = null
+
             this.tmp_prices = []
 
             let type = this.doorForm.price_type.key
@@ -917,7 +1042,11 @@ export default {
 
                 let find = false
                 if (item) {
-                    if (typeof this.doorForm[item] === "object" && this.doorForm[item] != null) {
+
+                    if (typeof this.doorForm[item] === "object"
+                        && this.doorForm[item] != null
+                        && item !== "door_type"
+                    ) {
                         if (item === "opening_type" && this.doorForm[item].sizes) {
                             find = true
                             let index = this.doorForm[item].sizes.findIndex(c =>
@@ -925,10 +1054,10 @@ export default {
                                 c.height == this.doorForm.height)
 
                             let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
-                            sum += price || 0
+                            sum += parseInt(price || 0)
 
                             this.tmp_prices.push({
-                                type:item,
+                                type: item,
                                 price: price
                             })
                         }
@@ -947,23 +1076,60 @@ export default {
                                 price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
                             }
 
-                            sum += price || 0
+                            sum += parseInt(price || 0)
 
                             this.tmp_prices.push({
-                                type:item,
+                                type: item,
                                 price: price
                             })
                         }
 
-                        if (item === "size" && this.doorForm[item].loops && !find) {
+                        if (item === "hinge_manufacturer" && this.doorForm[item].title != null && !find) {
                             find = true
 
-                            let price = this.doorForm[item].loops.price[type]
-                            sum += price || 0
+                            let price = this.doorForm[item].price[type]
+                            let fullPrice = 0
+
+                            if (this.doorForm.size)
+                                fullPrice = this.doorForm.size.loops.count * price
+
+                            sum += parseInt(fullPrice || 0)
 
                             this.tmp_prices.push({
-                                type:item,
+                                type: item,
+                                price: price,
+                                full_price: fullPrice
+                            })
+                        }
+
+                        if (item === "size" && this.doorForm[item].loops.price && !find) {
+                            find = true
+                            let price = this.doorForm[item].loops.price[type]
+                            sum += parseInt(price || 0)
+
+
+                            this.tmp_prices.push({
+                                type: item,
                                 price: price
+                            })
+                        }
+
+
+                        if (item === "service_painting" && this.doorForm[item].title != null && !find) {
+                            find = true
+
+                            let price = this.doorForm[item].price[type]
+                            let fullPrice = 0
+
+                            if (this.doorForm.size)
+                                fullPrice = (this.doorForm.size.loops.count + 1) * price
+
+                            sum += parseInt(fullPrice || 0)
+
+                            this.tmp_prices.push({
+                                type: item,
+                                price: price,
+                                full_price: fullPrice
                             })
                         }
 
@@ -974,10 +1140,10 @@ export default {
                                 (this.doorForm[item].price[type] || 0) :
                                 (this.doorForm[item].price || 0)
 
-                            sum += price || 0
+                            sum += parseInt(price || 0)
 
                             this.tmp_prices.push({
-                                type:item,
+                                type: item,
                                 price: price
                             })
                         }
@@ -1003,25 +1169,63 @@ export default {
 
             })
 
+            let doorTypeFunc = (tmpBasePrice) => {
+                let tmpDoorTypePrice = typeof this.doorForm["door_type"].price === "object" ?
+                    this.doorForm["door_type"].price[type] :
+                    this.doorForm["door_type"].price
+
+                let price = this.doorForm["door_type"].need_percent_price ?
+                    (tmpBasePrice * tmpDoorTypePrice) / 100 : tmpDoorTypePrice
+
+                this.tmp_prices.push({
+                    type: "door_type",
+                    price: price
+                })
+
+                return price || 0
+            }
 
             if (find) {
+                base = section.materials.find(m => m.is_base) || {
+                    price: {
+                        wholesale: 0,
+                        dealer: 0,
+                        retail: 0,
+                        cost: 0,
+                    }
+                }
+
+                let tmpBasePrice = typeof base.price === "object" ? base.price[type] : base.price
+                this.tmp_prices.push({
+                    type: 'base',
+                    price: tmpBasePrice
+                })
+
+                price = tmpBasePrice
+
+                sum += parseInt(doorTypeFunc(tmpBasePrice))
+
                 section.materials.forEach(sub => {
-                    if (sub.id === this.doorForm.front_side_finish.id) {
+                    if (sub.id === this.doorForm.front_side_finish.id
+                        && !this.doorForm.front_side_finish.is_base
+                    ) {
                         let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
                         price += tmpPrice
 
                         this.tmp_prices.push({
-                            type:'front_side_finish',
+                            type: 'front_side_finish',
                             price: tmpPrice
                         })
                     }
 
-                    if (sub.id === this.doorForm.back_side_finish.id) {
+                    if (sub.id === this.doorForm.back_side_finish.id
+                        && !this.doorForm.back_side_finish.is_base
+                    ) {
                         let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
                         price += tmpPrice
 
                         this.tmp_prices.push({
-                            type:'back_side_finish',
+                            type: 'back_side_finish',
                             price: tmpPrice
                         })
                     }
@@ -1034,12 +1238,35 @@ export default {
                 for (let i = 0; i < basePrices.length; i++) {
                     if (basePrices[i].width >= this.doorForm.width && basePrices[i].height >= this.doorForm.height) {
 
+                        base = basePrices[i].materials.find(m => m.is_base) || {
+                            price: {
+                                wholesale: 0,
+                                dealer: 0,
+                                retail: 0,
+                                cost: 0,
+                            }
+                        }
+
+                        let tmpBasePrice = typeof base.price === "object" ? base.price[type] : base.price
+                        this.tmp_prices.push({
+                            type: 'base',
+                            price: tmpBasePrice
+                        })
+
+                        price = tmpBasePrice
+
+                        sum += parseInt(doorTypeFunc(tmpBasePrice))
+
                         basePrices[i].materials.forEach(sub => {
-                            if (sub.id === this.doorForm.front_side_finish.id) {
+                            if (sub.id === this.doorForm.front_side_finish.id
+                                && !this.doorForm.front_side_finish.is_base
+                            ) {
+
+
                                 let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
                                 price += tmpPrice
                                 this.tmp_prices.push({
-                                    type:'front_side_finish',
+                                    type: 'front_side_finish',
                                     price: tmpPrice
                                 })
                             }
@@ -1047,11 +1274,14 @@ export default {
                         })
 
                         basePrices[i].materials.forEach(sub => {
-                            if (sub.id === this.doorForm.back_side_finish.id) {
+                            if (sub.id === this.doorForm.back_side_finish.id
+                                && !this.doorForm.back_side_finish.is_base
+                            ) {
+
                                 let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
                                 price += tmpPrice
                                 this.tmp_prices.push({
-                                    type:'back_side_finish',
+                                    type: 'back_side_finish',
                                     price: tmpPrice
                                 })
                             }
@@ -1061,6 +1291,7 @@ export default {
                     }
                 }
             }
+
 
             return sum + price;//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
@@ -1090,13 +1321,64 @@ export default {
         'doorForm': {
             handler(val) {
                 this.loadedParams = false
-                this.$nextTick(()=>{
+                this.$nextTick(() => {
                     this.loadedParams = true
                 })
 
             },
             deep: true
         },
+
+
+        'doorForm.fittings_color': {
+            handler(val) {
+                if (this.doorForm.fittings_color.title == null) {
+                    this.doorForm.service_painting = {title: null}
+                } else {
+                    let services = this.getServiceByType("service_painting")
+                    this.doorForm.service_painting = services.length > 0 ? services[0] : {title: null}
+                }
+
+            },
+            deep: true
+        },
+        'doorForm.need_hidden_stopper': {
+            handler(val) {
+                if (!this.doorForm.need_hidden_stopper) {
+                    this.doorForm.service_stopper = {title: null}
+                } else {
+                    let services = this.getServiceByType("service_stopper")
+                    this.doorForm.service_stopper = services.length > 0 ? services[0] : {title: null}
+                }
+
+            },
+            deep: true
+        },
+        'doorForm.need_hidden_door_closer': {
+            handler(val) {
+                if (!this.doorForm.need_hidden_door_closer) {
+                    this.doorForm.service_door_closer = {title: null}
+                } else {
+                    let services = this.getServiceByType("service_door_closer")
+                    this.doorForm.service_door_closer = services.length > 0 ? services[0] : {title: null}
+                }
+
+            },
+            deep: true
+        },
+        'doorForm.need_automatic_doorstep': {
+            handler(val) {
+                if (!this.doorForm.need_automatic_doorstep) {
+                    this.doorForm.service_doorstep = {title: null}
+                } else {
+                    let services = this.getServiceByType("service_doorstep")
+                    this.doorForm.service_doorstep = services.length > 0 ? services[0] : {title: null}
+                }
+
+            },
+            deep: true
+        },
+
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
@@ -1140,54 +1422,77 @@ export default {
 
         this.loadRalColors()
 
+        window.addEventListener("clear-cart", (e) => {
+            this.$store.dispatch("loadFormattedSizes").then(resp => {
+                this.clearForm()
+                this.loaded = true
+            }).catch(() => {
+
+            })
+        });
+
         this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
 
         if (!this.door) {
-            this.doorForm.id = uuid.v1()
+            this.$store.dispatch("loadFormattedSizes").then(resp => {
+                this.clearForm()
+                this.loaded = true
+            }).catch(() => {
 
-            this.$nextTick(() => {
-                this.clearForm(false)
             })
         } else {
-            this.$nextTick(() => {
-                this.doorForm = {
-                    id: this.door.product.id,
-                    width: this.door.product.width,
-                    height: this.door.product.height,
-                    depth: this.door.product.depth,
-                    count: this.door.quantity,
-                    size: this.door.product.size,
-                    purpose: this.door.product.purpose || null,
-                    handle_holes: this.door.product.handle_holes || null,
-                    handle_holes_type: this.door.product.handle_holes_type || null,
-                    opening_type: this.door.product.opening_type || null,
-                    box_and_frame_color: this.door.product.box_and_frame_color || null,
-                    door_type: this.door.product.door_type || null,
-                    front_side_finish: this.door.product.front_side_finish || null,
-                    back_side_finish: this.door.product.back_side_finish || null,
-                    front_side_finish_color: this.door.product.front_side_finish_color || null,
-                    back_side_finish_color: this.door.product.back_side_finish_color || null,
-                    seal_color: this.door.product.seal_color || null,
-                    fittings_color: this.door.product.fittings_color || null,
-                    loops: this.door.product.loops || null,
-                    loops_count: this.door.product.loops_count || 0,
-                    price_type: this.door.product.price_type || null,
-                    hinge_manufacturer: this.door.product.hinge_manufacturer || null,
-                    need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: true, //Верхняя перемычка
-                    need_automatic_doorstep: false, //Автоматический порог
-                    need_hidden_stopper: false, //Скрытый стопор
-                    need_hidden_door_closer: false, //Скрытый доводчик
-                    need_hidden_skirting_board: false, //нужен плинтус
-                    need_door_install: false,//нужна установка двери
-                    need_wrapper: true //нужна упаковка двери
+            this.$store.dispatch("loadFormattedSizes").then(resp => {
+                this.loaded = false
+                this.$nextTick(() => {
+                    this.doorForm.id = this.door.product.id
+                    this.doorForm.width = this.door.product.width
+                    this.doorForm.height = this.door.product.height
+                    this.doorForm.depth = this.door.product.depth
+                    this.doorForm.count = this.door.quantity
+                    this.doorForm.size = this.door.product.size
+                    this.doorForm.purpose = this.door.product.purpose || "Входная"
+                    this.doorForm.handle_holes = this.door.product.handle_holes || {title: null}
+                    this.doorForm.handle_holes_type = this.door.product.handle_holes_type || {title: null}
+                    this.doorForm.opening_type = this.door.product.opening_type || {title: null}
+                    this.doorForm.box_and_frame_color = this.door.product.box_and_frame_color || {title: null}
+                    this.doorForm.door_type = this.door.product.door_type || {title: null}
+                    this.doorForm.front_side_finish = this.door.product.front_side_finish || {title: null}
+                    this.doorForm.back_side_finish = this.door.product.back_side_finish || {title: null}
+                    this.doorForm.front_side_finish_color = this.door.product.front_side_finish_color || {title: null}
+                    this.doorForm.back_side_finish_color = this.door.product.back_side_finish_color || {title: null}
+                    this.doorForm.seal_color = this.door.product.seal_color || {title: null}
+                    this.doorForm.fittings_color = this.door.product.fittings_color || {title: null}
+                    this.doorForm.loops = this.door.product.loops || {title: null}
+                    this.doorForm.loops_count = this.door.product.loops_count || 0
+                    this.doorForm.price_type = this.door.product.price_type || {title: null}
+                    this.doorForm.hinge_manufacturer = this.door.product.hinge_manufacturer || {title: null}
+                    this.doorForm.need_handle_holes = this.door.product.need_handle_holes || true
+                    this.doorForm.need_upper_jumper = this.door.product.need_upper_jumper || true
+                    this.doorForm.need_automatic_doorstep = this.door.product.need_automatic_doorstep || false
+                    this.doorForm.need_hidden_stopper = this.door.product.need_hidden_stopper || false
+                    this.doorForm.need_hidden_door_closer = this.door.product.need_hidden_door_closer || false
+                    this.doorForm.need_hidden_skirting_board = this.door.product.need_hidden_skirting_board || false
+                    this.doorForm.need_door_install = this.door.product.need_door_install || false
+                    this.doorForm.need_wrapper = this.door.product.need_wrapper || true
+                    this.doorForm.service_doorstep = this.door.product.service_doorstep || {title: null}
+                    this.doorForm.service_painting = this.door.product.service_painting || {title: null}
+                    this.doorForm.service_stopper = this.door.product.service_stopper || {title: null}
+                    this.doorForm.service_door_closer = this.door.product.service_door_closer || {title: null}
+                    this.doorForm.service_handle = this.door.product.service_handle || {title: null}
 
-                }
+                    this.loaded = true
+                })
+
+
+            }).catch(() => {
+
+
             })
+
+
         }
 
 
-        this.doorForm.purpose = "Дверь " + (this.cartProducts.length + 1)
     },
     methods: {
 
@@ -1243,25 +1548,27 @@ export default {
 
                 })
 
-            this.doorForm[param].price_variants = tmp
+            //this.doorForm[param].price = tmp
 
             return price
         },
 
-        clearForm(needTestData = false) {
+        clearForm() {
 
+            this.loaded = false
             this.confirmModal.hide()
-            if (needTestData) {
-                this.doorForm = {
+
+            this.$nextTick(() => {
+                const doorForm = {
+                    purpose: "Дверь " + (this.cartProducts.length + 1),
                     id: uuid.v1(),
-                    width: this.getDictionary.size_variants[0].width || 0,
-                    height: this.getDictionary.size_variants[0].height || 0,
-                    depth: 0,
-                    count: 0,
-                    size: null,
-                    purpose: "Входная",
+                    count: 1,
+                    width: this.getDictionary.size_variants[0].width,
+                    height: this.getDictionary.size_variants[0].height,
+                    size: this.getDictionary.size_variants[0],
+                    loops_count: this.getDictionary.size_variants[0].loops.count,
                     handle_holes: this.getDictionary.handle_holes_variants[0],
-                    handle_holes_type: this.getDictionary.handle_holes_type_variants[0],
+                    handle_holes_type: {title: null},
                     opening_type: this.getDictionary.opening_variants[0],
                     box_and_frame_color: {title: null},
                     door_type: this.getDictionary.door_variants[0],
@@ -1271,56 +1578,29 @@ export default {
                     back_side_finish_color: {title: null},
                     seal_color: {title: null},
                     fittings_color: {title: null},
-                    loops: this.getDictionary.loops_variants[0],//расположение петель
-                    loops_count: 2,
+                    loops: this.getDictionary.loops_variants[0],
                     price_type: this.getDictionary.price_type_variants[1],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
-                    need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: true, //Верхняя перемычка
-                    need_automatic_doorstep: false, //Автоматический порог
-                    need_hidden_stopper: false, //Скрытый стопор
-                    need_hidden_door_closer: false, //Скрытый доводчик
-                    need_hidden_skirting_board: false, //нужен плинтус
-                    need_door_install: false, //нужна установка двери
-                    need_wrapper: true //нужна упаковка двери
-
-                }
-            } else
-                this.doorForm = {
-                    id: uuid.v1(),
-                    width: this.getDictionary.size_variants[0].width || 0,
-                    height: this.getDictionary.size_variants[0].height || 0,
-                    depth: 0,
-                    count: 1,
-                    price: 0,
-                    size: null,
-                    purpose: null,
-                    dealer_percent: 0,
-                    opening_type: {title: null},
-                    box_and_frame_color: {title: null},
-                    door_type: this.getDictionary.door_variants[0],
-                    front_side_finish: {title: null},
-                    back_side_finish: {title: null},
-                    front_side_finish_color: {title: null},
-                    back_side_finish_color: {title: null},
-                    seal_color: {title: null},
-                    fittings_color: {title: null},
-                    loops: this.getDictionary.loops_variants[0], //расположение петель
-                    loops_count: 0,
-                    price_type: this.getDictionary.price_type_variants[1],
-                    hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0], //Производитель петель
-                    handle_holes: this.getDictionary.handle_holes_variants[0],
-                    handle_holes_type: {title: null},
-                    need_handle_holes: true, //нужна дверная ручка
-                    need_upper_jumper: true, //Верхняя перемычка
-                    need_automatic_doorstep: false, //Автоматический порог
-                    need_hidden_stopper: false, //Скрытый стопор
-                    need_hidden_door_closer: false, //Скрытый доводчик
-                    need_hidden_skirting_board: false, //нужен плинтус
-                    need_door_install: false, //нужна установка двери
-                    need_wrapper: true //нужна упаковка двери
+                    need_handle_holes: true,
+                    need_upper_jumper: true,
+                    need_automatic_doorstep: false,
+                    need_hidden_stopper: false,
+                    need_hidden_door_closer: false,
+                    need_hidden_skirting_board: false,
+                    need_door_install: false,
+                    need_wrapper: true,
+                    service_doorstep: {title: null},
+                    service_painting: {title: null},
+                    service_stopper: {title: null},
+                    service_door_closer: {title: null},
+                    service_handle: {title: null},
                 }
 
+
+                this.doorForm = doorForm
+
+                this.loaded = true
+            })
 
         },
         selectDoorSize(item) {
@@ -1332,7 +1612,6 @@ export default {
                 this.doorForm.loops_count = 0
                 return
             }
-
 
             this.doorForm.width = item.width
             this.doorForm.height = item.height
@@ -1366,6 +1645,16 @@ export default {
 
 
         },
+        getServiceByType(type) {
+            if ((this.getDictionary.services || []).length === 0)
+                return []
+
+            let services = this.getDictionary.services.filter(item => item.type === type && item.is_active)
+
+            return services.length > 0 ? services.sort((a, b) => {
+                return b.order_position - a.order_position
+            }) : []
+        },
         alert(msg) {
             this.messages.push(msg)
         },
@@ -1374,8 +1663,8 @@ export default {
         },
         syncColors(name, color) {
 
-              if (color.title == 'RAL')
-                  return;
+            if (color.title == 'RAL')
+                return;
 
             this.color_sync_update = true
             this.$nextTick(() => {
@@ -1397,13 +1686,15 @@ export default {
         submitForm() {
             this.messages = []
 
-            this.$store.dispatch("addProductToCart", this.doorForm).then(() => {
+            this.$store.dispatch("addProductToCart", {
+                product: this.doorForm,
+                price: this.summaryPrice
+            }).then(() => {
 
-                this.$nextTick(() => {
-                    this.doorForm.id = uuid.v4()
-                })
+                this.confirm.title = "Товар успешно добавлен в корзину"
+                this.confirm.message = "Очистить форму?"
                 this.confirmModal.show()
-                //this.$emit("callback")
+
 
                 this.$notify({
                     title: "DoDoors",

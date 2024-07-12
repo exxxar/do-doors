@@ -884,6 +884,7 @@ const state = {
         purpose_variants: [
             'Входная', 'В спальню', 'В детскую', 'Офисная', 'В санузел'
         ],
+        services:[],
         opening_variants: [
             {
                 id: 1,
@@ -1369,9 +1370,11 @@ const mutations = {
             state.dictionary.finishes_variants.push({
                 id: item.id,
                 title: item.title,
+                is_base: item.is_base || false,
                 wrapper_variants: item.wrapper_variants,
                 door_variants: item.door_variants,
             })
+
         })
 
         state.dictionary.handle_holes_type_variants = []
@@ -1389,6 +1392,7 @@ const mutations = {
         state.dictionary.hinge_manufacturer_variants = []
 
         payload.hinges.forEach(item => {
+
             state.dictionary.hinge_manufacturer_variants.push({
                 id: item.id,
                 title: item.title,
@@ -1428,6 +1432,7 @@ const mutations = {
             state.dictionary.door_variants.push({
                 id: item.id,
                 title: item.title,
+                need_percent_price: item.need_percent_price || false,
                 price: item.price,
             })
         })
@@ -1444,6 +1449,12 @@ const mutations = {
                 code: item.code,
                 type: item.type,
             })
+        })
+
+        state.dictionary.services = []
+
+        payload.services.forEach(item => {
+            state.dictionary.services.push(item)
         })
     },
 }

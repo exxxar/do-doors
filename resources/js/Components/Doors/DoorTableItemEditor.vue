@@ -865,7 +865,7 @@ export default {
 
         if (!this.door) {
             this.doorForm.id = uuid.v1()
-         //   this.clearForm(false)
+            this.clearForm(false)
         } else {
             this.$nextTick(() => {
                 this.doorForm = {

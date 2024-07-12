@@ -32,7 +32,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async loadFormattedSizes(context) {
+    async loadFormattedSizeTable(context) {
 
         let link = `${BASE_SIZES_LINK}/formatted`
         let method = 'POST'

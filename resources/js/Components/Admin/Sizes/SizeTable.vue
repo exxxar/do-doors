@@ -325,7 +325,7 @@ export default {
     methods: {
 
         saveFormattedSizes() {
-            this.$store.dispatch("loadFormattedSizes").then(resp => {
+            this.$store.dispatch("loadFormattedSizeTable").then(resp => {
                 this.confirmModal.hide()
                 this.loadSizes();
                 this.$notify({

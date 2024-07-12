@@ -177,11 +177,7 @@ export default {
             });
         });
 
-        this.$store.dispatch("loadFormattedSizes").then(resp => {
 
-        }).catch(() => {
-
-        })
     },
     methods: {
         selectColor(item) {

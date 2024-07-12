@@ -43,6 +43,14 @@ import Pagination from "@/Components/Pagination.vue";
 
                 </th>
 
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('is_base')">База
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'is_base'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'is_base'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+
+                </th>
+
                 <th scope="col"
                     v-if="!simple"
                     class="text-center cursor-pointer" @click="sortAndLoad('order_position')">Позиция в
@@ -55,10 +63,12 @@ import Pagination from "@/Components/Pagination.vue";
                 </th>
                 <th scope="col"
                     v-if="!simple"
-                    class="text-center">Варианты двери</th>
+                    class="text-center">Варианты двери
+                </th>
                 <th scope="col"
                     v-if="!simple"
-                    class="text-center">Варианты контура вокруг</th>
+                    class="text-center">Варианты контура вокруг
+                </th>
                 <th scope="col"
                     v-if="!simple"
                     class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
@@ -70,7 +80,8 @@ import Pagination from "@/Components/Pagination.vue";
                 </th>
                 <th scope="col"
                     v-if="!simple"
-                    class="text-center">Действие</th>
+                    class="text-center">Действие
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -78,6 +89,10 @@ import Pagination from "@/Components/Pagination.vue";
                 <th scope="row">{{ item.id || index }}</th>
                 <td class="text-center cursor-pointer" @click="selectItem(item)">
                     {{ item.title || '-' }}
+                </td>
+
+                <td class="text-center cursor-pointer">
+                    {{ item.is_base ? "Да" : "Нет" }}
                 </td>
                 <td class="text-center"
                     v-if="!simple">
@@ -145,7 +160,7 @@ import Pagination from "@/Components/Pagination.vue";
 import {mapGetters} from "vuex";
 
 export default {
-    props:["simple"],
+    props: ["simple"],
     data() {
         return {
             sort: {

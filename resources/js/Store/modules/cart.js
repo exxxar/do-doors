@@ -99,16 +99,27 @@ const actions = {
 // mutations
 const mutations = {
 
-    pushProductToCart(state, product) {
-        const cartItem = state.items.find(item => item.product.id === product.id)
-        if (!cartItem)
+    pushProductToCart(state, payload) {
+        let product = payload.product
+        product.price = payload.price
+        let cartItemIndex = state.items.findIndex(item => item.product.id === product.id)
+
+        if (cartItemIndex===-1)
+        {
+            console.log("push to cart", product)
             state.items.push({
                 product,
                 quantity: product.count || 1
             })
+        }
+
         else {
-            cartItem.product = product
-            cartItem.quantity = product.count || 1
+
+            state.items[cartItemIndex].product = product
+            state.items[cartItemIndex].quantity = product.count || 1
+
+            console.log("update cart item", state.items[cartItemIndex])
+
         }
 
 

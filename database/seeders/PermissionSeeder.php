@@ -90,6 +90,11 @@ class PermissionSeeder extends Seeder
         $permission->slug = 'manage-views-adminmenu';
         $permission->save();
 
+        $permission = new Permission();
+        $permission->name = 'Работа с сервисами';
+        $permission->slug = 'manage-services';
+        $permission->save();
+
 
     }
 }

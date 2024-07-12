@@ -354,7 +354,12 @@ const showingNavigationDropdown = ref(false);
                         :href="route('permissions')" :active="route().current('permissions')">
                         Разрешения пользователей
                     </NavLink>
-
+                    <NavLink
+                        class="p-3"
+                        v-if="can('manage-services')"
+                        :href="route('services')" :active="route().current('services')">
+                        Сервисы
+                    </NavLink>
                     <NavLink
                         class="p-3"
                         v-if="can('manage-materials')"

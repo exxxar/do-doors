@@ -57,10 +57,10 @@ class ClientController extends Controller
 
     public function getSelfClientList(Request $request): ClientCollection
     {
-        $clients = Client::query()
-            ->where("user_id", Auth::user()->id);
+        $clients = Client::query()->get();
+            //->where("user_id", Auth::user()->id);
 
-        return new ClientCollection($clients->get());
+        return new ClientCollection($clients);
     }
 
     public function getClientList(Request $request): ClientCollection

@@ -21,7 +21,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
         </div>
 
         <div class="input-group mb-3">
-                <span class="input-group-text border-secondary"
+                <span class="input-group-text border-secondary rounded-0"
                       v-if="isHex(form.color)"
                       v-bind:style="{'background-color':form.color}"
                       id="basic-addon1" style="width: 40px;">
@@ -163,7 +163,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             <div class="col-12 d-flex justify-content-center">
                 <button
                     :disabled="!needClearForm"
-                    class="btn btn-outline-success rounded-5">
+                    class="btn btn-dark rounded-0">
                     <i class="fa-regular fa-floppy-disk mr-1" v-if="!loading"></i>
                     <span class="spinner-border spinner-border-sm  text-success"
                           role="status" v-else></span>
@@ -173,7 +173,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                     v-if="needClearForm&&!loading"
                     type="button"
                     @click="resetForm"
-                    class="btn btn-outline-danger rounded-5 ml-2">
+                    class="btn btn-outline-secondary rounded-0 ml-2">
                     <i class="fa-solid fa-xmark mr-1"></i>
                     Очистить форму
                 </button>
