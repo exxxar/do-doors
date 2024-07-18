@@ -23,10 +23,10 @@ use Revolution\Google\Sheets\Sheets;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get("/test", function (){
+Route::get("/test", function () {
     $path = storage_path() . "\\app";
 
-  //  $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
+    //  $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
 
     /* dd([
          "file_exist"=>file_exists($path . "/$fileName"),
@@ -35,28 +35,28 @@ Route::get("/test", function (){
      ]);*/
 
 
-        try {
-            $templateProcessor = new TemplateProcessor($path . "\\demo.docx");
-            $templateProcessor->setValue('name', "1231231");
-            $templateProcessor->setValue('email', "dasdasd");
-            $templateProcessor->setValue('phone', "!23123");
-            $templateProcessor->setValue('order_id', "1");
-            $templateProcessor->setValue('info', "3123");
-            $templateProcessor->setValue('total_price', 1313);
-            $templateProcessor->setValue('total_count', 44);
-            $templateProcessor->setValue('current_payed', 44);
-            $templateProcessor->setValue('payed_percent', 5);
-            $templateProcessor->setValue('delivery_terms', "test");
+    try {
+        $templateProcessor = new TemplateProcessor($path . "\\demo.docx");
+        $templateProcessor->setValue('name', "1231231");
+        $templateProcessor->setValue('email', "dasdasd");
+        $templateProcessor->setValue('phone', "!23123");
+        $templateProcessor->setValue('order_id', "1");
+        $templateProcessor->setValue('info', "3123");
+        $templateProcessor->setValue('total_price', 1313);
+        $templateProcessor->setValue('total_count', 44);
+        $templateProcessor->setValue('current_payed', 44);
+        $templateProcessor->setValue('payed_percent', 5);
+        $templateProcessor->setValue('delivery_terms', "test");
 
 
-            $templateProcessor->saveAs($path . "/test.docx");
+        $templateProcessor->saveAs($path . "/test.docx");
 
 
-        } catch (CopyFileException $e) {
-            dd($e);
-        } catch (CreateTemporaryFileException $e) {
-            dd($e);
-        }
+    } catch (CopyFileException $e) {
+        dd($e);
+    } catch (CreateTemporaryFileException $e) {
+        dd($e);
+    }
 
 
 
@@ -65,8 +65,8 @@ Route::get("/test", function (){
 
 
 
-Route::get('/login/google/callback', [GoogleLoginController::class,'callback'])->name('login.google-callback');
-Route::get('/login/google/service-callback', [GoogleLoginController::class,'serviceCallback'])->name('login.google-callback.test');
+Route::get('/login/google/callback', [GoogleLoginController::class, 'callback'])->name('login.google-callback');
+Route::get('/login/google/service-callback', [GoogleLoginController::class, 'serviceCallback'])->name('login.google-callback.test');
 
 
 Route::get('/open-calc', function (\Illuminate\Http\Request $request) {
@@ -85,14 +85,18 @@ Route::get('/open-calc', function (\Illuminate\Http\Request $request) {
     ]);
 })->name('open.calc.page');
 
+
+
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
+    return Inertia::render('Landing', [  //Welcome
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -300,7 +304,7 @@ Route::prefix("/sizes")
         Route::post("/store", "store");
         Route::post("/import", "import");
         Route::post("/update-param", "updateParam");
-        Route::post('/import-from-google', [GoogleLoginController::class,'getGoogleLink'])->name('login.google-redirect');
+        Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink'])->name('login.google-redirect');
         Route::delete("/{id}", "destroy");
 
     });
@@ -315,6 +319,18 @@ Route::prefix("/users")
         Route::delete("/{id}", "destroy");
     });
 
+
+
+Route::prefix("/")
+
+    ->controller(App\Http\Controllers\LandingController::class)
+    ->group(function () {
+
+        Route::post("/sendReqCallToBot", "sendReqCallToBot")->name('sendReqCallToBot');
+
+
+
+    });
 
 
 Route::resource('opening-variant', App\Http\Controllers\OpeningVariantController::class);
