@@ -18,13 +18,13 @@ defineProps({
 });
 </script>
 
-
+ 
 <script>
 import {mask} from 'vue-the-mask'
 
 
 export default{
-    
+     
     directives:{mask},
     data(){
         return{
@@ -32,56 +32,35 @@ export default{
                 phone:'',
                 fio:'',
                 msg: ''
-            }
+            },
+            error:'',
+            oki:''
         }
     },
     methods:{
-        submit: ()=>{
-            console.log("ksdjajdkl")
-            console.log(this.form)
-            axios.post('/sendReqCallToBot', {form:this.form.value}).then(res=>{
-                console.log("dasjlkdkj")
-            }).cathch(er=>{
-            console.log("errrrr")
+        submit(){
+            
+            axios.post('/sendReqCallToBot', this.form).then(res=>{
+                
+                this.oki = res.data
+
+                window.setTimeout(() => {
+                this.oki = '',
+                this.form.phone = '' 
+                this.form.fio = '' 
+                this.form.msg = '' 
+                },2000);
+                
+                
+            }).catch(er=>{
+                
+            this.error = er
             })
         }
-    },
+    }
 }
-// import {mask} from 'vue-the-mask'
-// // import axios from 'axios';
-
-// export default {
-//     directives: {
-//         mask
-//     },
-//     data() {
-//         return {
-//             form: useForm({
-//                 phone: '',
-//                 fio: '',
-//                 msg: ''
-//             })
-//         }
-//     },
-//     methods: {
-//         submit:()=>{
-//             // axios.post('/sendReqCallToBot', {form:this.form}).then( res=>{
-//             //     console.log(res)
-//             // } 
-//             // )
-//         }
-//     },
-//     mounted:{
-
-//     }
-        
-// }
-
-
-
 
 </script>
-
 
 <template>
 <Head title="Lendos" />
@@ -111,8 +90,8 @@ export default{
 
                 <InputLabel class="mt-2" for="text" value="Сообщение" />
                 <TextArea id="msg" type="textarea" class="mt-1 block w-full" v-model="form.msg" required autofocus />
-                <InputLabel v-if="form.recentlySuccessful" class="mt-3 text-green-500 uppercase" for="text"  value ="Запрос отправлен!" />
-                     <InputLabel v-if="form.onError" class="mt-3 text-green-500 uppercase" for="text"  value ="Произошла ошибка отправки на сервер" />
+                <InputLabel  class="mt-3 text-green-500 uppercase" for="text"  value ="" > {{oki}}</InputLabel>
+                     <InputLabel v-if="error" class="mt-3 text-red-500 uppercase" for="text"  value= "Произошла ошибка отправки, попробуйте еще раз" />
                     <div class="mt-4 flex items-center justify-center">
                         <PrimaryButton  :class="{ 'opacity-25': form.processing }" :disabled="form.processing"> Отправить</PrimaryButton>
                     </div>
