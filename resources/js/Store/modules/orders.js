@@ -17,7 +17,27 @@ const getters = {
 }
 
 const actions = {
-    async loadOrders(context, payload = {dataObject: null, page: 0, size: 50}) {
+
+
+
+    async sendMsgBackCall(context, payload = { form: null }) {
+        let link = `/sendReqCallToBot`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.form)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+
+
+    async loadOrders(context, payload = { dataObject: null, page: 0, size: 50 }) {
         let page = payload.page || 0
         let size = payload.size || 50
 
@@ -40,7 +60,7 @@ const actions = {
     },
 
 
-    async updateContractTemplate(context, payload = {contractTemplateForm: null}) {
+    async updateContractTemplate(context, payload = { contractTemplateForm: null }) {
         let link = `${BASE_ORDERS_LINK}/update-contract-templates`
         let _axios = util.makeAxiosFactory(link, "POST", payload.contractTemplateForm)
         return _axios.then((response) => {
@@ -52,7 +72,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async storeOrder(context, payload = {orderForm: null}) {
+    async storeOrder(context, payload = { orderForm: null }) {
         let link = `${BASE_ORDERS_LINK}/store`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.orderForm)
@@ -67,7 +87,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async removeOrder(context, payload = {orderId: null}) {
+    async removeOrder(context, payload = { orderId: null }) {
         let link = `${BASE_ORDERS_LINK}/${payload.orderId}`
 
         let _axios = util.makeAxiosFactory(link, 'DELETE')
@@ -79,7 +99,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async duplicateOrder(context, payload = {orderId: null}) {
+    async duplicateOrder(context, payload = { orderId: null }) {
         let link = `${BASE_ORDERS_LINK}/duplicate/${payload.orderId}`
 
         let _axios = util.makeAxiosFactory(link, 'GET')

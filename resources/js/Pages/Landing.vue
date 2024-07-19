@@ -17,7 +17,6 @@ defineProps({
     }
 });
 </script>
-
  
 <script>
 import {mask} from 'vue-the-mask'
@@ -33,29 +32,33 @@ export default{
                 fio:'',
                 msg: ''
             },
-            error:'',
-            oki:''
         }
     },
     methods:{
         submit(){
-            
-            axios.post('/sendReqCallToBot', this.form).then(res=>{
-                
-                this.oki = res.data
+            this.$store.dispatch("sendMsgBackCall", {
+                form: this.form
+            }).then((response) => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: response.data,
+                    type:"success"
+                });
 
-                window.setTimeout(() => {
-                this.oki = '',
-                this.form.phone = '' 
-                this.form.fio = '' 
-                this.form.msg = '' 
-                },2000);
+                this.$emit("callback")
+            }).catch(error => {
                 
-                
-            }).catch(er=>{
-                
-            this.error = er
+                let msg = `Произошла ошибка: ${error.message}` 
+                if(error.response.status == 422){
+                    msg = "Некорректные данные!"
+                }
+                this.$notify({
+                    title: "DoDoors",
+                    text:  msg,
+                    type:"error"
+                });
             })
+
         }
     }
 }
@@ -67,14 +70,13 @@ export default{
 <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
     <div v-if="canLogin" class="sm:fixed sm:top-0 sm:right-0 p-6 text-end">
         <Link v-if="$page.props.auth.user" :href="route('dashboard')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</Link>
-
         <template v-else>
             <Link :href="route('login')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</Link>
 
             <Link v-if="canRegister" :href="route('register')" class="ms-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</Link>
         </template>
     </div>
-
+<notifications position="top right"/>
     <div class="bg-white drop-shadow-xl ">
 
         <form @submit.prevent="submit">
@@ -90,12 +92,9 @@ export default{
 
                 <InputLabel class="mt-2" for="text" value="Сообщение" />
                 <TextArea id="msg" type="textarea" class="mt-1 block w-full" v-model="form.msg" required autofocus />
-                <InputLabel  class="mt-3 text-green-500 uppercase" for="text"  value ="" > {{oki}}</InputLabel>
-                     <InputLabel v-if="error" class="mt-3 text-red-500 uppercase" for="text"  value= "Произошла ошибка отправки, попробуйте еще раз" />
                     <div class="mt-4 flex items-center justify-center">
                         <PrimaryButton  :class="{ 'opacity-25': form.processing }" :disabled="form.processing"> Отправить</PrimaryButton>
                     </div>
-
                 </div>
             </form>
         </div>

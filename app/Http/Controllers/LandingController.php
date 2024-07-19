@@ -33,7 +33,7 @@ class LandingController extends Controller
 			$telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
 			$telegram->sendMessage($tmp);
 
-			$message = "Запрос отправлен, ожидайте с вами скоро с вами свяжутся!";
+			$message = "Запрос успешно оправлен";
 
 			return response()->json($message);
 
