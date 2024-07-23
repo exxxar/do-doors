@@ -18,7 +18,6 @@ class Client extends Model
     protected $fillable = [
         'status',
         'phone',
-
         'email',
         'fact_address',
         'comment',
@@ -49,5 +48,23 @@ class Client extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getMainRequisites(){
+        $main_requisites = []; 
+        foreach ($this->requisites ?? [] as $item) {
+            if($item["is_main"]){
+                 $main_requisites = $item;
+            }
+        }
+   
+      if(empty($main_requisites)){
+        $main_requisites["bik"] = "-";
+        $main_requisites["checking_account"] = "-";
+        $main_requisites["correspondent_account"] = "-";
+        $main_requisites["bank"] = "-";
+      }
+
+        return $main_requisites;
     }
 }
