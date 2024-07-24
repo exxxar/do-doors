@@ -29,6 +29,7 @@ class Client extends Model
         'ogrn',
         'okpo',
         'requisites',
+        'fio'
     ];
 
     /**
@@ -66,5 +67,14 @@ class Client extends Model
       }
 
         return $main_requisites;
+    }
+    public function getInitials(){
+        
+        $fio = explode(" ",$this->fio, 3);
+        // $result = "$fio[0] substr($fio[1], 0, 1). substr($fio[2], 0, 1).";
+        return $fio[0] . " " . mb_substr($fio[1], 0, 1) . "." . mb_substr($fio[2], 0, 1) . ".";
+        
+        // $result = "$fio[0] " . mb_substr($fio[1], 0, 1) . " " . mb_substr($fio[2], 0, 1);
+        // return $result;
     }
 }

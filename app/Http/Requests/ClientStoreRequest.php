@@ -37,6 +37,7 @@ class ClientStoreRequest extends FormRequest
             'ogrn' => ['nullable', 'string', 'max:50'],
             'okpo' => ['nullable', 'string', 'max:50'],
             'requisites' => ['nullable', 'json'],
+            'fio' =>['nullable', 'string', 'max:255'],
         ];
     }
 }
