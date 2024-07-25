@@ -18,7 +18,6 @@ class Client extends Model
     protected $fillable = [
         'status',
         'phone',
-
         'email',
         'fact_address',
         'comment',
@@ -30,6 +29,7 @@ class Client extends Model
         'ogrn',
         'okpo',
         'requisites',
+        'fio'
     ];
 
     /**
@@ -49,5 +49,32 @@ class Client extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getMainRequisites(){
+        $main_requisites = []; 
+        foreach ($this->requisites ?? [] as $item) {
+            if($item["is_main"]){
+                 $main_requisites = $item;
+            }
+        }
+   
+      if(empty($main_requisites)){
+        $main_requisites["bik"] = "-";
+        $main_requisites["checking_account"] = "-";
+        $main_requisites["correspondent_account"] = "-";
+        $main_requisites["bank"] = "-";
+      }
+
+        return $main_requisites;
+    }
+    public function getInitials(){
+        
+        $fio = explode(" ",$this->fio, 3);
+        // $result = "$fio[0] substr($fio[1], 0, 1). substr($fio[2], 0, 1).";
+        return $fio[0] . " " . mb_substr($fio[1], 0, 1) . "." . mb_substr($fio[2], 0, 1) . ".";
+        
+        // $result = "$fio[0] " . mb_substr($fio[1], 0, 1) . " " . mb_substr($fio[2], 0, 1);
+        // return $result;
     }
 }

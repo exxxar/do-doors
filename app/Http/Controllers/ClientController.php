@@ -83,7 +83,8 @@ class ClientController extends Controller
                 ->orWhere("kpp", 'like', "%$search%")
                 ->orWhere("ogrn", 'like', "%$search%")
                 ->orWhere("okpo", 'like', "%$search%")
-                ->orWhere("id", 'like', "%$search%");
+                ->orWhere("id", 'like', "%$search%")
+                ->orWhere("fio", 'like', "%$search%");
 
         $clients = $clients->orderBy($order, $direction);
 
@@ -93,6 +94,7 @@ class ClientController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request);
         $request->validate([
             "title" => "required"
         ]);
@@ -115,7 +117,8 @@ class ClientController extends Controller
             'kpp' => $request->kpp ?? null,
             'ogrn' => $request->ogrn ?? null,
             'okpo' => $request->okpo ?? null,
-            'requisites' => $requisites
+            'requisites' => $requisites,
+            'fio' => $request->fio ?? null
         ];
 
         if (is_null($id))
