@@ -24,10 +24,6 @@ use Telegram\Bot\Exceptions\TelegramSDKException;
 use Telegram\Bot\FileUpload\InputFile;
 
 use nomelodic\NCL\NCLNameCaseRu;
-// require 'D:\Users\lsv\Programms\OpenServer\domains\do-doors\vendor\nomelodic\name-case-lib\src\NCLNameCaseRu.php';
-// require 'D:\Users\lsv\Programms\OpenServer\domains\do-doors\app\Http\Controllers\CalcController.php';
-
-// require '';
 
 
 
@@ -135,7 +131,7 @@ class CalcController extends Controller
         ];
 
         $telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
-        //  $telegram->sendMessage($tmp);     ///////////////////////               
+         $telegram->sendMessage($tmp);     ///////////////////////               
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
         $current_date = Carbon::now("+3:00")->format("Y-m-d H:i:s");
@@ -161,21 +157,21 @@ class CalcController extends Controller
         $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
 
         Excel::store(new CartExport($items), $excelFileName);
-/////////////////
-        // $telegram->sendDocument([
-        //     'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-        //     "document" => InputFile::createFromContents(Storage::get("$excelFileName"), "order-" . $timeFragment . ".xls"),
-        //     "parse_mode" => "HTML",
-        // ]);
+///////////////
+        $telegram->sendDocument([
+            'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+            "document" => InputFile::createFromContents(Storage::get("$excelFileName"), "order-" . $timeFragment . ".xls"),
+            "parse_mode" => "HTML",
+        ]);
 
         Storage::delete($excelFileName);
 
 //////////////////
-        // $telegram->sendDocument([
-        //     'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-        //     "document" => InputFile::createFromContents($file, "order-" . $timeFragment . ".pdf"),
-        //     "parse_mode" => "HTML",
-        // ]);
+        $telegram->sendDocument([
+            'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+            "document" => InputFile::createFromContents($file, "order-" . $timeFragment . ".pdf"),
+            "parse_mode" => "HTML",
+        ]);
 
 
         $path = storage_path() . "/app";
@@ -193,7 +189,7 @@ class CalcController extends Controller
 
         $main_requisites = $client->getMainRequisites(); 
         $fam_initial = $client->getInitials();   
-        // dd($fam_initial);
+     
 
         $nc = new NCLNameCaseRu();
         $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);
@@ -201,6 +197,8 @@ class CalcController extends Controller
         if (file_exists($path . "/$fileName")) {
             try {
                 $templateProcessor = new TemplateProcessor($path . "/$fileName");
+                
+                $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
                 $templateProcessor->setValue('title', $name);
                 $templateProcessor->setValue('member',  $member ?? '-');
                 $templateProcessor->setValue('fio',  $fam_initial ?? '-');
@@ -235,12 +233,12 @@ class CalcController extends Controller
                 
 
 
-// dd($client);
-                // $telegram->sendDocument([
-                //     'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                //     "document" => InputFile::create($path . $newName),
-                //     "parse_mode" => "HTML",
-                // ]);
+
+                $telegram->sendDocument([
+                    'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+                    "document" => InputFile::create($path . $newName),
+                    "parse_mode" => "HTML",
+                ]);
 
 
               
