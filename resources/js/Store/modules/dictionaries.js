@@ -884,7 +884,7 @@ const state = {
         purpose_variants: [
             'Входная', 'В спальню', 'В детскую', 'Офисная', 'В санузел'
         ],
-        services:[],
+        services: [],
         opening_variants: [
             {
                 id: 1,
@@ -1404,11 +1404,13 @@ const mutations = {
         let directions = [
             {
                 title: 'На себя',
-                direction: 'on'
+                direction: 'on',
+
             },
             {
                 title: 'От себя',
-                direction: 'from'
+                direction: 'from',
+                excludes: [45, 43],
             }
         ];
 
@@ -1416,12 +1418,13 @@ const mutations = {
 
         directions.forEach(item => {
             Object.keys(payload.depth).forEach(key => {
-                state.dictionary.opening_variants.push({
-                    title: item.title,
-                    direction: item.direction,
-                    depth: key,
-                    sizes: payload.depth[key]
-                })
+                if ((item.excludes || []).indexOf(parseInt(key))  === -1)
+                    state.dictionary.opening_variants.push({
+                        title: item.title,
+                        direction: item.direction,
+                        depth: key,
+                        sizes: payload.depth[key]
+                    })
             })
 
         })
@@ -1429,6 +1432,7 @@ const mutations = {
         state.dictionary.door_variants = []
 
         payload.door_variants.forEach(item => {
+
             state.dictionary.door_variants.push({
                 id: item.id,
                 title: item.title,
