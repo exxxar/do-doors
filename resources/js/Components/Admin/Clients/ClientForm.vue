@@ -31,7 +31,7 @@
             </div>
             <div class="col-md-6 col-12">
                 <div class="form-floating mb-3">
-                    <input type="text" v-model="form.fio" class="form-control" id="client-title" required>
+                    <input type="text" v-model="form.fio" class="form-control" id="client-title">
                     <label for="fio">ФИО представителя компании</label>
                 </div>
             </div>

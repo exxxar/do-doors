@@ -67,6 +67,8 @@ class CalcController extends Controller
         $name = $request->name;
         $email = $request->email ?? 'не указано';
         $phone = $request->phone;
+        $passport = $request->passport ?? 'не указано';
+        $passport_issued = $request->passport_issued ?? 'не указано';
         $info = $request->info ?? 'не указана';
         $totalPrice = $request->total_price ?? 0;
         $totalCount = $request->total_count ?? 0;
@@ -177,14 +179,20 @@ class CalcController extends Controller
         $path = storage_path() . "/app";
 
         $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
+        if($client->status == 'individual'){
+            $fileName = "договор с ФЛ.docx";
+        }
+        // dd($client);
 
        /* dd([
             "file_exist"=>file_exists($path . "/$fileName"),
             "filename"=>$fileName,
             "path"=>$path
         ]);*/
+        $statusClient = $client->getShortClientStatus();
+        
 
-        $newName = "/договор с клиентом №".$client->id." ".($workWithNds==1?"ООО":"ИП")." от".(Carbon::now()->format('Y-m-d h-i-s')).".docx";
+        $newName = "/договор с клиентом №".$client->id." ".($statusClient)." от".(Carbon::now()->format('Y-m-d h-i-s')).".docx";
 
 
         $main_requisites = $client->getMainRequisites(); 
@@ -222,12 +230,16 @@ class CalcController extends Controller
 
 
                 // requisites
-                  $templateProcessor->setValue('bik',  $main_requisites["bik"]);
-                  $templateProcessor->setValue('ksch',  $main_requisites["correspondent_account"]);
-                  $templateProcessor->setValue('rsch',  $main_requisites["checking_account"]);
-                  $templateProcessor->setValue('bank_name',  $main_requisites["bank"]);
+                $templateProcessor->setValue('bik',  $main_requisites["bik"]);
+                $templateProcessor->setValue('ksch',  $main_requisites["correspondent_account"]);
+                $templateProcessor->setValue('rsch',  $main_requisites["checking_account"]);
+                $templateProcessor->setValue('bank_name',  $main_requisites["bank"]);
                 // requisites
 
+
+                $templateProcessor->setValue('passport',  $passport);
+                $templateProcessor->setValue('passport_issued',  $passport_issued);
+                 
 
                 $templateProcessor->saveAs($path . $newName);
                 

@@ -15,9 +15,15 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="javascript:void(0)" @click="selectInfo(client)"
-                        v-for="client in self_clients">{{ client.title || null }}
+                <li>
+                    
+                    <template v-for="client in self_clients">
+                        <a v-if = "client.status == 'individual'" class="dropdown-item" href="javascript:void(0)" @click="selectInfo(client)"
+                        >{{ client.title || null }}
                         ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                    </template>
+                    
+                    
                 </li>
             </ul>
         </div>
@@ -33,32 +39,29 @@
                 placeholder="name@example.com" required>
             <label for="checkout-email">Ваш email</label>
         </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" v-mask="'## ##  ######'" v-model="clientForm.passport" id="checkout-email"
+                placeholder="name@example.com" >
+            <label for="checkout-email">Паспорт</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" v-model="clientForm.passport_issued" id="checkout-email"
+                placeholder="name@example.com" >
+            <label for="checkout-email">Выдан</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" v-model="clientForm.delivery_address" id="checkout-email"
+                placeholder="name@example.com" required>
+            <label for="checkout-email">Адрес доставки</label>
+        </div>
+         <div class="form-floating mb-3">
+            <input type="text" class="form-control" v-model="clientForm.info" id="checkout-email"
+                placeholder="name@example.com" >
+            <label for="checkout-email">Дополнительная информация</label>
+        </div>
 
-        <div class="form-floating">
-            <textarea class="form-control border-secondary rounded-0" v-model="clientForm.info"
-                placeholder="Оставьте свой комментарий" id="checkout-info"></textarea>
-            <label for="checkout-info">Дополнительная информация</label>
-        </div>
-        <div class="row  my-3">
-            <div class="col-md-6">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" value="1" v-model="clientForm.work_with_nds"
-                        name="flexRadioDefault" id="work-with-nds">
-                    <label class="form-check-label" for="work-with-nds">
-                        Для ООО
-                    </label>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" value="0" name="flexRadioDefault"
-                        v-model="clientForm.work_with_nds" id="work-without-nds">
-                    <label class="form-check-label" for="work-without-nds">
-                        Для ИП
-                    </label>
-                </div>
-            </div>
-        </div>
+
+
 
         <hr class="hr hr-blurry my-3" />
 
@@ -143,12 +146,15 @@
                     name: null,
                     phone: null,
                     email: null,
+                    passport: null,
+                    passport_issued: null,
+                    delivery_address: null,
                     info: null,
                     promo: null,
                     work_with_nds: 1,
                     items: [],
-                    current_payed: 0,
-                    payed_percent: 0,
+                    current_payed: 19333, /// в ноль
+                    payed_percent: 70,////в ноль
                     delivery_terms: null,
                 }
             }
@@ -185,12 +191,18 @@
                     this.clientForm.name = null
                     this.clientForm.email = null
                     this.clientForm.phone = null
+                    this.clientForm.pasport = null
+                    this.clientForm.pasport_issued = null
+                    this.clientForm.fact_address = null
                     return;
                 }
                 this.clientForm.id = client.id || null
                 this.clientForm.name = client.title || null
                 this.clientForm.email = client.email || null
                 this.clientForm.phone = client.phone || null
+                this.clientForm.delivery_address = client.fact_address || null
+                this.clientForm.pasport = client.pasport || null
+                this.clientForm.pasport_issued = client.pasport_issued || null
             },
             clearCart() {
                 this.$store.dispatch("clearCart").then((response) => {
