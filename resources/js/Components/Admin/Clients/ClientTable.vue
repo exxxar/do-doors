@@ -35,10 +35,17 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название \ ФИО
+                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'title'"><i
+                        class="fa-solid fa-caret-up"></i></span>
+
+                </th>
+                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')"> ФИО
+                    <span v-if="sort.direction === 'desc'&&sort.column === 'fio'"><i
+                        class="fa-solid fa-caret-down"></i></span>
+                    <span v-if="sort.direction === 'asc'&&sort.column === 'fio'"><i
                         class="fa-solid fa-caret-up"></i></span>
 
                 </th>
@@ -132,6 +139,9 @@ import Pagination from "@/Components/Pagination.vue";
                 <th scope="row">{{ item.id || index }}</th>
                 <td class="text-center" @click="selectItem(item)">
                     {{ item.title || '-' }}
+                </td>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.fio || '-' }}
                 </td>
                 <td class="text-center">
                     {{ item.phone || '-' }}
@@ -239,6 +249,7 @@ export default {
                     comment: null,
                     user_id: null,
                     title: null,
+                    fio: null,
                     law_address: null,
                     inn: null,
                     kpp: null,

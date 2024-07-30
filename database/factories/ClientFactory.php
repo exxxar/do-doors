@@ -39,6 +39,7 @@ class ClientFactory extends Factory
             'ogrn' => $this->faker->regexify('[A-Za-z0-9]{50}'),
             'okpo' => $this->faker->regexify('[A-Za-z0-9]{50}'),
             'requisites' => '{}',
+            'fio' => $this->faker->regexify('[A-Za-z0-9]{255}'),
         ];
     }
 }
