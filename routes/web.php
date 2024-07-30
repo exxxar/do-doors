@@ -86,6 +86,7 @@ Route::get('/open-calc', function (\Illuminate\Http\Request $request) {
 })->name('open.calc.page');
 
 Route::get('/', function () {
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),

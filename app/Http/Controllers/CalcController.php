@@ -215,7 +215,7 @@ class CalcController extends Controller
 
             }
 
-            return response()->download(storage_path('app/' . $newName));
+           return response()->download(storage_path('app/' . $newName));
 
         }
     }
