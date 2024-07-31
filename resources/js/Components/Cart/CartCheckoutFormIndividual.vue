@@ -16,14 +16,14 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    
+
                     <template v-for="client in self_clients">
-                        <a v-if = "client.status == 'individual'" class="dropdown-item" href="javascript:void(0)" @click="selectInfo(client)"
-                        >{{ client.title || null }}
-                        ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                        <a v-if="client.status == 'individual' || client.status == 'new_client' " class="dropdown-item"
+                            href="javascript:void(0)" @click="selectInfo(client)">{{ client.title || null }}
+                            ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
                     </template>
-                    
-                    
+
+
                 </li>
             </ul>
         </div>
@@ -40,13 +40,13 @@
             <label for="checkout-email">Ваш email</label>
         </div>
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" v-mask="'## ##  ######'" v-model="clientForm.passport" id="checkout-email"
-                placeholder="name@example.com" >
+            <input type="text" class="form-control" v-mask="'## ##  ######'" v-model="clientForm.passport"
+                id="checkout-email" placeholder="name@example.com">
             <label for="checkout-email">Паспорт</label>
         </div>
         <div class="form-floating mb-3">
             <input type="text" class="form-control" v-model="clientForm.passport_issued" id="checkout-email"
-                placeholder="name@example.com" >
+                placeholder="name@example.com">
             <label for="checkout-email">Выдан</label>
         </div>
         <div class="form-floating mb-3">
@@ -54,9 +54,9 @@
                 placeholder="name@example.com" required>
             <label for="checkout-email">Адрес доставки</label>
         </div>
-         <div class="form-floating mb-3">
+        <div class="form-floating mb-3">
             <input type="text" class="form-control" v-model="clientForm.info" id="checkout-email"
-                placeholder="name@example.com" >
+                placeholder="name@example.com">
             <label for="checkout-email">Дополнительная информация</label>
         </div>
 
@@ -81,21 +81,36 @@
 
             {{clientForm.client}}
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" v-model="clientForm.current_payed" id="checkout-name"
-                    placeholder="name@example.com" required>
+                <input disabled type="text" class="form-control" v-model="clientForm.current_payed" id="checkout-name"
+                    placeholder="" required>
                 <label for="checkout-name">Начальная внесенная покупателем сумма, руб</label>
             </div>
 
             <div class="form-floating mb-3">
-                <input type="text" disabled class="form-control" v-model="clientForm.payed_percent" id="checkout-name"
+                <input type="text" class="form-control" v-model="clientForm.payed_percent" id="checkout-name"
                     placeholder="name@example.com" required>
                 <label for="checkout-name">Процент внесенной суммы от полной стоимости</label>
             </div>
-            <div class="form-floating mb-3">
+
+            <div class="form-check form-switch">
+                <input @click="flgDays = !flgDays" v-model="flgDays" class="form-check-input" type="checkbox"
+                    role="switch" id="">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Указать кол-во рабочих дней / Выбрать
+                    конкретную дату</label>
+            </div>
+
+            <div v-if="flgDays" class="form-floating mb-3">
+                <input type="text" class="form-control" v-model="clientForm.work_days" id="checkout-name"
+                    placeholder="name@example.com" required>
+                <label for="checkout-name">Кол-во рабочих дней</label>
+            </div>
+
+            <div v-else class="form-floating mb-3">
                 <input type="date" class="form-control" v-model="clientForm.delivery_terms" id="checkout-name"
                     placeholder="name@example.com" required>
                 <label for="checkout-name">Срок передачи товара покупателю</label>
             </div>
+
 
             <button class="btn btn-dark w-100 my-2 rounded-0">Отправить и скачать договор</button>
         </div>
@@ -125,10 +140,10 @@
         },
         watch: {
 
-            'clientForm.current_payed': {
+            'clientForm.payed_percent': {
                 handler(val) {
-                    this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
-                        this.cartTotalPrice) * 100)
+                    this.clientForm.current_payed = Math.round((
+                        this.cartTotalPrice * this.clientForm.payed_percent) / 100)
 
                 },
                 deep: true
@@ -141,6 +156,7 @@
                 step: 0,
                 discount: 0,
                 self_clients: [],
+                flgDays: true, // числом или датой дни 
                 clientForm: {
                     id: null,
                     name: null,
@@ -156,6 +172,7 @@
                     current_payed: 19333, /// в ноль
                     payed_percent: 70,////в ноль
                     delivery_terms: null,
+                    work_days: 0,
                 }
             }
         },
