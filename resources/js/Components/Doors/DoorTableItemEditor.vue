@@ -654,7 +654,7 @@ export default {
             return (this.doorForm.price_type.id !== 3) ? this.summaryPrice : this.summaryPriceWithDealer
         },
         summaryPriceWithDealer() {
-            return Math.round((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
+            return ((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100))).toFixed(2)
         },
         summaryPrice() {
             let sum = 0;

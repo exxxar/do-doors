@@ -65,8 +65,9 @@
 
         <hr class="hr hr-blurry my-3" />
 
-        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
-                v-if="discount>0">(скидка {{ discount }}%)</span></h6>
+
+        <h6 class="font-bold">Итого цена {{ (cartTotalPrice * (1 - (discount / 100))).toFixed(2) }} ₽ <span
+            v-if="discount>0">(скидка {{ discount }}%)</span></h6>
         <p class="mb-2"><small>Возможно в рассрочку!</small></p>
         <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
                 зависит, просто уточните эти детали в беседе с менеджером</small></p>
@@ -127,20 +128,18 @@
     import { mapGetters } from "vuex";
     import { mask } from 'vue-the-mask'
 
+
     export default {
         directives: { mask },
         computed: {
             ...mapGetters(['getErrors',
                 'getDictionary',
                 'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
-
         },
         watch: {
-
             'clientForm.payed_percent': {
                 handler(val) {
-                    this.clientForm.current_payed = Math.round((
-                        this.cartTotalPrice * this.clientForm.payed_percent) / 100)
+                    this.clientForm.current_payed = ((this.cartTotalPrice * this.clientForm.payed_percent)/100).toFixed(2)
                 },
                 deep: true
             },

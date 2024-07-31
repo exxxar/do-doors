@@ -304,7 +304,7 @@ Route::prefix("/sizes")
         Route::post("/store", "store");
         Route::post("/import", "import");
         Route::post("/update-param", "updateParam");
-        Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink'])->name('login.google-redirect');
+        Route::post('/import-from-google', [GoogleLoginController::class,'getGoogleLink'])->name('login.google-redirect');
         Route::delete("/{id}", "destroy");
 
     });
