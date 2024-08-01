@@ -178,10 +178,10 @@ class CalcController extends Controller
 
         $path = storage_path() . "/app";
 
-        $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
-        if($client->status == 'individual'){
-            $fileName = "договор с ФЛ.docx";
-        }
+        $fileName = $client->status == 'individual' ? "договор с ФЛ.docx": ($workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx") ;
+        // if($client->status == 'individual'){
+        //     $fileName = "договор с ФЛ.docx";
+        // }
         // dd($client);
 
        /* dd([
