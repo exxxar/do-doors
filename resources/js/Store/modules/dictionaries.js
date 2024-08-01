@@ -1295,19 +1295,20 @@ const state = {
         price_type_variants: [
             {
                 id: 1,
+                title: 'Розница',
+                key: 'retail'
+            },
+            {
+                id: 2,
                 title: 'Опт',
                 key: 'wholesale'
             },
             {
-                id: 2,
-                title: 'Розница',
-                key: 'dealer'
-            },
-            {
                 id: 3,
                 title: 'Цена дилера',
-                key: 'retail'
-            }
+                key: 'dealer'
+            },
+
         ], //типы цен
     }
 }
@@ -1322,6 +1323,21 @@ const getters = {
 
 // actions
 const actions = {
+    async updatedFormattedSizes(context) {
+
+        let link = `/sizes/formatted`
+        let method = 'POST'
+
+
+        let _axios = util.makeAxiosFactory(link, method)
+
+        return _axios.then((response) => {
+            context.commit("setDictionarySizes", response.data || [])
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadFormattedSizes(context) {
 
         let link = `/sizes.json`
@@ -1445,6 +1461,7 @@ const mutations = {
         state.dictionary.color_variants = []
 
         payload.colors.forEach(item => {
+
             state.dictionary.color_variants.push({
                 id: item.id,
                 title: item.title,
@@ -1452,6 +1469,7 @@ const mutations = {
                 sizes: item.sizes,
                 code: item.code,
                 type: item.type,
+                excludes: item.excludes || []
             })
         })
 

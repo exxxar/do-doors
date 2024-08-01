@@ -135,7 +135,7 @@ export default {
     computed: {
         ...mapGetters(['getErrors', 'getDictionary', 'cartTotalCount', 'cartProducts', 'cartTotalPrice']),
         summaryPriceWithDealer() {
-            return (this.summaryPrice * (1 + ((this.doorForm.dealer_percent || 0) / 100))).toFixed(2)
+            return Math.round(this.summaryPrice * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
         },
 
 

@@ -85,21 +85,46 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
         </div>
 
 
+        <div class="row">
+            <div class="col-md-6 col-12">
+                <div class="form-floating mb-3">
+                    <select class="form-select"
+                            @invalid="alert('Вы не выбрали вариант использования!')"
+                            v-model="form.type"
+                            id="floatingSelect" aria-label="Floating label select example" required>
+                        <option :value="null">Выберите один из вариантов</option>
+                        <option :value="item.key" v-for="item in filteredTypes">{{
+                                item.title
+                            }}
+                        </option>
+                    </select>
+                    <label for="floatingSelect">Вариант применения</label>
+                </div>
+            </div>
+            <div class="col-md-6 col-12">
 
+                <div class="dropdown">
+                    <button class="btn d-flex justify-content-start align-items-center btn-outline-secondary rounded-0 w-100 p-3" type="button"
+                            data-bs-auto-close="outside"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Исключения из расчёта <span v-if="(form.excludes||[]).length>0" class="fw-bold ml-1">({{form.excludes.length}})</span>
+                    </button>
+                    <ul class="dropdown-menu rounded-0 w-100">
+                        <li
+                            v-for="item in filteredExcludes">
+                            <a class="dropdown-item"
+                               @click="addToExcludes(item)"
+                               href="javascript:void(0)">
+                                <i class="fa-solid fa-check"
+                                   v-if="form.excludes.indexOf(item.key)!=-1"></i>
+                                {{ item.title }}</a></li>
 
-        <div class="form-floating mb-3">
-            <select class="form-select"
-                    @invalid="alert('Вы не выбрали вариант использования!')"
-                    v-model="form.type"
-                    id="floatingSelect" aria-label="Floating label select example" required>
-                <option :value="null">Выберите один из вариантов</option>
-                <option :value="item.key" v-for="item in types">{{
-                        item.title
-                    }}
-                </option>
-            </select>
-            <label for="floatingSelect">Вариант применения</label>
+                    </ul>
+                </div>
+
+            </div>
         </div>
+
 
         <div class="row">
             <div class="col-12">
@@ -169,28 +194,34 @@ export default {
             types: [
                 {
                     title: 'Для всех',
-                    key: 'all'
+                    key: 'all',
+                    usage: ["type"]
                 },
                 {
                     title: 'Отделка сторон',
-                    key: 'side_finish'
+                    key: 'side_finish',
+                    usage: ["type"]
                 },
                 {
                     title: 'Короб и каркас',
-                    key: 'box_and_frame'
+                    key: 'box_and_frame',
+                    usage: ["type", "excludes"]
                 },
 
                 {
                     title: 'Фурнитура',
-                    key: 'fittings'
+                    key: 'fittings',
+                    usage: ["type", "excludes"]
                 },
 
                 {
                     title: 'Уплотнитель',
-                    key: 'seal'
+                    key: 'seal',
+                    usage: ["type", "excludes"]
                 },
 
             ],
+
             form: {
                 id: null,
                 title: null,
@@ -202,6 +233,7 @@ export default {
                 },
                 code: null,
                 type: null,
+                excludes: [],
                 assign_with_size: false,
 
 
@@ -209,6 +241,12 @@ export default {
         }
     },
     computed: {
+        filteredTypes() {
+            return this.types.filter(item => item.usage.indexOf("type") !== -1)
+        },
+        filteredExcludes() {
+            return this.types.filter(item => item.usage.indexOf("excludes") !== -1)
+        },
         needClearForm() {
             return this.form.id ||
                 this.form.title ||
@@ -218,6 +256,7 @@ export default {
 
         }
     },
+
     mounted() {
 
         if (this.item)
@@ -231,6 +270,7 @@ export default {
                         retail: 0,
                         cost: 0,
                     },
+                    excludes: this.item.excludes || [],
                     code: this.item.code || null,
                     type: this.item.type || null,
                     assign_with_size: this.item.assign_with_size || false,
@@ -238,7 +278,17 @@ export default {
             })
     },
     methods: {
+        addToExcludes(item) {
+            if (!this.form.excludes)
+                this.form.excludes = []
 
+            let index = this.form.excludes.findIndex(e => e === item.key)
+
+            if (index === -1)
+                this.form.excludes.push(item.key)
+            else
+                this.form.excludes.splice(index, 1)
+        },
         callbackSelectColor(item) {
             this.form.title = item.names.en || item.color.code
             this.form.code = item.color.code || item.color.hex || null
@@ -256,7 +306,7 @@ export default {
 
             this.form.id = null
             this.form.title = null
-            this.form.price =  {
+            this.form.price = {
                 wholesale: 0,
                 dealer: 0,
                 retail: 0,
@@ -264,6 +314,7 @@ export default {
             }
             this.form.code = null
             this.form.type = null
+            this.form.excludes = []
 
             this.$emit("callback")
 

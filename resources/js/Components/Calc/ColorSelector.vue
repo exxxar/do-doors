@@ -28,6 +28,12 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                 <li>
                     <hr class="dropdown-divider">
                 </li>
+                <li><a class="dropdown-item" href="javascript:void(0)"
+                       @click="openRalModal">Выбор цвета RAL</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item"
                        v-bind:class="{'bg-primary text-white':color.title===item.title }"
                        @click="selectColor(item)"
@@ -37,7 +43,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
         </div>
 
         <div
-            v-if="(color.code||null)==='RAL'"
+            v-if="(color.code||'').toLowerCase()==='ral'"
             class="input-group mb-3">
                       <span class="input-group-text border-secondary"
                             v-if="isHex(color.title)"
@@ -48,8 +54,8 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                 <input type="text"
                        @invalid="alert('Вы не выбрали цвет')"
                        v-model="color.title"
-                       class="form-control" id="seal_color" required>
-                <label for="seal_color"><i class="fa-solid fa-palette"></i>
+                       class="form-control" id="select-color-input" required>
+                <label for="select-color-input"><i class="fa-solid fa-palette"></i>
                     <slot name="name"></slot>
                 </label>
             </div>
@@ -66,11 +72,18 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                 <li>
                     <hr class="dropdown-divider">
                 </li>
+                <li><a class="dropdown-item" href="javascript:void(0)"
+                       @click="openRalModal">Выбор цвета RAL</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
                 <li><a class="dropdown-item"
                        v-bind:class="{'bg-primary text-white':color.title===item.title }"
                        @click="selectColor(item)"
                        href="javascript:void(0)" v-for="item in filteredColors">{{ item.title }}</a>
                 </li>
+
             </ul>
         </div>
     </div>
@@ -100,7 +113,7 @@ import {mapGetters} from "vuex";
 import {uuid} from "vue-uuid";
 
 export default {
-    props: ["modelValue"],
+    props: ["modelValue","filter"],
     data() {
         return {
             id: null,
@@ -118,9 +131,13 @@ export default {
         },
         'color': {
             handler(val) {
-                let search = this.color.title
+                let search = (this.color.title||'').toLowerCase()
 
-                if ((this.color.title || '').length === 4) {
+
+                if (search.indexOf("ral")!==-1)
+                    search = search.substring(search.indexOf("ral")+3).trim()
+
+                if (search.length === 4) {
                     Object.keys(this.colors).forEach(key => {
                         if (this.colors[key].code === search) {
                             this.color.code = this.colors[key].color.hex
@@ -139,7 +156,7 @@ export default {
 
         filteredColors() {
             let colors = this.getDictionary.color_variants
-            return colors.filter(item => item.type === "seal" || item.type === "all")
+            return colors.filter(item => item.type === this.filter || item.type === "all")
         },
     },
     mounted() {
@@ -163,6 +180,13 @@ export default {
 
             this.colorModal.hide()
         },
+        loadRalColors() {
+            this.$store.dispatch("loadRalColors")
+        },
+        openRalModal(){
+            this.colorModal = new bootstrap.Modal(document.getElementById('select-ral-color-' + this.id), {})
+            this.colorModal.show()
+        },
         selectColor(item) {
             let color = null
 
@@ -171,21 +195,27 @@ export default {
                     title: item.title || item.code,
                     code: item.code || null,
                     sizes: item.sizes,
+                    is_ral: false,
+                    excludes: item.excludes || [],
                     type: item.type || 'all',
                     assign_with_size: item.assign_with_size || false,
                 }
 
-                if (item.title === "RAL") {
+                if (item.title.toLowerCase() === "ral") {
+                    this.loadRalColors()
+
                     color = {
                         title: 'RAL',
                         code: 'RAL',
+                        is_ral: true,
                         sizes: item.sizes,
+                        excludes: item.excludes || [],
                         type: item.type || 'all',
                         assign_with_size: item.assign_with_size || false,
                     }
 
-                    this.colorModal = new bootstrap.Modal(document.getElementById('select-ral-color-' + this.id), {})
-                    this.colorModal.show()
+                    //this.colorModal = new bootstrap.Modal(document.getElementById('select-ral-color-' + this.id), {})
+                    //this.colorModal.show()
                 }
             }
 

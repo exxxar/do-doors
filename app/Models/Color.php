@@ -20,6 +20,7 @@ class Color extends Model
         'price',
         'type',
         'code',
+        'excludes',
         'assign_with_size',
     ];
 
@@ -32,6 +33,7 @@ class Color extends Model
         'id' => 'integer',
         'order_position' => 'integer',
         'price' => 'json',
+        'excludes' => 'array',
         'assign_with_size' => 'boolean',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

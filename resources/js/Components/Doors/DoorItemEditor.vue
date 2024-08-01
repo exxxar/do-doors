@@ -262,6 +262,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     <div class="col-md-6 col-12">
                         <ColorSelector
+                            :filter="'front_side_finish_color'"
                             v-if="doorForm.front_side_finish.title!=='Под покраску'"
                             @invalid="alert('Вы не выбрали цвет отделки первой стороны')"
                             v-model="doorForm.front_side_finish_color">
@@ -308,6 +309,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     <div class="col-md-6 col-12">
                         <ColorSelector
+                            :filter="'back_side_finish_color'"
                             v-if="doorForm.back_side_finish.title!=='Под покраску'"
                             @invalid="alert('Вы не выбрали цвет отделки второй стороны')"
                             v-model="doorForm.back_side_finish_color">
@@ -327,6 +329,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                         <ColorSelector
                             v-if="!color_sync_update"
+                            :filter="'box_and_frame_color'"
                             v-on:change="syncColors('box_and_frame_color',$event)"
                             @invalid="alert('Вы не выбрали цвет короба и каркаса')"
                             v-model="doorForm.box_and_frame_color">
@@ -341,6 +344,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     <div class="col-md-6 col-12">
                         <ColorSelector
                             v-if="!color_sync_update"
+                            :filter="'seal_color'"
                             v-on:change="syncColors('seal_color',$event)"
                             @invalid="alert('Вы не выбрали цвет уплотнителя')"
                             v-model="doorForm.seal_color">
@@ -355,6 +359,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                         <ColorSelector
                             v-if="!color_sync_update"
+                            :filter="'fittings_color'"
                             v-on:change="syncColors('fittings_color',$event)"
                             @invalid="alert('Вы не выбрали цвет фурнитуры')"
                             v-model="doorForm.fittings_color">
@@ -365,7 +370,8 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
 
-                    <div class="col-md-6 col-12" v-if="doorForm.fittings_color.title!=null">
+                    <div class="col-md-6 col-12"
+                         v-if="doorForm.fittings_color.title!=null&&doorForm.fittings_color.is_ral">
 
                         <div class="form-floating w-100">
                             <select class="form-select"
@@ -655,6 +661,8 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     <div class="row bg-white p-2 m-0 border-gray-100 border shadow-md">
                         <div class="p-0 mb-2"
                              v-bind:class="{'col-md-2':doorForm.price_type.id===3,'col-md-4':doorForm.price_type.id!==3}">
+
+
                             <div class="form-floating">
                                 <select class="form-select"
                                         v-model="doorForm.price_type"
@@ -1004,29 +1012,11 @@ export default {
     },
     computed: {
         ...mapGetters(['getErrors', 'getDictionary', 'cartTotalCount', 'cartProducts', 'cartTotalPrice']),
-
-        filteredSideFinishColors() {
-            let colors = this.getDictionary.color_variants
-            return colors.filter(item => item.type === "side_finish" || item.type === "all")
-        },
-        filteredBoxAndFrameColors() {
-            let colors = this.getDictionary.color_variants
-            return colors.filter(item => item.type === "box_and_frame" || item.type === "all")
-        },
-        filteredFittingsColors() {
-            let colors = this.getDictionary.color_variants
-            return colors.filter(item => item.type === "fittings" || item.type === "all")
-        },
-        filteredSealColors() {
-            let colors = this.getDictionary.color_variants
-            return colors.filter(item => item.type === "seal" || item.type === "all")
-        },
-
         resultPrice() {
             return (this.doorForm.price_type.id !== 3) ? this.summaryPrice : this.summaryPriceWithDealer
         },
         summaryPriceWithDealer() {
-            return ((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100))).toFixed(2)
+            return Math.round((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
         },
 
         summaryPrice() {
@@ -1065,15 +1055,20 @@ export default {
                         if (item.indexOf("_color") !== -1 && this.doorForm[item].sizes && !find) {
                             find = true
 
+                            let isExcluded = (this.doorForm[item] || {excludes: []})
+                                .excludes.indexOf(item
+                                    .substring(0, item
+                                        .indexOf("_color"))) !== -1
+
                             let price = 0;
                             if (!this.doorForm[item].assign_with_size)
-                                price = this.doorForm[item].sizes[0].price[type]
+                                price = isExcluded ? 0 : this.doorForm[item].sizes[0].price[type]
                             else {
                                 let index = this.doorForm[item].sizes.findIndex(c =>
                                     c.width == this.doorForm.width &&
                                     c.height == this.doorForm.height)
 
-                                price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
+                                price = index === -1 || isExcluded ? 0 : this.doorForm[item].sizes[index].price[type]
                             }
 
                             sum += parseInt(price || 0)
@@ -1118,13 +1113,13 @@ export default {
                         if (item === "service_painting" && this.doorForm[item].title != null && !find) {
                             find = true
 
-                            let price = this.doorForm[item].price[type]
+                            let price = this.doorForm["fittings_color"].is_ral ? this.doorForm[item].price[type] : 0
                             let fullPrice = 0
 
                             if (this.doorForm.size)
                                 fullPrice = (this.doorForm.size.loops.count + 1) * price
 
-                            sum += parseInt(fullPrice || 0)
+                            sum += fullPrice || 0
 
                             this.tmp_prices.push({
                                 type: item,
@@ -1174,15 +1169,16 @@ export default {
                     this.doorForm["door_type"].price[type] :
                     this.doorForm["door_type"].price
 
+                let koef = this.doorForm["door_type"].id !== 3 ? 1 : 0.8
                 let price = this.doorForm["door_type"].need_percent_price ?
-                    (tmpBasePrice * tmpDoorTypePrice) / 100 : tmpDoorTypePrice
+                    (tmpBasePrice * tmpDoorTypePrice) / 100 : (tmpBasePrice * koef + tmpDoorTypePrice)
 
                 this.tmp_prices.push({
                     type: "door_type",
-                    price: price
+                    price: (price || 0) > 0 ? price : tmpBasePrice
                 })
 
-                return price || 0
+                return (price || 0) > 0 ? price : tmpBasePrice
             }
 
             if (find) {
@@ -1196,14 +1192,15 @@ export default {
                 }
 
                 let tmpBasePrice = typeof base.price === "object" ? base.price[type] : base.price
+
                 this.tmp_prices.push({
                     type: 'base',
                     price: tmpBasePrice
                 })
 
-                price = tmpBasePrice
+                price = parseInt(doorTypeFunc(tmpBasePrice))
 
-                sum += parseInt(doorTypeFunc(tmpBasePrice))
+                //sum += parseInt(doorTypeFunc(tmpBasePrice))
 
                 section.materials.forEach(sub => {
                     if (sub.id === this.doorForm.front_side_finish.id
@@ -1248,14 +1245,17 @@ export default {
                         }
 
                         let tmpBasePrice = typeof base.price === "object" ? base.price[type] : base.price
+
                         this.tmp_prices.push({
                             type: 'base',
                             price: tmpBasePrice
                         })
 
-                        price = tmpBasePrice
 
-                        sum += parseInt(doorTypeFunc(tmpBasePrice))
+                        price = parseInt(doorTypeFunc(tmpBasePrice))
+
+
+                        //  sum += parseInt(doorTypeFunc(tmpBasePrice))
 
                         basePrices[i].materials.forEach(sub => {
                             if (sub.id === this.doorForm.front_side_finish.id
@@ -1420,7 +1420,7 @@ export default {
 
     mounted() {
 
-        this.loadRalColors()
+        //this.loadRalColors()
 
         window.addEventListener("clear-cart", (e) => {
             this.$store.dispatch("loadFormattedSizes").then(resp => {

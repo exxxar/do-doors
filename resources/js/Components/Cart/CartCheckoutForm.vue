@@ -88,7 +88,7 @@
 
         <hr class="hr hr-blurry my-3"/>
 
-        <h6 class="font-bold">Итого цена {{ (cartTotalPrice * (1 - (discount / 100))).toFixed(2) }} ₽ <span
+        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
             v-if="discount>0">(скидка {{ discount }}%)</span></h6>
         <p class="mb-2"><small>Возможно в рассрочку!</small></p>
         <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
@@ -162,8 +162,8 @@ export default {
 
         'clientForm.current_payed': {
             handler(val) {
-               this.clientForm.payed_percent = ((this.clientForm.current_payed /
-                   this.cartTotalPrice) * 100).toFixed(2)
+               this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
+                   this.cartTotalPrice) * 100)
 
             },
             deep: true
