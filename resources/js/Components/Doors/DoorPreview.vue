@@ -26,7 +26,18 @@
                 </div>
 
 
-                <div style="position: relative;">
+
+
+                <div style="position: relative;z-index: 5;">
+                    <div class="door-header">
+                        <div
+                            class="door-closer d-flex justify-content-center align-items-center"
+                            style="font-size: 12px;"
+                            v-bind:class="{'to-right':door.loops.type==='left','to-left':door.loops.type==='right'}"
+                            v-if="door.need_hidden_door_closer">
+                            5
+                        </div>
+                    </div>
                     <div class="door">
                         <img :src="doorImage?doorImage:'/images/door-1.jpg'"
                              class="w-100 h-100" style="object-fit: cover;"
@@ -54,17 +65,31 @@
                 </div>
 
 
+                <div class="door-backstage">
+                    <div class="skirting-board "
+                         style="font-size: 12px;"
+                         v-if="door.need_hidden_skirting_board">
+                        <p>3</p>
+                    </div>
+
+                    <div class="center">
+
+                    </div>
+
+                    <div class="skirting-board "
+                         style="font-size: 12px;"
+                         v-if="door.need_hidden_skirting_board">
+                        <p>3</p>
+                    </div>
+                </div>
+
                 <div class="door-footer">
                     <div class="doorstep d-flex justify-content-center align-items-center"
                          style="font-size: 12px;"
                          v-if="door.need_automatic_doorstep">
                         2
                     </div>
-                    <div class="skirting-board d-flex justify-content-center align-items-center"
-                         style="font-size: 12px;"
-                         v-if="door.need_hidden_skirting_board">
-                        <p>3</p>
-                    </div>
+
 
                     <div class="stopper d-flex justify-content-center align-items-center"
                          style="font-size: 12px;"
@@ -73,13 +98,6 @@
                         4
                     </div>
 
-                    <div
-                        class="door-closer d-flex justify-content-center align-items-center"
-                         style="font-size: 12px;"
-                         v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
-                         v-if="door.need_hidden_door_closer">
-                        5
-                    </div>
 
 
                 </div>
@@ -217,10 +235,84 @@ export default {
         }
     }
 
+    .door-header {
+        width: 100%;
+        height: 40px;
+        position: absolute;
+        border-top: 1px dashed black;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        .door-closer {
+            position: absolute;
+            width: 50px;
+            height: 18px;
+            top: 0px;
+            border: 1px dashed black;
+            z-index: 2;
+
+            &.to-left {
+                margin-right: 150px;
+            }
+
+            &.to-right {
+                margin-right: -150px;
+            }
+        }
+    }
+
+    .door-backstage {
+        position: absolute;
+        bottom: 20px;
+
+        width: 100%;
+        display: flex;
+      //  justify-content: space-around;
+        z-index: 5;
+
+
+
+        .skirting-board {
+            font-size: 12px;
+            //background: rgba(255, 255, 255, 0.66);
+            height: 100%;
+            text-align: center;
+            font-weight: bold;
+            width: 125px;
+
+            background-image: repeating-linear-gradient(
+                    -45deg,
+                    #651111 0,
+                    #651111 15px,
+                    #ffffff 15px,
+                    #ffffff 25px
+            );
+
+            display: flex;
+            justify-content: center;
+
+            p {
+                width: 30px;
+                background-color: rgba(255, 255, 255, 0.81);
+            }
+
+
+           /* &:nth-child(1) {
+                margin-right: 200px;
+            }*/
+        }
+
+        .center {
+            width: 200px;
+            background-color: transparent;;
+        }
+
+    }
 
     .door-footer {
         width: 100%;
-        height: 40px;
+        height: 20px;
         position: relative;
         border-top: 1px dashed black;
         display: flex;
@@ -231,7 +323,7 @@ export default {
         .doorstep {
             position: absolute;
             width: 200px;
-            height: 22px;
+            height: 20px;
             background-color: #fdfdfd;
             border: 1px dashed black;
             background-image: repeating-linear-gradient(
@@ -276,34 +368,18 @@ export default {
             top: -18px;
 
             border: 1px dashed black;
-            z-index: 2;
+            z-index: 5;
 
             &.to-left {
-                margin-left: 150px;
+                margin-left: 120px;
             }
 
             &.to-right {
-                margin-right: 150px;
+                margin-right: 120px;
             }
         }
 
-        .door-closer {
-            position: absolute;
-            width: 50px;
-            height: 18px;
-            top: -18px;
-            margin-right: 150px;
-            border: 1px dashed black;
-            z-index: 2;
 
-            &.to-left {
-                margin-right: 150px;
-            }
-
-            &.to-right {
-                margin-right: -150px;
-            }
-        }
     }
 
     .door-but {
@@ -311,8 +387,9 @@ export default {
         height: 400px;
         background-size: cover;
         position: absolute;
-        right: -90px;
+        right: -81px;
         top: 0;
+        z-index: 1;
         border: 1px black solid;
 
         background-image: repeating-linear-gradient(

@@ -15,9 +15,12 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="javascript:void(0)" @click="selectInfo(client)"
-                        v-for="client in self_clients">{{ client.title || null }}
-                        ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                <li>
+                    <template v-for="client in self_clients">
+                        <a v-if="client.status != 'individual'" class="dropdown-item" href="javascript:void(0)"
+                            @click="selectInfo(client)">{{ client.title || null }}
+                            ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                    </template>
                 </li>
             </ul>
         </div>
@@ -62,8 +65,9 @@
 
         <hr class="hr hr-blurry my-3" />
 
-        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
-                v-if="discount>0">(скидка {{ discount }}%)</span></h6>
+
+        <h6 class="font-bold">Итого цена {{ (cartTotalPrice * (1 - (discount / 100))).toFixed(2) }} ₽ <span
+            v-if="discount>0">(скидка {{ discount }}%)</span></h6>
         <p class="mb-2"><small>Возможно в рассрочку!</small></p>
         <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
                 зависит, просто уточните эти детали в беседе с менеджером</small></p>
@@ -78,17 +82,29 @@
 
             {{clientForm.client}}
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" v-model="clientForm.current_payed" id="checkout-name"
+                <input type="text" disabled class="form-control" v-model="clientForm.current_payed" id="checkout-name"
                     placeholder="name@example.com" required>
                 <label for="checkout-name">Начальная внесенная покупателем сумма, руб</label>
             </div>
 
             <div class="form-floating mb-3">
-                <input type="text" disabled class="form-control" v-model="clientForm.payed_percent" id="checkout-name"
+                <input type="text" class="form-control" v-model="clientForm.payed_percent" id="checkout-name"
                     placeholder="name@example.com" required>
                 <label for="checkout-name">Процент внесенной суммы от полной стоимости</label>
             </div>
-            <div class="form-floating mb-3">
+            <div class="form-check form-switch">
+                <input @click="flgDays = !flgDays" v-model="flgDays" class="form-check-input" type="checkbox"
+                    role="switch" id="">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Указать кол-во рабочих дней / Выбрать
+                    конкретную дату</label>
+            </div>
+
+            <div v-if="flgDays" class="form-floating mb-3">
+                <input type="text" class="form-control" v-model="clientForm.work_days" id="checkout-name"
+                    placeholder="name@example.com" required>
+                <label for="checkout-name">Кол-во рабочих дней</label>
+            </div>
+            <div v-else class="form-floating mb-3">
                 <input type="date" class="form-control" v-model="clientForm.delivery_terms" id="checkout-name"
                     placeholder="name@example.com" required>
                 <label for="checkout-name">Срок передачи товара покупателю</label>
@@ -112,21 +128,18 @@
     import { mapGetters } from "vuex";
     import { mask } from 'vue-the-mask'
 
+
     export default {
         directives: { mask },
         computed: {
             ...mapGetters(['getErrors',
                 'getDictionary',
                 'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
-
         },
         watch: {
-
-            'clientForm.current_payed': {
+            'clientForm.payed_percent': {
                 handler(val) {
-                    this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
-                        this.cartTotalPrice) * 100)
-
+                    this.clientForm.current_payed = ((this.cartTotalPrice * this.clientForm.payed_percent)/100).toFixed(2)
                 },
                 deep: true
             },
@@ -137,6 +150,7 @@
                 tab: 0,
                 step: 0,
                 discount: 0,
+                flgDays: true, // числом или датой дни 
                 self_clients: [],
                 clientForm: {
                     id: null,
@@ -150,6 +164,7 @@
                     current_payed: 0,
                     payed_percent: 0,
                     delivery_terms: null,
+                    work_days: 0,
                 }
             }
         },

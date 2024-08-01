@@ -68,6 +68,7 @@ class CalcController extends Controller
         $email = $request->email ?? 'не указано';
         $phone = $request->phone;
         $passport = $request->passport ?? 'не указано';
+        $work_days = $request->work_days ?? 0;
         $passport_issued = $request->passport_issued ?? 'не указано';
         $info = $request->info ?? 'не указана';
         $totalPrice = $request->total_price ?? 0;
@@ -106,6 +107,7 @@ class CalcController extends Controller
             'profit' => 0,
         ]);
 
+        
         foreach ($items as $item) {
 
             OrderDetail::query()->create([
@@ -133,7 +135,7 @@ class CalcController extends Controller
         ];
 
         $telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
-         $telegram->sendMessage($tmp);     ///////////////////////               
+        $telegram->sendMessage($tmp);     ///////////////////////               
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
         $current_date = Carbon::now("+3:00")->format("Y-m-d H:i:s");
@@ -197,7 +199,9 @@ class CalcController extends Controller
 
         $main_requisites = $client->getMainRequisites(); 
         $fam_initial = $client->getInitials();   
-     
+        
+        $work_days_string = $work_days . "(" . (new \MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) .")";
+        
 
         $nc = new NCLNameCaseRu();
         $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);
@@ -207,6 +211,7 @@ class CalcController extends Controller
                 $templateProcessor = new TemplateProcessor($path . "/$fileName");
                 
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
+                $templateProcessor->setValue('numb_doc', $order->id);
                 $templateProcessor->setValue('title', $name);
                 $templateProcessor->setValue('member',  $member ?? '-');
                 $templateProcessor->setValue('fio',  $fam_initial ?? '-');
@@ -227,6 +232,8 @@ class CalcController extends Controller
                 $templateProcessor->setValue('payed_percent', $payedPercent);
                 $templateProcessor->setValue('last_payment', $totalPrice - $currentPayed); 
                 $templateProcessor->setValue('delivery_terms', $deliveryTerms);
+                $templateProcessor->setValue('work_days', $work_days_string);
+
 
 
                 // requisites
@@ -261,7 +268,7 @@ class CalcController extends Controller
 
             }
 
-            return response()->download(storage_path('app/' . $newName));
+           return response()->download(storage_path('app/' . $newName));
 
         }
     }
