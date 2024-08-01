@@ -209,6 +209,31 @@
         </div>
     </form>
 
+
+      <form v-on:submit.prevent="submit(2)" class="row mb-3">
+        <div class="col-12">
+            <a class="mb-0 small text-red-600" href="/orders/download-template?type=2" target="_blank">Скачать текущий
+                шаблон ФЛ</a>
+        </div>
+        <div class="col-md-10">
+            <div class="form-floating border-gray-100 border">
+                <input type="file" class="form-control"
+                       accept="doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                       id="door-contract-3"
+                       ref="doorFileContract3"
+                       @change="onChangeFile"
+                       placeholder="name@example.com" required>
+                <label for="door-contract-3">Договор для ФЛ</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-dark rounded-0 w-100 h-100">Загрузить</button>
+        </div>
+    </form>
+
+
+
+
 </template>
 <script>
 export default {
@@ -238,6 +263,9 @@ export default {
 
                 if (type === 0)
                     this.$refs.doorFileContract2.value = null
+
+                if (type === 2)
+                    this.$refs.doorFileContract3.value = null
 
                 this.$notify({
                     title: "DoDoors",
