@@ -169,8 +169,8 @@
                     promo: null,
                     work_with_nds: 1,
                     items: [],
-                    current_payed: 19333, /// в ноль
-                    payed_percent: 70,////в ноль
+                    current_payed: 0, 
+                    payed_percent: 0,
                     delivery_terms: null,
                     work_days: 0,
                 }
