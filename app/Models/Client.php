@@ -69,12 +69,33 @@ class Client extends Model
         return $main_requisites;
     }
     public function getInitials(){
+
+        $candidat_fio = $this->fio;
+        if($this->status == 'individual'){
+            $candidat_fio = $this->title;
+        }
+        if(is_null($candidat_fio) && $candidat_fio == ''){
+            return null;
+        }
+        $fio = explode(" ",$candidat_fio, 3);
         
-        $fio = explode(" ",$this->fio, 3);
-        // $result = "$fio[0] substr($fio[1], 0, 1). substr($fio[2], 0, 1).";
         return $fio[0] . " " . mb_substr($fio[1], 0, 1) . "." . mb_substr($fio[2], 0, 1) . ".";
-        
-        // $result = "$fio[0] " . mb_substr($fio[1], 0, 1) . " " . mb_substr($fio[2], 0, 1);
-        // return $result;
     }
+
+    public function getShortClientStatus(){
+        $statusClient = '';
+        switch($this->status){
+            case 'individual':
+                $statusClient = "ФЛ";
+                break;
+            case 'sole_proprietor':
+                $statusClient = "ИП";
+                break;
+            case 'legal_entity':
+                $statusClient = "ООО";
+                break;    
+        }
+        return $statusClient;
+    }
+
 }

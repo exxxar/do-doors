@@ -48,7 +48,8 @@ class OrderController extends Controller
         if (is_null($file))
             return response()->noContent(400);
 
-        $name = $type == 0 ? "договор с ИП.docx" : "договор с ООО.docx";
+        $name = $type == 0 ? "договор с ИП.docx" : ($type == 1 ? "договор с ООО.docx" : "договор с ФЛ.docx");
+        
         if (file_exists($path . "/" . $name))
             unlink($path . "/" . $name);
         $file->move($path, $name);
@@ -162,7 +163,7 @@ class OrderController extends Controller
             "type" => "required",
         ]);
 
-        $name = $request->type == 0 ? "договор с ИП.docx" : "договор с ООО.docx";
+        $name =  $request->type == 0 ? "договор с ИП.docx" : ($request->type == 1 ? "договор с ООО.docx" : "договор с ФЛ.docx");
 
         $headers = array(
             'Content-Type:  application/vnd.openxmlformats-officedocument.wordprocessingml.document',
