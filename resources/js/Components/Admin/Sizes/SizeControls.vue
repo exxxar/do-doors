@@ -222,7 +222,7 @@ export default {
 
         },
         saveFormattedSizes() {
-            this.$store.dispatch("loadFormattedSizes").then(resp => {
+            this.$store.dispatch("updatedFormattedSizes").then(resp => {
                 this.confirmModal.hide()
                 window.dispatchEvent(new CustomEvent("load-sizes", {
                     detail: null

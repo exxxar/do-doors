@@ -53,37 +53,31 @@ class ColorController extends Controller
         $id = $request->id ?? null;
 
         $priceData = json_decode($request->price ?? '[]');
+        $excludes = json_decode($request->excludes ?? '[]');
+
+        $tmp = [
+            "title" => $request->title ?? null,
+            'price' => (object)[
+                "wholesale" => $priceData->wholesale ?? 0,
+                "dealer" => $priceData->dealer ?? 0,
+                "retail" => $priceData->retail ?? 0,
+                "cost" => $priceData->cost ?? 0,
+            ],
+            'code' => $request->code ?? null,
+            'type' => $request->type ?? null,
+            'excludes' => $excludes,
+        ];
 
         if (is_null($id))
             $color = Color::query()
-                ->create([
-                    "title" => $request->title ?? null,
-                    'price' => (object)[
-                        "wholesale" => $priceData->wholesale ?? 0,
-                        "dealer" => $priceData->dealer ?? 0,
-                        "retail" => $priceData->retail ?? 0,
-                        "cost" => $priceData->cost ?? 0,
-                    ],
-                    'code' => $request->code ?? null,
-                    'type' => $request->type ?? null,
-                ]);
+                ->create($tmp);
         else {
             $color = Color::query()->find($id);
 
             if (is_null($color))
                 return response()->noContent(404);
 
-            $color->update([
-                "title" => $request->title ?? null,
-                'price' => (object)[
-                    "wholesale" => $priceData->wholesale ?? 0,
-                    "dealer" => $priceData->dealer ?? 0,
-                    "retail" => $priceData->retail ?? 0,
-                    "cost" => $priceData->cost ?? 0,
-                ],
-                'code' => $request->code ?? null,
-                'type' => $request->type ?? null,
-            ]);
+            $color->update($tmp);
 
         }
 

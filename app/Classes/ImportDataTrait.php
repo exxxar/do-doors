@@ -343,6 +343,10 @@ trait ImportDataTrait
                 "cost" => 0,
             ];
 
+        function intRound($arg): float|int
+        {
+            return round(intval($arg) / 10) * 10;
+        }
 
         foreach ($sizes as $size) {
 
@@ -350,12 +354,14 @@ trait ImportDataTrait
                 continue;
             }
 
+
             $size->price = (object)[
-                "wholesale" => round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["wholesale"] * ($size->price_koef ?? 1), 2),
-                "dealer" => round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["dealer"] * ($size->price_koef ?? 1), 2),
-                "retail" => round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["retail"] * ($size->price_koef ?? 1), 2),
-                "cost" => round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["cost"] * ($size->price_koef ?? 1), 2),
+                "wholesale" => intRound(round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["wholesale"] * ($size->price_koef ?? 1))),
+                "dealer" => intRound(round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["dealer"] * ($size->price_koef ?? 1))),
+                "retail" => intRound(round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["retail"] * ($size->price_koef ?? 1))),
+                "cost" => intRound(round($consumeBasePrice[$size->width][$size->material_id ?? $size->type]["cost"] * ($size->price_koef ?? 1))),
             ];
+
 
 
             $size->save();

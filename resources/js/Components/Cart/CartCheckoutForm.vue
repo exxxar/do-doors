@@ -66,7 +66,7 @@
         <hr class="hr hr-blurry my-3" />
 
 
-        <h6 class="font-bold">Итого цена {{ (cartTotalPrice * (1 - (discount / 100))).toFixed(2) }} ₽ <span
+        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
             v-if="discount>0">(скидка {{ discount }}%)</span></h6>
         <p class="mb-2"><small>Возможно в рассрочку!</small></p>
         <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
@@ -128,7 +128,6 @@
     import { mapGetters } from "vuex";
     import { mask } from 'vue-the-mask'
 
-
     export default {
         directives: { mask },
         computed: {
@@ -136,43 +135,46 @@
                 'getDictionary',
                 'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
         },
-        watch: {
-            'clientForm.payed_percent': {
-                handler(val) {
-                    this.clientForm.current_payed = ((this.cartTotalPrice * this.clientForm.payed_percent)/100).toFixed(2)
-                },
-                deep: true
-            },
+     watch: {
+        'clientForm.current_payed': {
+            handler(val) {
+               this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
+                   this.cartTotalPrice) * 100)
 
+            },
+            deep: true
         },
+
+    },
         data() {
-            return {
-                tab: 0,
-                step: 0,
-                discount: 0,
-                flgDays: true, // числом или датой дни 
-                self_clients: [],
-                clientForm: {
-                    id: null,
-                    name: null,
-                    phone: null,
-                    email: null,
-                    info: null,
-                    promo: null,
-                    work_with_nds: 1,
-                    items: [],
-                    current_payed: 0,
-                    payed_percent: 0,
-                    delivery_terms: null,
-                    work_days: 0,
-                }
+        return {
+            tab: 0,
+            step: 0,
+            discount: 0,
+            flgDays: true, // числом или датой дни 
+            self_clients: [],
+            clientForm: {
+                id: null,
+                name: null,
+                phone: null,
+                email: null,
+                info: null,
+                promo: null,
+                work_with_nds: 1,
+                items: [],
+                current_payed: 0,
+                payed_percent: 0,
+                delivery_terms: null,
+                work_days: 0,
             }
-        },
-        mounted() {
-            this.loadSelfClients()
-        },
-        methods: {
-            hasRoles(role) {
+        }
+    },
+    mounted() {
+        this.loadSelfClients()
+    },
+    methods: {
+
+           hasRoles(role) {
                 let tmpRole = false
 
                 if (typeof role == "object")
