@@ -107,7 +107,7 @@ class CalcController extends Controller
             'profit' => 0,
         ]);
 
-        
+
         foreach ($items as $item) {
 
             OrderDetail::query()->create([
@@ -135,7 +135,7 @@ class CalcController extends Controller
         ];
 
         $telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
-        $telegram->sendMessage($tmp);     ///////////////////////               
+        $telegram->sendMessage($tmp);     ///////////////////////
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
         $current_date = Carbon::now("+3:00")->format("Y-m-d H:i:s");
@@ -192,24 +192,24 @@ class CalcController extends Controller
             "path"=>$path
         ]);*/
         $statusClient = $client->getShortClientStatus();
-        
+
 
         $newName = "/договор с клиентом №".$client->id." ".($statusClient)." от".(Carbon::now()->format('Y-m-d h-i-s')).".docx";
 
 
-        $main_requisites = $client->getMainRequisites(); 
-        $fam_initial = $client->getInitials();   
-        
-        $work_days_string = $work_days . "(" . (new \MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) .")";
-        
+        $main_requisites = $client->getMainRequisites();
+        $fam_initial = $client->getInitials();
+
+        $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) .")";
+
 
         $nc = new NCLNameCaseRu();
         $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);
-        
+
         if (file_exists($path . "/$fileName")) {
             try {
                 $templateProcessor = new TemplateProcessor($path . "/$fileName");
-                
+
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
                 $templateProcessor->setValue('numb_doc', $order->id);
                 $templateProcessor->setValue('title', $name);
@@ -223,14 +223,14 @@ class CalcController extends Controller
                 $templateProcessor->setValue('ogrn', $client->ogrn ?? '-');
                 $templateProcessor->setValue('kpp', $client->kpp ?? '-');
                 $templateProcessor->setValue('okpo', $client->okpo ?? '-');
-           
+
                 $templateProcessor->setValue('order_id', $order->id);
                 $templateProcessor->setValue('info', $info);
                 $templateProcessor->setValue('total_price', $totalPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
                 $templateProcessor->setValue('current_payed', $currentPayed);
                 $templateProcessor->setValue('payed_percent', $payedPercent);
-                $templateProcessor->setValue('last_payment', $totalPrice - $currentPayed); 
+                $templateProcessor->setValue('last_payment', $totalPrice - $currentPayed);
                 $templateProcessor->setValue('delivery_terms', $deliveryTerms);
                 $templateProcessor->setValue('work_days', $work_days_string);
 
@@ -246,10 +246,10 @@ class CalcController extends Controller
 
                 $templateProcessor->setValue('passport',  $passport);
                 $templateProcessor->setValue('passport_issued',  $passport_issued);
-                 
+
 
                 $templateProcessor->saveAs($path . $newName);
-                
+
 
 
 
@@ -260,7 +260,7 @@ class CalcController extends Controller
                 ]);
 
 
-              
+
 
             } catch (CopyFileException $e) {
 

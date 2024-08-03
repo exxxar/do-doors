@@ -1,7 +1,6 @@
 <script setup>
 import CartProductItem from '@/Components/Cart/CartProductItem.vue'
 import CartCheckoutForm from "@/Components/Cart/CartCheckoutForm.vue";
-import CartCheckoutFormIndividual from "@/Components/Cart/CartCheckoutFormIndividual.vue";
 </script>
 <template>
 
@@ -31,30 +30,37 @@ import CartCheckoutFormIndividual from "@/Components/Cart/CartCheckoutFormIndivi
                 </div>
             </div>
             <div class="col-lg-4 bg-grey">
-                
-        <ul class="nav nav-tabs mb-3" id="legal-or-individual-tab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#legal_entity-tab-pane"
-                type="button" role="tab" aria-controls="legal_entity-tab-pane" aria-selected="true">Юридическое
-                лицо</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#individual-tab-pane"
-                type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Физическое
-                лицо</button>
-        </li>
-        </ul>
-     <div class="tab-content" id="legal-or-individual-tabContent">
-         <div class="tab-pane fade show active" id="legal_entity-tab-pane" role="tabpanel" aria-labelledby="legal_entity">
-            <CartCheckoutForm
+
+                <ul class="nav nav-tabs mb-3" id="legal-or-individual-tab" role="tablist">
+                    <li class="nav-item"
+                        role="presentation">
+                        <button
+                            class="nav-link rounded-0"
+                            v-bind:class="{'active':tab===0}"
+                            @click="tab=0"
+                            id="home-tab"
+                            type="button"
+                            aria-controls="legal_entity-tab-pane" aria-selected="true">Юридическое
+                            лицо
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
+                        <button
+                            v-bind:class="{'active':tab===1}"
+                            @click="tab=1"
+                            class="nav-link rounded-0"
+                            id="profile-tab"
+                            type="button" aria-controls="profile-tab-pane" aria-selected="false">Физическое
+                            лицо
+                        </button>
+                    </li>
+                </ul>
+
+                <CartCheckoutForm
+                    :type="tab"
                     v-on:back="back"></CartCheckoutForm>
-         </div>
-         <div class="tab-pane fade show" id="individual-tab-pane" role="tabpanel" aria-labelledby="legal_entity">
-             <CartCheckoutFormIndividual
-                    v-on:back="back"></CartCheckoutFormIndividual>
-         </div>
-     </div>    
-                
+
             </div>
         </form>
     </div>
@@ -65,15 +71,20 @@ import {mapGetters} from "vuex";
 
 export default {
     computed: {
-        ...mapGetters(['getErrors', 'cartTotalCount', 'cartProducts','cartTotalPrice']),
+        ...mapGetters(['getErrors', 'cartTotalCount', 'cartProducts', 'cartTotalPrice']),
 
     },
-    methods:{
+    data() {
+        return {
+            tab: 0,
+        }
+    },
+    methods: {
 
-        goToCheckout(){
+        goToCheckout() {
             this.$emit("callback")
         },
-        back(){
+        back() {
             window.location = "/dashboard"
         }
     }
