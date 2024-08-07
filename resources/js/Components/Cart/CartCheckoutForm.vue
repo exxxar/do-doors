@@ -22,10 +22,14 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <template v-for="client in self_clients">
-                        <a v-if="client.status != 'individual'" class="dropdown-item" href="javascript:void(0)"
+                    <!-- v-if="clientStatus(client)" -->
+                    <template  v-for="client in self_clients_c">
+                      
+                            <a  class="dropdown-item" href="javascript:void(0)" 
                            @click="selectInfo(client)">{{ client.title || null }}
                             ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                       
+
                     </template>
                 </li>
             </ul>
@@ -59,6 +63,11 @@ export default {
         ...mapGetters(['getErrors',
             'getDictionary',
             'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
+       self_clients_c(){
+        return (this.type||0)===0 ? this.self_clients.filter(c => c.status== "sole_proprietor" || c.status== "legal_entity" || c.status== "new_client") :
+          this.self_clients.filter(c=> c.status == "individual" || c.status== "new_client") 
+       },
+        
     },
     watch: {},
     data() {
@@ -159,6 +168,7 @@ export default {
 
             })
         },
+      
         submit() {
 
             this.clientForm.items = this.cartProducts
