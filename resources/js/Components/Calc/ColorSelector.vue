@@ -9,8 +9,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             class="dropdown-center"
             v-if="(color.code||null)!=='RAL'">
             <button
-                v-bind:class="{'text-white':color.code||null}"
-                v-bind:style="{'background-color':color.code}"
+                v-bind:style="{'background-color':color.code,'color':invertHex(color.code)}"
                 class="btn btn-outline-secondary w-100 rounded-0 custom-dropdown-btn text-left"
                 type="button"
                 data-bs-toggle="dropdown"
@@ -167,6 +166,18 @@ export default {
     },
     methods: {
 
+        invertHex(color) {
+            if (!color)
+                return "#000000";
+
+            var hex = color.replace(/#/, '');
+            var red = parseInt(hex.substr(0, 2), 16);
+            var green = parseInt(hex.substr(2, 2), 16);
+            var blue = parseInt(hex.substr(4, 2), 16);
+
+            var luminance = (0.2126*  red + 0.7152*  green + 0.0722 * blue) / 255;
+            return luminance > 0.5 ? '#000000' : '#ffffff';
+        },
         isHex(num) {
             return /^#[0-9A-F]{6}$/i.test(num)
         },
@@ -184,6 +195,8 @@ export default {
             this.$store.dispatch("loadRalColors")
         },
         openRalModal(){
+            this.loadRalColors()
+
             this.colorModal = new bootstrap.Modal(document.getElementById('select-ral-color-' + this.id), {})
             this.colorModal.show()
         },
