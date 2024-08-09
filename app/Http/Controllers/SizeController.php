@@ -438,7 +438,7 @@ class SizeController extends Controller
 
         Log::info("store size ".public_path() . '/sizes.json');
 
-        file_put_contents(public_path() . 'sizes.json', json_encode($response));
+        file_put_contents(public_path() . '/sizes.json', json_encode($response));
 
         return response()->json($response);
 
