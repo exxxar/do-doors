@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -435,7 +436,7 @@ class SizeController extends Controller
 
         ];
 
-        file_put_contents(public_path() . '\sizes.json', json_encode($response));
+        file_put_contents(public_path() . '/sizes.json', json_encode($response));
 
         return response()->json($response);
 
@@ -658,12 +659,11 @@ class SizeController extends Controller
             DB::table('sizes')->truncate();
         }
 
-        Material::query()->truncate();
-
-
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        DB::table('materials')->truncate();
 
         foreach ($tmp as $file)
-            Excel::import(new PriceMultiSheetImport($usePriceKoef), storage_path("app/public/documents/" . $file));
+            Excel::import(new PriceMultiSheetImport(), storage_path("app/public/documents/" . $file));
 
 
         if ($usePriceKoef)

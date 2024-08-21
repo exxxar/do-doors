@@ -889,21 +889,21 @@ const state = {
             {
                 id: 1,
                 title: 'НА СЕБЯ',
-                depth: 45,
+                depth: 43,
                 direction: 'on',
                 price: 0,
             },
             {
                 id: 2,
                 title: 'НА СЕБЯ',
-                depth: 57,
+                depth: 59,
                 direction: 'on',
                 price: 0,
             },
             {
                 id: 3,
                 title: 'ОТ СЕБЯ',
-                depth: 57,
+                depth: 59,
                 direction: 'from',
                 price: 0,
             }

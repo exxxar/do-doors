@@ -345,7 +345,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         <ColorSelector
                             v-if="!color_sync_update"
                             :filter="'seal_color'"
-                            v-on:change="syncColors('seal_color',$event)"
                             @invalid="alert('Вы не выбрали цвет уплотнителя')"
                             v-model="doorForm.seal_color">
                             <template #name>
@@ -360,7 +359,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         <ColorSelector
                             v-if="!color_sync_update"
                             :filter="'fittings_color'"
-                            v-on:change="syncColors('fittings_color',$event)"
                             @invalid="alert('Вы не выбрали цвет фурнитуры')"
                             v-model="doorForm.fittings_color">
                             <template #name>
@@ -1666,18 +1664,91 @@ export default {
             if (color.title == 'RAL')
                 return;
 
+            const variants = [
+                {
+                    color: 'Silver',
+                    box_and_frame_color: {
+                        title:'Серебро',
+                        code:'#c0c0c0',
+                    },
+                    seal_color: {
+                        title:'Серый',
+                        code:'#808080'
+                    },
+                    fittings_color: {
+                        title:'Серебро',
+                        code:'#c0c0c0',
+                    },
+                },
+                {
+                    color: 'Black',
+                    box_and_frame_color: {
+                        title:'Черный',
+                        code:'#000000',
+                    },
+                    seal_color: {
+                        title:'Черный',
+                        code:'#000000',
+                    },
+                    fittings_color: {
+                        title:'Черный',
+                        code:'#000000',
+                    },
+                },
+                {
+                    color: 'Gold',
+                    box_and_frame_color: {
+                        title:'Золотой',
+                        code:'#ffd700',
+                    },
+                    seal_color:  {
+                        title:'Бежевый',
+                        code:'#f5f5dc',
+                    },
+                    fittings_color: {
+                        title:'Золотой',
+                        code:'#ffd700',
+                    },
+                }
+            ]
+
+
             this.color_sync_update = true
             this.$nextTick(() => {
                 this.color_sync_update = false
 
-                if (this.doorForm.box_and_frame_color.title == null)
-                    this.doorForm.box_and_frame_color = color
+                let selected = variants.find(v => v.color === color.title);
 
-                if (this.doorForm.seal_color.title == null)
-                    this.doorForm.seal_color = color
+                this.doorForm.box_and_frame_color = {
+                    assign_with_size: color.assign_with_size,
+                    code: selected ? selected.box_and_frame_color.code : color.code,
+                    title: selected ? selected.box_and_frame_color.title : color.title,
+                    excludes: color.excludes,
+                    is_ral: color.is_ral,
+                    sizes: color.sizes,
+                    type: color.type
+                }
 
-                if (this.doorForm.fittings_color.title == null)
-                    this.doorForm.fittings_color = color
+                this.doorForm.seal_color = {
+                    assign_with_size: color.assign_with_size,
+                    code: selected ? selected.seal_color.code : color.code,
+                    title: selected ? selected.seal_color.title : color.title,
+                    excludes: color.excludes,
+                    is_ral: color.is_ral,
+                    sizes: color.sizes,
+                    type: color.type
+                }
+
+                this.doorForm.fittings_color = {
+                    assign_with_size: color.assign_with_size,
+                    code: selected ? selected.fittings_color.code : color.code,
+                    title: selected ? selected.fittings_color.title : color.title,
+                    excludes: color.excludes,
+                    is_ral: color.is_ral,
+                    sizes: color.sizes,
+                    type: color.type
+                }
+
 
             })
 

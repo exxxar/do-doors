@@ -100,7 +100,7 @@ trait ImportDataTrait
 
     public function importColorsRow($row, $rowIndex, $zeroStart = false)
     {
-        $colors = ["Black" => "#2E3032", "Silver" => "#8F999F", "Gold" => "#E2B007", "RAL" => null];
+        $colors = ["Black" => "#000000", "Silver" => "#c0c0c0", "Gold" => "#ffd700", "RAL" => null];
         if ($rowIndex == ($zeroStart ? 0 : 1)) {
             unset($row[0]);
             unset($row[1]);
