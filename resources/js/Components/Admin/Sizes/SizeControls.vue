@@ -2,17 +2,16 @@
     <div class="row">
         <div class="col-12 d-flex">
 
-            <div class="dropdown mb-3">
+            <div class="dropdown mb-2">
                 <button
-                    class="btn btn-outline-secondary dropdown-toggle w-100 rounded-0"
+                    class="btn btn-outline-secondary dropdown-toggle w-100 rounded-0 p-3"
                     type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     <i class="fa-solid fa-bars mr-2"></i>Управление разделом
                 </button>
                 <ul class="dropdown-menu rounded-0">
                     <li><a class="dropdown-item" href="/sizes/export-prices">Скачать шаблон таблицы</a></li>
-                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные
-                        из Excel или Google таблицы</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0)" @click="openImportFormModal">Загрузить данные</a></li>
 
                     <li><a class="dropdown-item" href="javascript:void(0)" @click="openConfirmModal">Обновить JSON</a>
                     </li>
@@ -186,10 +185,10 @@ export default {
             importGoogleForm: {
                 sheet_id: null,
                 use_price_koef: true,
-                need_rewrite: false,
+                need_rewrite: true,
             },
             importForm: {
-                need_rewrite: false,
+                need_rewrite: true,
                 use_price_koef: true,
                 files: [],
             },

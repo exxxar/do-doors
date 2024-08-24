@@ -6,6 +6,7 @@ use App\Models\Color;
 use App\Models\Material;
 use App\Models\Size;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 trait ImportDataTrait
 {
@@ -32,9 +33,10 @@ trait ImportDataTrait
                     if (!$hasMaterial)
                         Material::query()->create([
                             "title" => $item,
-                            "is_base" => strtolower($item) == "под покраску"
+                            "is_base" => trim(mb_strtolower($item)) == "под покраску"
                         ]);
 
+                    //Log::info("material=>$item =>".(trim(mb_strtolower($item)) == "под покраску"?"true":"false"));
                 }
 
 
