@@ -56,33 +56,34 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
             </thead>
             <tbody>
 
-            <tr v-for="(item, index) in prices">
+            <tr @click="openEditModal($event, item, index)" v-for="(item, index) in prices">
                 <td class="table-side-column"><span>{{ item.height }}</span></td>
                 <td class="table-side-column"><span>{{ item.width }}</span></td>
 
                 <template v-for="(price, priceIndex) in item.prices">
 
-                    <template v-if="selectedMaterials.indexOf(price.material_id)!=-1">
-
-                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                    <template  v-if="selectedMaterials.indexOf(price.material_id)!=-1">
+                        
+                        <td :value =priceIndex  style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                             {{ item.prices[priceIndex].value || 0}}
                         </td>
-                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                        <td :value =priceIndex style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                            {{ item.prices[priceIndex].price.wholesale}}
                         </td>
-                        <td  style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                        <td :value =priceIndex style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                             {{ item.prices[priceIndex].price.dealer}}
                         </td>
-                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                        <td :value =priceIndex style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                             {{ item.prices[priceIndex].price.retail}}
                         </td>
-                        <td style="text-align: center;border:1px solid #dadada;min-width: 100px;">
+                        <td :value =priceIndex style="text-align: center;border:1px solid #dadada;min-width: 100px;">
                             {{ item.prices[priceIndex].price.cost}}
                         </td>
-                        <td width="100px" style="text-align: center;border:1px solid #dadada;">
+                        <td :value =priceIndex width="100px" style="text-align: center;border:1px solid #dadada;">
                            {{item.prices[priceIndex].price_koef}}
-
                         </td>
+                        
+                        
                     </template>
 
                 </template>
@@ -104,6 +105,26 @@ import {PerfectScrollbar} from 'vue3-perfect-scrollbar'
         <p class="mb-0">Воспользуйтесь формой выше и добавьте свой первый размер</p>
     </div>
 
+
+<div class="modal fade" id="edit-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-md ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <!-- <MaterialTable
+                        :simple="true"
+                        v-on:select="selectMaterial"
+                        v-if="!loadingMaterial"></MaterialTable> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-0" data-bs-dismiss="modal">Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -115,15 +136,21 @@ export default {
             prices: [],
             selectedMaterials: [],
             table:null,
+            editModal: null,
+            
         }
     },
 
     mounted() {
         this.loadSizes();
+        this.editModal = new bootstrap.Modal(document.getElementById('edit-modal'), {})
     },
     methods: {
+        
+
         switchData(data){
             this.prices = this.table[data]
+            
         },
         toggleMaterialId(id) {
             let index = this.selectedMaterials.findIndex(item => item === id)
@@ -143,6 +170,19 @@ export default {
             }).catch(() => {
 
             })
+        },
+        openEditModal(event, item, index) {
+            // item[index].prices[price_index]
+            
+            // console.log(index)
+            const target = event.target.closest('td');
+            
+            const priceIndex = target.getAttribute('value');
+
+            console.log(priceIndex)
+            console.log(item.prices[priceIndex])
+            
+            this.editModal.show();
         },
         saveParam(param, index, priceIndex) {
 
