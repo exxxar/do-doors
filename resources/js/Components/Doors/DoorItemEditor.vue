@@ -14,7 +14,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
             >
 
                 <div class="row">
-                    <div class="col-md-6 col-12">
+                    <div class="col-md-6 col-12 mb-2">
                         <button
                             type="button"
                             @click="openConfirmModal('Внимание!','Вы очищает текущую работу в калькуляторе! Продолжить?')"
@@ -23,7 +23,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-2">
                             <div class="form-floating">
                                 <input type="text"
                                        min="0"
@@ -56,7 +56,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
 
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-2">
                             <div class="form-floating">
                                 <input type="number"
                                        min="0"
@@ -103,7 +103,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-2">
 
                             <div class="form-floating">
                                 <input type="number"
@@ -152,7 +152,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-2">
                             <select class="form-select"
                                     v-model="doorForm.opening_type"
                                     @invalid="alert('Вы не выбрали вариант открывания и толщину двери!')"
@@ -172,7 +172,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     <div class="col-md-6 col-12">
 
 
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-2">
 
                             <select class="form-select"
                                     v-model="doorForm.door_type"
@@ -190,7 +190,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     <div class="col-md-6 col-12">
 
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-2">
                             <select class="form-select"
                                     v-model="doorForm.hinge_manufacturer"
                                     @invalid="alert('Вы не выбрали расположение петель!')"
@@ -206,7 +206,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     </div>
 
                     <div class="col-md-6 col-12">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-2">
                             <select class="form-select"
                                     v-model="doorForm.loops"
                                     @invalid="alert('Вы не выбрали сторону петель!')"
@@ -221,7 +221,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     </div>
 
 
-                    <div class="col-md-6 col-12  mb-3">
+                    <div class="col-md-6 col-12  mb-2">
 
                         <div class="input-group">
 
@@ -260,7 +260,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     </div>
 
 
-                    <div class="col-md-6 col-12">
+                    <div class="col-md-6 col-12 mb-2">
                         <ColorSelector
                             :filter="'front_side_finish_color'"
                             v-if="doorForm.front_side_finish.title!=='Под покраску'"
@@ -277,7 +277,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-12 mb-3">
+                    <div class="col-md-6 col-12 mb-2">
                         <div class="input-group">
                             <div class="form-floating ">
                                 <select class="form-select"
@@ -307,7 +307,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
                     </div>
 
-                    <div class="col-md-6 col-12">
+                    <div class="col-md-6 col-12 mb-2">
                         <ColorSelector
                             :filter="'back_side_finish_color'"
                             v-if="doorForm.back_side_finish.title!=='Под покраску'"
@@ -412,7 +412,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     </div>
 
                     <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes">
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-2">
                             <select class="form-select"
                                     @invalid="alert('Вы не выбрали отверстие под ручку!')"
                                     v-model="doorForm.handle_holes"
@@ -446,7 +446,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                     <div
                         v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
                         class="col-12 d-flex align-items-center">
-                        <div class="form-floating w-100 mb-3">
+                        <div class="form-floating w-100 mb-2">
                             <select class="form-select"
                                     v-model="doorForm.service_handle"
                                     id="door-service-door_closer"
