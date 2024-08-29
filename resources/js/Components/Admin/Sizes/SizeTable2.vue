@@ -5,10 +5,10 @@
 <template>
     <div class="row">
         <div class="col-12">
-            <button @click="switchData('sizes')">Размеры</button>
-            <button @click="switchData('loops')">Петли</button>
-            <button @click="switchData('colors')">Цвет</button>
-            <button @click="switchData('variants')">Толщина</button>
+            <button class="btn-dark text-white btn btn-outline-secondary mr-2 rounded-0" @click="switchData('sizes')">Размеры</button>
+            <button class="btn-dark text-white btn btn-outline-secondary mr-2 rounded-0" @click="switchData('loops')">Петли</button>
+            <button class="btn-dark text-white btn btn-outline-secondary mr-2 rounded-0" @click="switchData('colors')">Цвет</button>
+            <button class="btn-dark text-white btn btn-outline-secondary mr-2 rounded-0" @click="switchData('variants')">Толщина</button>
         </div>
     </div>
     <div class="row">
@@ -65,7 +65,7 @@
             </thead>
             <tbody>
 
-                <tr @click="openEditModal($event, item, index)" v-for="(item, index) in prices">
+                <tr  @click="openEditModal($event, item, index)" v-for="(item, index) in prices">
                     <td class="table-side-column"><span>{{ item.height }}</span></td>
                     <td class="table-side-column"><span>{{ item.width }}</span></td>
 
@@ -126,14 +126,14 @@
                     <div class="row">
                         <div class="col-12 col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="number" v-model="editableFieldsForm.width" class="form-control"
+                                <input type="number" v-model="editableFieldsForm.activeItem.width" class="form-control"
                                     id="size-width" required>
                                 <label for="size-width">Ширина, см</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="number" v-model="editableFieldsForm.height" class="form-control"
+                                <input type="number" v-model="editableFieldsForm.activeItem.height" class="form-control"
                                     id="size-height" required>
                                 <label for="size-height">Высота, см</label>
                             </div>
@@ -143,7 +143,7 @@
                     <div class="row">
                         <div class="col-12 col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="number" v-model="editableFieldsForm.countLoops" class="form-control"
+                                <input  type="number" v-model="editableFieldsForm.activeItemPrices.value" class="form-control"
                                     id="size-price-wholesale" required>
                                 <label for="size-price-wholesale">Число петель</label>
                             </div>
@@ -183,7 +183,7 @@
 
                         <div class="col-12 col-md-6">
                             <div class="form-floating mb-3">
-                                <input type="number" v-model="editableFieldsForm.price_koef" step="0.1"
+                                <input type="number" v-model="editableFieldsForm.activeItemPrices.price_koef" step="0.1"
                                     class="form-control" id="size-price-koef" required>
                                 <label for="size-price-koef">Ценовой коэффициент</label>
                             </div>
@@ -217,14 +217,12 @@
 
                 activeLink: null, //Размеры Петли Цвет Толщина
                 activeMaterial: null,
-                editableFieldsForm: {
+                
+                editableFieldsForm:  {
 
-                    width: 0,
-                    height: 0,
                     price: [],
-                    price_koef: 0,
-                    countLoops: 0,
-
+                    activeItemPrices:[],
+                    activeItem:[]
                 }
 
             }
@@ -276,19 +274,16 @@
 
                 })
             },
-            openEditModal(event, item, index) {
-
+            openEditModal(event, item) {
                 const target = event.target.closest('td');
-                const priceIndex = target.getAttribute('value');
-                this.activeMaterial = this.materials[priceIndex].title
+                const priceIndex = target.getAttribute('value') || 0;
+                this.activeMaterial = this.materials[priceIndex].title 
                 this.activeLink = this.activeLink || "Петили"
-
-                this.editableFieldsForm.width = item.width
-                this.editableFieldsForm.height = item.height
+                this.editableFieldsForm.activeItem = item
+                this.editableFieldsForm.activeItemPrices = item.prices[priceIndex]
                 this.editableFieldsForm.price = item.prices[priceIndex].price
-                this.editableFieldsForm.price_koef = item.prices[priceIndex].price_koef
                 this.editableFieldsForm.countLoops = item.prices[priceIndex].value || 0
-
+                
                 this.editModal.show();
             },
             saveParam(param, index, priceIndex) {
