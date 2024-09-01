@@ -305,6 +305,7 @@ Route::prefix("/sizes")
         Route::post("/generate", "generateSizes");
         Route::get("/duplicate/{id}", "duplicate");
         Route::post("/store", "store");
+         Route::post("/save-changesWH", "saveSizesChanges"); //Функция для обновления высоты и ширины
         Route::post("/import", "import");
         Route::post("/update-param", "updateParam");
         Route::post('/import-from-google', [GoogleLoginController::class,'getGoogleLink'])->name('login.google-redirect');

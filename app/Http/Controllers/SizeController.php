@@ -674,8 +674,35 @@ class SizeController extends Controller
         return response()->noContent();
     }
 
+    //Функция для обновления высоты и ширины
+    public function saveSizesChanges(Request $request){
+        $request->validate([
+            'oldValue' => "required",
+            'newValue' => "required",
+            'type' => "required",
+        ]);
+        
+        
+        $newW = $request->newValue["width"];
+        $newH = $request->newValue["height"];
+        $size = Size::query()
+                ->where("width", $request->oldValue["width"])
+                ->where("height", $request->oldValue["height"])
+                ->where("type", $request->type)
+                ->update(
+                    [
+                    'width' => $newW,
+                    'height' => $newH,
+                    ]
+         );
+        
+        return response()->noContent(200);
+    }
+     //Функция для обновления высоты и ширины
+
     public function store(Request $request)
     {
+       
         $request->validate([
             'width' => "required",
             'height' => "required",
@@ -718,7 +745,7 @@ class SizeController extends Controller
 
         }
 
-
+// dd($tmpData);
         if (is_null($id)) {
             $size = Size::query()
                 ->create($tmpData);
