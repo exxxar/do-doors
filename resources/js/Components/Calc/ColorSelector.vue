@@ -24,12 +24,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                 <li><a class="dropdown-item" href="javascript:void(0)"
                        @click="selectColor(null)">Не выбрано</a>
                 </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="javascript:void(0)"
-                       @click="openRalModal">Выбор цвета RAL</a>
-                </li>
+
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -37,6 +32,12 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                        v-bind:class="{'bg-primary text-white':color.title===item.title }"
                        @click="selectColor(item)"
                        href="javascript:void(0)" v-for="item in filteredColors">{{ item.title }}</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="javascript:void(0)"
+                       @click="openRalModal">Справочник цветов RAL</a>
                 </li>
             </ul>
         </div>

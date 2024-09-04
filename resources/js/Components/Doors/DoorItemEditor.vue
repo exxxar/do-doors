@@ -860,8 +860,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
             </div>
         </div>
     </div>
-
-
     <!-- Modal -->
     <div class="modal fade" :id="'finish-front-variant-modal-'+doorForm.id" tabindex="-1"
          aria-labelledby="exampleModalLabel"
@@ -887,7 +885,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
             </div>
         </div>
     </div>
-
     <!-- Modal -->
     <div class="modal fade" :id="'finish-back-variant-modal-'+doorForm.id" tabindex="-1"
          aria-labelledby="exampleModalLabel"
@@ -1290,8 +1287,11 @@ export default {
                 }
             }
 
+            let intRound = (arg)=> {
+                return Math.round(parseInt(arg) / 10) * 10;
+            }
 
-            return sum + price;//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
+            return intRound(sum + price);//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
         filteredHeight() {
             if (!this.getDictionary)
