@@ -7,6 +7,7 @@ use App\Models\Color;
 use App\Models\Material;
 use App\Models\Size;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Google\Client;
 use Google\Service\Sheets;
@@ -169,8 +170,13 @@ class GoogleLoginController extends Controller
             if ($needRewrite) {
                 Schema::disableForeignKeyConstraints();
                 Size::query()->truncate();
-                Material::query()->truncate();
                 Schema::enableForeignKeyConstraints();
+
+                $materials = Material::query()->get();
+                foreach ($materials as $material){
+                    $material->deleted_at = Carbon::now();
+                    $material->save();
+                }
             }
 
 

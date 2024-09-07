@@ -26,15 +26,21 @@ trait ImportDataTrait
 
                     $this->materials[] = $item;
 
-                    $hasMaterial = count(Material::query()
-                            ->where("title", $item)
-                            ->get() ?? []) > 0;
+                    $tmpMaterial = Material::withTrashed()
+                        ->where("title", $item)
+                        ->first();
+
+                    $hasMaterial = !is_null($tmpMaterial ?? null);
 
                     if (!$hasMaterial)
                         Material::query()->create([
                             "title" => $item,
                             "is_base" => trim(mb_strtolower($item)) == "под покраску"
                         ]);
+                    else {
+                        $tmpMaterial->deleted_at = null;
+                        $tmpMaterial->save();
+                    }
 
                     //Log::info("material=>$item =>".(trim(mb_strtolower($item)) == "под покраску"?"true":"false"));
                 }
@@ -184,8 +190,10 @@ trait ImportDataTrait
             $code = $colors[$title] ?? null;
 
 
-            $isExist = !is_null(Color::query()->where("title", $title)
-                ->first() ?? null);
+            $tmpColor = Color::withTrashed()->where("title", $title)
+                ->first() ;
+
+            $isExist = !is_null($tmpColor ?? null);
 
             if (!$isExist) {
                 Color::query()
@@ -202,6 +210,10 @@ trait ImportDataTrait
                         'code' => $code,
                         'assign_with_size' => true,
                     ]);
+            }
+            else {
+                $tmpColor->deleted_at = null;
+                $tmpColor->save();
             }
 
             $colorIndex++;

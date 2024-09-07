@@ -18,7 +18,13 @@ class PriceColorsImport implements OnEachRow
 
     public function __construct()
     {
-        Color::query()->truncate();
+        $colors = Color::query()->get();
+
+        foreach ($colors as $color)
+        {
+            $color->deleted_at = Carbon::now();
+            $color->save();
+        }
     }
 
     public function onRow(Row $row)

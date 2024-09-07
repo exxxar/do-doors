@@ -21,6 +21,7 @@ use App\Models\Hinge;
 use App\Models\Material;
 use App\Models\Service;
 use App\Models\Size;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -660,7 +661,13 @@ class SizeController extends Controller
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        DB::table('materials')->truncate();
+        $materials = Material::query()->get();
+
+        foreach ($materials as $material){
+            $material->deleted_at = Carbon::now();
+            $material->save();
+        }
+        //DB::table('materials')->truncate();
 
         foreach ($tmp as $file)
             Excel::import(new PriceMultiSheetImport(), storage_path("app/public/documents/" . $file));
