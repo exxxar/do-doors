@@ -230,12 +230,14 @@ export default {
                     title: "DoDoors",
                     text: "Вы успешно обновили данные",
                 });
+                window.location.reload()
             }).catch(() => {
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибка обновления данных",
                     type: 'error'
                 });
+                window.location.reload()
             })
         },
         openImportFormModal() {
