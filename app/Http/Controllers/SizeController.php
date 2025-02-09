@@ -44,213 +44,52 @@ class SizeController extends Controller
 
     protected function preparePrices(): array
     {
-        $heightList = array_values(Size::query()
-            ->distinct()
-            ->pluck("height")->toArray());
+        // Получаем все уникальные размеры
+        $heightList = Size::query()->distinct()->pluck("height")->toArray();
+        $widthList = Size::query()->distinct()->pluck("width")->toArray();
 
-        $widthList = array_values(Size::query()
-            ->distinct()
-            ->pluck("width")->toArray());
+        // Загружаем все размеры сразу, чтобы избежать множества запросов к БД
+        $sizes = Size::query()->get()->sortBy(['height', 'width']);
 
-        $sizes = Size::query()
-            ->get()
-            ->sortBy([
-                ['height', 'asc'],
-                ['width', 'asc'],
-            ]);
+        $groupedSizes = Collection::make($sizes)->groupBy(['height', 'width', 'type']);
 
-        //  dd(Size::query()->where("material_id",11)->get());
+        $prepareData = function ($type) use ($heightList, $widthList, $groupedSizes) {
+            $result = [];
+            foreach ($heightList as $height) {
+                foreach ($widthList as $width) {
+                    $materialList = $groupedSizes[$height][$width][$type] ?? collect();
+                    $prices = $materialList->unique("material_id")->map(function ($material) {
+                        return (object)[
+                            "id" => $material->id,
+                            "price" => $material->price,
+                            "price_koef" => $material->price_koef,
+                            "material_id" => $material->material_id ?? null,
+                            "value" => $material->value ?? null, // Добавляем value только для loops и colors
+                        ];
+                    })->values()->toArray();
 
-        $tmpSizes = [];
-///
-        foreach ($heightList as $height) {
-            foreach ($widthList as $width) {
-                $materialList = Collection::make($sizes)
-                    ->where("width", $width)
-                    ->where("height", $height)
-                    ->where("type", "sizes")
-                    ->unique("material_id")
-                    ->toArray();
-
-                $tmpMaterials = [];
-                foreach ($materialList as $material) {
-                    $material = (object)$material;
-                    $tmpMaterials[] = (object)[
-                        "id" => $material->id,
-                        "price" => $material->price,
-                        "price_koef" => $material->price_koef,
-                        "material_id" => $material->material_id,
+                    $result[] = (object)[
+                        "width" => $width,
+                        "height" => $height,
+                        "prices" => $prices,
                     ];
                 }
-
-
-                // Log::info("loop=>".print_r(array_values($materialList), true));
-                $tmpSizes[] = (object)[
-                    "width" => $width,
-                    "height" => $height,
-                    "prices" => $tmpMaterials
-                ];
-
-
             }
-        }
+            return $result;
+        };
 
-        $tmpLoops = [];
-///->where("type","sizes")
-        foreach ($heightList as $height) {
-            foreach ($widthList as $width) {
-                $materialList = Collection::make($sizes)
-                    ->where("width", $width)
-                    ->where("height", $height)
-                    ->where("type", "loops")
-                    ->unique("material_id")
-                    ->toArray();
+        $tmpSizes = $prepareData("sizes");
+        $tmpLoops = $prepareData("loops");
+        $tmpColors = $prepareData("colors");
+        $tmpDepth = $prepareData("depth");
 
-
-                $tmpMaterials = [];
-                foreach ($materialList as $material) {
-                    $material = (object)$material;
-                    $tmpMaterials[] = (object)[
-                        "id" => $material->id,
-                        "price" => $material->price,
-                        "price_koef" => $material->price_koef,
-                        "value" => $material->value,
-                        "material_id" => $material->material_id,
-                    ];
-                }
-
-                // Log::info("loop=>".print_r(array_values($materialList), true));
-                $tmpLoops[] = (object)[
-                    "width" => $width,
-                    "height" => $height,
-
-                    "prices" => $tmpMaterials
-                ];
-
-
-            }
-        }
-
-        $tmpColors = [];
-///->where("type","sizes")
-        foreach ($heightList as $height) {
-            foreach ($widthList as $width) {
-                $materialList = Collection::make($sizes)
-                    ->where("width", $width)
-                    ->where("height", $height)
-                    ->where("type", "colors")
-                    ->unique("value")
-                    ->toArray();
-
-
-                $tmpValues = [];
-                foreach ($materialList as $val) {
-                    $val = (object)$val;
-                    $tmpValues[] = (object)[
-                        "id" => $val->id,
-                        "price" => $val->price,
-                        "price_koef" => $val->price_koef,
-                        "value" => $val->value,
-                    ];
-                }
-
-                // Log::info("loop=>".print_r(array_values($materialList), true));
-                $tmpColors[] = (object)[
-                    "width" => $width,
-                    "height" => $height,
-
-                    "prices" => $tmpValues
-                ];
-
-
-            }
-        }
-
-
-        $tmpDepth = [];
-///->where("type","sizes")
-        foreach ($heightList as $height) {
-            foreach ($widthList as $width) {
-                $materialList = Collection::make($sizes)
-                    ->where("width", $width)
-                    ->where("height", $height)
-                    ->where("type", "depth")
-                    ->unique("value")
-                    ->toArray();
-
-
-                $tmpValues = [];
-                foreach ($materialList as $val) {
-                    $val = (object)$val;
-                    $tmpValues[] = (object)[
-                        "id" => $val->id,
-                        "price" => $val->price,
-                        "price_koef" => $val->price_koef,
-                        "value" => $val->value,
-                    ];
-                }
-
-                // Log::info("loop=>".print_r(array_values($materialList), true));
-                $tmpDepth[] = (object)[
-                    "width" => $width,
-                    "height" => $height,
-
-                    "prices" => $tmpValues
-                ];
-
-
-            }
-        }
-
-
+        // Получаем материалы и варианты
         $materials = Material::query()->select("title", "id")->get()->toArray();
-        $variants = Size::query()->where("type", "depth")->get()->unique("value")->toArray();
-        $colors = Size::query()->where("type", "colors")->get()->unique("value")->toArray();
+        $depthVariants = Size::query()->where("type", "depth")->get()->unique("value")->toArray();
+        $colorVariants = Size::query()->where("type", "colors")->get()->unique("value")->toArray();
 
-        $tmpDepthNames = [];
-
-        foreach ($variants as $variant) {
-            $variant = (object)$variant;
-            $tmpDepthNames[] = (object)[
-                "title" => "толщина $variant->value мм"
-            ];
-        }
-
-
-        $tmpColorsNames = [];
-
-        foreach ($colors as $color) {
-            $color = (object)$color;
-            $tmpColorsNames[] = (object)[
-                "title" => "цвет профиля $color->value"
-            ];
-
-        }
-
-        /*
-
-         foreach ($tmp as $item)
-             if (count($item->prices)<count($materials))
-             {
-                 for ($i=0;$i<((count($materials)-count($item->prices))+1);$i++)
-                     $item->prices[] = (object)[
-                         "id" =>  null,
-                         "price" =>  0,
-                         "price_koef" =>  0,
-
-                     ];
-             }*/
-
-        /*    dd([
-                "materials" => $materials,
-                "color_names" => $tmpColorsNames,
-                "depth_names" => $tmpDepthNames,
-                "loops" => $tmpLoops,
-                "sizes" => $tmpSizes,
-                "colors"=>$tmpColors,
-                "variants"=>$tmpDepth
-            ]);*/
-
+        $tmpDepthNames = array_map(fn($variant) => (object)["title" => "толщина {$variant['value']} мм"], $depthVariants);
+        $tmpColorsNames = array_map(fn($color) => (object)["title" => "цвет профиля {$color['value']}"], $colorVariants);
 
         return [
             "materials" => $materials,
@@ -262,6 +101,7 @@ class SizeController extends Controller
             "variants" => $tmpDepth
         ];
     }
+
 
     public function getPreparedPrices(Request $request)
     {
