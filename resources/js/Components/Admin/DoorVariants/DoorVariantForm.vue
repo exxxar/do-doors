@@ -177,7 +177,6 @@ export default {
                 retail: 0,
                 cost: 0,
             }
-
             this.$emit("callback")
 
         },

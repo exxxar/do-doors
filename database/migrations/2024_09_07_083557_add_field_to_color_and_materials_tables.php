@@ -15,7 +15,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        Schema::table('colors', function (Blueprint $table) {
+        Schema::table('materials', function (Blueprint $table) {
             $table->softDeletes();
         });
     }

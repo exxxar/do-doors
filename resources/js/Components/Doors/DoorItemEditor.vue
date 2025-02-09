@@ -833,7 +833,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
             </div>
         </div>
     </div>
-    <div class="modal fade  " id="confirm-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade  " id="editor-confirm-dialog-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0">
 
@@ -1429,7 +1429,7 @@ export default {
             })
         });
 
-        this.confirmModal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
+        this.confirmModal = new bootstrap.Modal(document.getElementById('editor-confirm-dialog-modal'), {})
 
         if (!this.door) {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
