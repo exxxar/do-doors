@@ -49,17 +49,23 @@ trait ImportDataTrait
 
             $stepKoef = ($type == "loops") ? 1 : 0;
 
+            $price_wholesale = (float)filter_var($row[$i+ $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $price_dealer = (float)filter_var($row[$i + 1+ $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_retail = (float)filter_var($row[$i + 2+ $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_cost = (float)filter_var($row[$i + 3+ $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $priceKoef = floatval($row[$i + 4+ $stepKoef] ?? 0);
+
             Size::create([
                 'width' => $width,
                 'height' => $height,
                 'material_id' => $material->id ?? null,
                 'price' => (object) [
-                    "wholesale" => (float) ($row[$i + $stepKoef] ?? 0),
-                    "dealer" => (float) ($row[$i + 1 + $stepKoef] ?? 0),
-                    "retail" => (float) ($row[$i + 2 + $stepKoef] ?? 0),
-                    "cost" => (float) ($row[$i + 3 + $stepKoef] ?? 0),
+                    "wholesale" => $price_wholesale,
+                    "dealer" => $price_dealer,
+                    "retail" =>$price_retail,
+                    "cost" => $price_cost,
                 ],
-                'price_koef' => (float) ($row[$i + 4 + $stepKoef] ?? 0),
+                'price_koef' => $priceKoef,
                 "type" => $type,
                 'value' => $type == "loops" ? (int) ($row[$i] ?? 0) : 0,
             ]);
@@ -94,17 +100,23 @@ trait ImportDataTrait
         foreach ($this->colors as $index => $color) {
             $i = 2 + $index * 5;
 
+            $price_wholesale = (float)filter_var($row[$i] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $price_dealer = (float)filter_var($row[$i + 1] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_retail = (float)filter_var($row[$i + 2] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_cost = (float)filter_var($row[$i + 3] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $priceKoef = floatval($row[$i + 4] ?? 0);
+
             Size::create([
                 'width' => $width,
                 'height' => $height,
                 'material_id' => null,
                 'price' => (object) [
-                    "wholesale" => (float) ($row[$i] ?? 0),
-                    "dealer" => (float) ($row[$i + 1] ?? 0),
-                    "retail" => (float) ($row[$i + 2] ?? 0),
-                    "cost" => (float) ($row[$i + 3] ?? 0),
+                    "wholesale" => $price_wholesale,
+                    "dealer" => $price_dealer,
+                    "retail" =>$price_retail,
+                    "cost" => $price_cost,
                 ],
-                'price_koef' => (float) ($row[$i + 4] ?? 0),
+                'price_koef' => $priceKoef,
                 "type" => "colors",
                 'value' => $color,
             ]);
@@ -177,10 +189,10 @@ trait ImportDataTrait
 
             $stepKoef = 0;
 
-            $price_wholesale = (float)filter_var($row[$i + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_dealer = (float)filter_var($row[$i + 1 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_retail = (float)filter_var($row[$i + 2 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
-            $price_cost = (float)filter_var($row[$i + 3 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
+            $price_wholesale = (float)filter_var($row[$i + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $price_dealer = (float)filter_var($row[$i + 1 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_retail = (float)filter_var($row[$i + 2 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_cost = (float)filter_var($row[$i + 3 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
             $priceKoef = floatval($row[$i + 4 + $stepKoef] ?? 0);
 
             Log::info("depth=>".print_r([
