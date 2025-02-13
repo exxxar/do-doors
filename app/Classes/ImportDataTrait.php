@@ -188,11 +188,15 @@ trait ImportDataTrait
             // $material = Material::query()->where("title", $this->materials[$materialIndex])->first();
 
             $stepKoef = 0;
+            $rawValue_wholesale  = str_replace(',', '.', $row[$i + $stepKoef] ?? 0);
+            $rawValue_dealer   = str_replace(',', '.', $row[$i + 1 + $stepKoef] ?? 0);
+            $rawValue_retail   = str_replace(',', '.', $row[$i + 2 + $stepKoef] ?? 0);
+            $rawValue_cost   = str_replace(',', '.', $row[$i + 3 + $stepKoef] ?? 0);
 
-            $price_wholesale = (float)filter_var($row[$i + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-            $price_dealer = (float)filter_var($row[$i + 1 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
-            $price_retail = (float)filter_var($row[$i + 2 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
-            $price_cost = (float)filter_var($row[$i + 3 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_wholesale = (float)filter_var($rawValue_wholesale, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $price_dealer = (float)filter_var($rawValue_dealer, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_retail = (float)filter_var($rawValue_retail, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+            $price_cost = (float)filter_var($rawValue_cost, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
             $priceKoef = floatval($row[$i + 4 + $stepKoef] ?? 0);
 
             Log::info("depth=>".print_r([
