@@ -17,7 +17,7 @@ const getters = {
 }
 
 const actions = {
-    async loadPreparedPrices(context, payload = {dataObject:null}) {
+    async loadPreparedPrices(context, payload = { dataObject: null }) {
 
         let link = `${BASE_SIZES_LINK}/prepared-prices`
         let method = 'POST'
@@ -47,7 +47,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async loadSizes(context, payload = {dataObject: null, page: 0, size: 50}) {
+    async loadSizes(context, payload = { dataObject: null, page: 0, size: 50 }) {
         let page = payload.page || 0
         let size = payload.size || 50
 
@@ -69,7 +69,7 @@ const actions = {
         })
     },
 
-    async updateSizeParam(context, payload = {dataObject: null}) {
+    async updateSizeParam(context, payload = { dataObject: null }) {
         let link = `${BASE_SIZES_LINK}/update-param`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.dataObject)
@@ -82,7 +82,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async generateSizes(context, payload = {generateForm: null}) {
+    async generateSizes(context, payload = { generateForm: null }) {
         let link = `${BASE_SIZES_LINK}/generate`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.generateForm)
@@ -95,7 +95,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async recountPrice(context, payload = {recountForm: null}) {
+    async recountPrice(context, payload = { recountForm: null }) {
         let link = `${BASE_SIZES_LINK}/recount`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.recountForm)
@@ -110,7 +110,7 @@ const actions = {
     },
 
 
-    async importSizesFromGoogle(context, payload = {importForm: null}) {
+    async importSizesFromGoogle(context, payload = { importForm: null }) {
         let link = `${BASE_SIZES_LINK}/import-from-google`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.importForm)
@@ -122,7 +122,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async importSizes(context, payload = {importForm: null}) {
+    async importSizes(context, payload = { importForm: null }) {
         let link = `${BASE_SIZES_LINK}/import`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.importForm)
@@ -134,7 +134,18 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async storeSize(context, payload = {sizeForm: null}) {
+    async saveSizeWHChanges(context, payload = { sizeForm: null }) { //Функция для обновления высоты и ширины
+        let link = `${BASE_SIZES_LINK}/save-changesWH`
+        let _axios = util.makeAxiosFactory(link, "POST", payload.sizeForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+    async storeSize(context, payload = { sizeForm: null }) {
         let link = `${BASE_SIZES_LINK}/store`
 
         let _axios = util.makeAxiosFactory(link, "POST", payload.sizeForm)
@@ -146,7 +157,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async removeSize(context, payload = {sizeId: null}) {
+    async removeSize(context, payload = { sizeId: null }) {
         let link = `${BASE_SIZES_LINK}/${payload.sizeId}`
 
         let _axios = util.makeAxiosFactory(link, 'DELETE')
@@ -158,7 +169,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
-    async duplicateSize(context, payload = {sizeId: null}) {
+    async duplicateSize(context, payload = { sizeId: null }) {
         let link = `${BASE_SIZES_LINK}/duplicate/${payload.sizeId}`
 
         let _axios = util.makeAxiosFactory(link, 'GET')
