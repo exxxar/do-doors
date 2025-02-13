@@ -1041,6 +1041,7 @@ export default {
                             let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
                             sum += parseInt(price || 0)
 
+                            console.log("opening_type",price,item )
                             this.tmp_prices.push({
                                 type: item,
                                 price: price

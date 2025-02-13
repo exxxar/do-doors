@@ -183,6 +183,14 @@ trait ImportDataTrait
             $price_cost = (float)filter_var($row[$i + 3 + $stepKoef] ?? 0, FILTER_SANITIZE_NUMBER_FLOAT);
             $priceKoef = floatval($row[$i + 4 + $stepKoef] ?? 0);
 
+            Log::info("depth=>".print_r([
+                    "row"=>$row,
+                    "wholesale" => $price_wholesale,
+                    "dealer" => $price_dealer,
+                    "retail" => $price_retail,
+                    "cost" => $price_cost,
+                ],true));
+
             $res = Size::query()->create([
                 'width' => $width ?? 0,
                 'height' => $height ?? 0,

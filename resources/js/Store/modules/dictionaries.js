@@ -1435,6 +1435,7 @@ const mutations = {
         directions.forEach(item => {
             Object.keys(payload.depth).forEach(key => {
                 if ((item.excludes || []).indexOf(parseInt(key))  === -1)
+                    console.log("variants", item, key,payload.depth[key] )
                     state.dictionary.opening_variants.push({
                         title: item.title,
                         direction: item.direction,
