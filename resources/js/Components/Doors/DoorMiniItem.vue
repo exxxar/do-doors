@@ -3,7 +3,8 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <h6 class="text-muted font-bold">{{item.product.purpose || '-'}}: {{item.product.door_type.title}} {{ item.product.width }}x{{ item.product.height }}x{{ item.product.depth }}
+                    <h6 class="text-muted font-bold">{{item.product.purpose || '-'}}: {{item.product.door_type.title}} {{ item.product.width }}x{{ item.product.height }}x
+                        {{ item.product.opening_type?.depth || 0 }}
                     </h6>
                     <h6 class="text-black mb-0">
                         <span v-if="item.product.box_and_frame_color.title">({{item.product.box_and_frame_color.title}})</span> лицо

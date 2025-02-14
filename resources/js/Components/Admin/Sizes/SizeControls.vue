@@ -35,20 +35,76 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input"
-                               v-model="need_import_from_google"
-                               type="checkbox" role="switch" id="need_rewrite">
-                        <label class="form-check-label" for="need_rewrite">
-                            <span v-if="need_import_from_google">Загрузить из Google-таблицы</span>
-                            <span v-else>Загрузить из Excel-файла</span>
 
-                        </label>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div
+                                style="min-height: 80px;"
+                                @click="need_import_from_google = true"
+                                v-bind:class="{'bg-dark text-white':need_import_from_google}"
+                                class="card rounded-0">
+                                <div class="card-body  d-flex justify-content-center align-items-center text-center cursor-pointer">
+                                    <p style="line-height: 100%;"
+                                       class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                        <i v-if="need_import_from_google" class="fa-solid fa-check mr-2"></i>
+                                        Загрузить из Google-таблицы</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div
+                                style="min-height: 80px;"
+                                @click="need_import_from_google = false"
+                                v-bind:class="{'bg-dark text-white':!need_import_from_google}"
+                                class="card rounded-0">
+                                <div class="card-body d-flex justify-content-center align-items-center text-center cursor-pointer">
+                                    <p style="line-height: 100%;"
+                                       class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                        <i v-if="!need_import_from_google" class="fa-solid fa-check mr-2"></i>
+                                        Загрузить из Excel-файла</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <form
                         v-if="!need_import_from_google"
                         v-on:submit.prevent="importSubmit">
-                        <div class="form-check form-switch">
+
+
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importForm.need_rewrite = true"
+                                    v-bind:class="{'bg-dark text-white':importForm.need_rewrite}"
+                                    class="card rounded-0">
+                                    <div class="card-body cursor-pointer d-flex justify-content-center align-items-center">
+
+                                        <p style="line-height: 100%;" class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="importForm.need_rewrite" class="fa-solid fa-check mr-2"></i>Перезаписать старые значения</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importForm.need_rewrite = false"
+                                    v-bind:class="{'bg-dark text-white':!importForm.need_rewrite}"
+                                    class="card rounded-0">
+                                    <div class="card-body d-flex justify-content-center align-items-center text-center cursor-pointer">
+
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="!importForm.need_rewrite" class="fa-solid fa-check mr-2"></i>
+                                        Добавить новые значения</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+<!--                        <div class="form-check form-switch">
                             <input class="form-check-input"
                                    v-model="importForm.need_rewrite"
                                    type="checkbox" role="switch" id="need_rewrite">
@@ -57,19 +113,53 @@
                                 <span v-else>Добавить новые значения</span>
 
                             </label>
+                        </div>-->
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importForm.use_price_koef = true"
+                                    v-bind:class="{'bg-dark text-white':importForm.use_price_koef}"
+                                    class="card rounded-0">
+                                    <div class="card-body  d-flex justify-content-center align-items-center text-center cursor-pointer">
+
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="importForm.use_price_koef" class="fa-solid fa-check mr-2"></i>
+                                            Пересчитать по коэффициентам</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importForm.use_price_koef = false"
+                                    v-bind:class="{'bg-dark text-white':!importForm.use_price_koef}"
+                                    class="card rounded-0">
+                                    <div class="card-body d-flex justify-content-center align-items-center text-center cursor-pointer">
+
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="!importForm.use_price_koef" class="fa-solid fa-check mr-2"></i>
+                                            Записать как есть</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-check form-switch">
+
+<!--                        <div class="form-check form-switch">
                             <input class="form-check-input"
                                    v-model="importForm.use_price_koef"
-                                   type="checkbox" role="switch" id="need_rewrite">
-                            <label class="form-check-label" for="need_rewrite">
+                                   type="checkbox" role="switch" id="use_price_koef">
+                            <label class="form-check-label" for="use_price_koef">
                                 <span
                                     v-if="importForm.use_price_koef">Использовать ценовые коэффициенты для расчета</span>
                                 <span v-else>Записать как есть</span>
 
                             </label>
-                        </div>
+                        </div>-->
 
                         <div class="form-floating my-3 border-gray-100 border">
                             <input type="file" class="form-control"
@@ -89,7 +179,41 @@
                     <form
                         v-else
                         v-on:submit.prevent="importFromGoogleSubmit">
-                        <div class="form-check form-switch">
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importGoogleForm.need_rewrite = true"
+                                    v-bind:class="{'bg-dark text-white':importGoogleForm.need_rewrite}"
+                                    class="card rounded-0">
+                                    <div class="card-body  d-flex justify-content-center align-items-center text-center cursor-pointer">
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="importGoogleForm.need_rewrite" class="fa-solid fa-check mr-2"></i>
+                                            Перезаписать старые значения</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importGoogleForm.need_rewrite = false"
+                                    v-bind:class="{'bg-dark text-white':!importGoogleForm.need_rewrite}"
+                                    class="card rounded-0">
+                                    <div class="card-body d-flex justify-content-center align-items-center text-center cursor-pointer">
+
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="!importGoogleForm.need_rewrite" class="fa-solid fa-check mr-2"></i>
+                                            Добавить новые значения</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+<!--                        <div class="form-check form-switch">
                             <input class="form-check-input"
                                    v-model="importGoogleForm.need_rewrite"
                                    type="checkbox" role="switch" id="need_rewrite_google">
@@ -98,18 +222,50 @@
                                 <span v-else>Добавить новые значения</span>
 
                             </label>
+                        </div>-->
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importGoogleForm.use_price_koef = true"
+                                    v-bind:class="{'bg-dark text-white':importGoogleForm.use_price_koef}"
+                                    class="card rounded-0">
+                                    <div class="card-body  d-flex justify-content-center align-items-center text-center cursor-pointer">
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="importGoogleForm.use_price_koef" class="fa-solid fa-check mr-2"></i>
+                                            Пересчитать по коэффициентам</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div
+                                    style="min-height: 80px;"
+                                    @click="importGoogleForm.use_price_koef = false"
+                                    v-bind:class="{'bg-dark text-white':!importGoogleForm.use_price_koef}"
+                                    class="card rounded-0">
+                                    <div class="card-body d-flex justify-content-center align-items-center text-center cursor-pointer">
+
+                                        <p style="line-height: 100%;"
+                                           class=" d-flex justify-content-center align-items-center text-center mb-0">
+                                            <i v-if="!importGoogleForm.use_price_koef" class="fa-solid fa-check mr-2"></i>
+                                            Записать как есть</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-check form-switch">
+<!--                        <div class="form-check form-switch">
                             <input class="form-check-input"
                                    v-model="importGoogleForm.use_price_koef"
-                                   type="checkbox" role="switch" id="need_rewrite">
-                            <label class="form-check-label" for="need_rewrite">
+                                   type="checkbox" role="switch" id="importGoogleForm_use_price_koef">
+                            <label class="form-check-label" for="importGoogleForm_use_price_koef">
                                 <span v-if="importGoogleForm.use_price_koef">Использовать ценовые коэффициенты для расчета</span>
                                 <span v-else>Записать как есть</span>
 
                             </label>
-                        </div>
+                        </div>-->
 
                         <div class="form-floating my-3 border-gray-100 border">
                             <input type="text" class="form-control"
@@ -184,12 +340,12 @@ export default {
             need_import_from_google: false,
             importGoogleForm: {
                 sheet_id: null,
-                use_price_koef: true,
+                use_price_koef: false,
                 need_rewrite: true,
             },
             importForm: {
                 need_rewrite: true,
-                use_price_koef: true,
+                use_price_koef: false,
                 files: [],
             },
             recountForm: {

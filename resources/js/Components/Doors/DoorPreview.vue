@@ -60,7 +60,7 @@
 
                     <div class="door-but">
                         <div class="height"><span>{{ door.height }}</span></div>
-                        <div class="depth"><span>{{ door.depth }}</span></div>
+                        <div class="depth"><span>{{ door.opening_type?.depth || 0 }}</span></div>
                     </div>
                 </div>
 

@@ -733,7 +733,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                         <h6>Характеристики</h6>
                         <h6 class="text-muted font-bold">{{ doorForm.door_type.title }} {{
                                 doorForm.width
-                            }}x{{ doorForm.height }}x{{ doorForm.depth }},
+                            }}x{{ doorForm.height }}x{{ doorForm.opening_type?.depth || 0 }}
                         </h6>
                         <h6 class="text-black mb-0">
 
@@ -1319,6 +1319,7 @@ export default {
 
         'doorForm': {
             handler(val) {
+                console.log("doorForm", this.doorForm)
                 this.loadedParams = false
                 this.$nextTick(() => {
                     this.loadedParams = true
