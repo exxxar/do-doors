@@ -9,7 +9,7 @@
 </head>
 
 <body>
-
+<h3 style="text-align: center; font-weight: bold;">Спецификация к договору DoDoors</h3>
 
 @if(!empty($items??[]))
     <table>

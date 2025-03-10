@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ClientTable from "@/Components/Admin/Clients/ClientTable.vue";
 import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
 import {Head} from '@inertiajs/vue3';
-
+import SellerInfoEditor from "@/Components/Admin/Documents/SellerInfoEditor.vue";
 import Contracts from "@/Components/Admin/Documents/Contracts.vue";
 </script>
 
@@ -20,6 +20,7 @@ import Contracts from "@/Components/Admin/Documents/Contracts.vue";
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
+                        <SellerInfoEditor></SellerInfoEditor>
                         <Contracts></Contracts>
                     </div>
 

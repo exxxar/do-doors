@@ -1,5 +1,7 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+
+import PromoCodeForm from "@/Components/Admin/PromoCodes/PomoCodeForm.vue";
 </script>
 <template>
     <form class="row">
@@ -25,106 +27,108 @@ import Pagination from "@/Components/Pagination.vue";
         </div>
     </form>
 
-    <div style="overflow-y: auto;">
-        <table class="table" v-if="items.length>0">
-            <thead>
-            <tr>
-                <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
-                        class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('code')">Код
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'code'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'code'"><i
-                        class="fa-solid fa-caret-up"></i></span>
 
-                </th>
+    <table class="table" v-if="items.length>0">
+        <thead>
+        <tr>
+            <th scope="col" class="cursor-pointer" @click="sortAndLoad('id')">#
+                <span v-if="sort.direction === 'desc'&&sort.column === 'id'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
+                    class="fa-solid fa-caret-up"></i></span>
+            </th>
+            <th scope="col" class="text-center">Действие</th>
+            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('code')">Код
+                <span v-if="sort.direction === 'desc'&&sort.column === 'code'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'code'"><i
+                    class="fa-solid fa-caret-up"></i></span>
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('discount')">Процент скидки
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'discount'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'discount'"><i
-                        class="fa-solid fa-caret-up"></i></span>
+            </th>
 
-                </th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('description')">Описание
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'description'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'description'"><i
-                        class="fa-solid fa-caret-up"></i></span>
+            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('discount')">Процент скидки
+                <span v-if="sort.direction === 'desc'&&sort.column === 'discount'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'discount'"><i
+                    class="fa-solid fa-caret-up"></i></span>
 
-                </th>
-                <th scope="col" class="text-center">Число активация</th>
-                <th scope="col" class="text-center">Активный</th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('end_at')">
-                    Дата окончания
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'end_at'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'end_at'"><i
-                        class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                    Дата изменения
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                        class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col" class="text-center">Действие</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(item, index) in items">
-                <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center" @click="selectItem(item)">
-                    {{ item.code || '-' }}
-                </td>
-                <td class="text-center">
-                    {{ item.discount || 0 }}
-                </td>
-                <td class="text-center ">
-                    {{ item.description || 0 }}
-                </td>
-                <td class="text-center">
-                    {{ item.activation_count || 0 }}
-                </td>
-                <td class="text-center">
-                   <span v-if="item.is_active">Активный</span>
-                   <span v-else>Не активный</span>
+            </th>
+            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('description')">Описание
+                <span v-if="sort.direction === 'desc'&&sort.column === 'description'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'description'"><i
+                    class="fa-solid fa-caret-up"></i></span>
 
-                </td>
+            </th>
+            <th scope="col" class="text-center">Число активация</th>
+            <th scope="col" class="text-center">Активный</th>
+            <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('end_at')">
+                Дата окончания
+                <span v-if="sort.direction === 'desc'&&sort.column === 'end_at'"><i
+                    class="fa-solid fa-caret-down"></i></span>
+                <span v-if="sort.direction === 'asc'&&sort.column === 'end_at'"><i
+                    class="fa-solid fa-caret-up"></i></span>
+            </th>
+            <!--                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                                Дата изменения
+                                <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                                    class="fa-solid fa-caret-down"></i></span>
+                                <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                                    class="fa-solid fa-caret-up"></i></span>
+                            </th>-->
 
-                <td class="text-center">
-                    {{ item.end_at || '-' }}
-                </td>
-                <td class="text-center">
-                    {{ item.updated_at || '-' }}
-                </td>
-                <td class="text-center">
-                    <div class="dropdown">
-                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item"
-                                   @click="selectItem(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(item, index) in items">
+            <th scope="row">{{ item.id || index }}</th>
+            <td class="text-center">
+                <div class="dropdown">
+                    <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item"
+                               @click="selectItem(item)"
+                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
 
-                            <li><a class="dropdown-item text-danger"
-                                   @click="removeItem(item.id)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
+                        <li><a class="dropdown-item text-danger"
+                               @click="removeItem(item.id)"
+                               href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td class="text-center">
+                {{ item.code || '-' }}
+            </td>
+            <td class="text-center">
+                {{ item.discount || 0 }}
+            </td>
+            <td class="text-center ">
+                {{ item.description || 0 }}
+            </td>
+            <td class="text-center">
+                {{ item.activation_count || 0 }}
+            </td>
+            <td class="text-center">
+                <span v-if="item.is_active">Активный</span>
+                <span v-else>Не активный</span>
 
-            </tbody>
-        </table>
-    </div>
+            </td>
+
+            <td class="text-center">
+                {{ item.end_at || '-' }}
+            </td>
+            <!--                <td class="text-center">
+                                {{ item.updated_at || '-' }}
+                            </td>-->
+
+        </tr>
+
+        </tbody>
+    </table>
+  
     <div class="alert alert-success rounded-0" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Промокоды</h4>
         <p>К сожалению, раздел промокодов пуст. Вы еще не добавили ни одного промокода, которые можно отобразить на этой
@@ -140,6 +144,24 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="promocode-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <PromoCodeForm
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></PromoCodeForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -148,6 +170,8 @@ export default {
 
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -171,6 +195,8 @@ export default {
     },
     mounted() {
         this.loadPromoCodes();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('promocode-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -197,7 +223,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+            // this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicatePromoCode", {

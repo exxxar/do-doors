@@ -5,7 +5,7 @@
         <p class="mb-2"><small>Возможно в рассрочку!</small></p>
         <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
             зависит, просто уточните эти детали в беседе с менеджером</small></p>
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <input type="text"
                    class="form-control" @keyup="findPromo" v-model="clientForm.promo" id="checkout-promo"
                    placeholder="name@example.com">
@@ -14,20 +14,22 @@
 
         <div v-if="hasRoles(['manager','administrator'])">
 
-            <div class="form-floating mb-3">
+            <p><small>Начальная внесенная покупателем сумма</small></p>
+            <div class="form-floating mb-2">
                 <input type="text" class="form-control"
                        @change="changeCurrentPayed"
                        v-model="clientForm.current_payed" id="checkout-name"
                        placeholder="" required>
-                <label for="checkout-name">Начальная внесенная покупателем сумма, руб</label>
+                <label for="checkout-name">Начальная сумма, руб</label>
             </div>
 
-            <div class="form-floating mb-3">
+            <p><small>Процент внесенной суммы от полной стоимости</small></p>
+            <div class="form-floating mb-2">
                 <input type="text" class="form-control"
                        @change="changePayedPercent"
                        v-model="clientForm.payed_percent" id="checkout-name"
                        placeholder="name@example.com" required>
-                <label for="checkout-name">Процент внесенной суммы от полной стоимости</label>
+                <label for="checkout-name">%</label>
             </div>
 
             <div class="form-check form-switch">
@@ -37,31 +39,69 @@
                     конкретную дату</label>
             </div>
 
-            <div v-if="flgDays" class="form-floating mb-3">
+            <div v-if="flgDays" class="form-floating mb-2">
                 <input type="text" class="form-control" v-model="clientForm.work_days" id="checkout-name"
                        placeholder="name@example.com" required>
                 <label for="checkout-name">Кол-во рабочих дней</label>
             </div>
 
-            <div v-else class="form-floating mb-3">
+            <div v-else class="form-floating mb-2">
                 <input type="date" class="form-control" v-model="clientForm.delivery_terms" id="checkout-name"
                        placeholder="name@example.com" required>
                 <label for="checkout-name">Срок передачи товара покупателю</label>
             </div>
 
+            <div class="form-check form-switch mb-2">
+                <input  v-model="clientForm.need_delivery" class="form-check-input" type="checkbox"
+                       role="switch" id="need-delivery">
+                <label class="form-check-label" for="need-delivery">Нужна доставка</label>
+            </div>
+
+            <template v-if="clientForm.need_delivery">
+                <div class="form-floating mb-2">
+                    <input type="number"
+                           min="0"
+                           class="form-control"
+                           v-model="clientForm.delivery_price" id="delivery-price"
+                           placeholder="name@example.com" required>
+                    <label for="delivery-price">Сумма за доставку</label>
+                </div>
+
+                <div class="form-floating mb-2">
+                    <input type="text" class="form-control"
+                           v-model="clientForm.delivery_city" id="delivery-city"
+                           placeholder="name@example.com" required>
+                    <label for="delivery-city">Город доставки</label>
+                </div>
+
+                <div class="form-floating mb-2">
+                    <input type="text" class="form-control"
+                           v-model="clientForm.delivery_address" id="delivery-address"
+                           placeholder="name@example.com" required>
+                    <label for="delivery-address">Адрес доставки</label>
+                </div>
+            </template>
+
+            <slot name="loader"></slot>
             <button
-                class="btn btn-dark w-100 my-2 rounded-0">Отправить и скачать договор
+                :disabled="disabled"
+                class="btn btn-dark w-100 my-2 rounded-0 p-3">
+                Отправить и скачать договор
             </button>
         </div>
+        <template v-else>
+            <button
+                    :disabled="disabled"
+                    class="btn btn-dark w-100 my-2 rounded-0 p-3">Отправить</button>
+        </template>
 
-        <button v-else class="btn btn-dark w-100 my-2 rounded-0">Отправить</button>
     </template>
 </template>
 <script>
 import {mapGetters} from "vuex";
 
 export default {
-    props: ['modelValue'],
+    props: ['modelValue', 'disabled'],
     data() {
         return {
             flgDays: true, // числом или датой дни

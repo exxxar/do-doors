@@ -435,7 +435,7 @@ export default {
 <style lang="scss">
 .cart-fixed-btn {
     position: fixed;
-    bottom: 111px;
+    bottom: 21px;
     right: 13px;
     padding: 10px;
     z-index: 10;
@@ -456,6 +456,6 @@ export default {
 }
 
 .btn-dark {
-    background-color: black;
+    background-color: black !important;
 }
 </style>

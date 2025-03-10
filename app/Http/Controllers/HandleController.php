@@ -8,17 +8,49 @@ use App\Http\Resources\HandleCollection;
 use App\Http\Resources\HandleResource;
 use App\Http\Resources\MaterialCollection;
 use App\Http\Resources\MaterialResource;
+use App\Imports\HandleMultiSheetImport;
+use App\Imports\PriceMultiSheetImport;
 use App\Models\Handle;
 use App\Models\Material;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HandleController extends Controller
 {
     use Utility;
+
+    public function import(Request $request)
+    {
+
+        $tmp = $this->uploadDocuments(
+            $request->hasFile('files') ?
+                $request->file('files') : null);
+
+        $needRewrite = ($request->need_rewrite ?? false) == "true";
+
+        if ($needRewrite) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::table('handles')->truncate();
+        }
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        foreach ($tmp as $file) {
+            $path = storage_path("app/public/documents/" . $file);
+            Excel::import(new HandleMultiSheetImport($path), $path);
+        }
+
+
+
+        return response()->noContent();
+    }
+
 
     public function index(Request $request): \Inertia\Response
     {
@@ -77,26 +109,30 @@ class HandleController extends Controller
 
         $id = $request->id ?? null;
 
+        $priceData = json_decode($request->price ?? '[]');
+
+        $tmp = [
+            "title" => $request->title ?? null,
+            'price' => (object)[
+                "wholesale" => $priceData->wholesale ?? 0,
+                "dealer" => $priceData->dealer ?? 0,
+                "retail" => $priceData->retail ?? 0,
+                "cost" => $priceData->cost ?? 0,
+            ],
+            'color' => $request->color ?? null,
+            'variants' => $variants
+        ];
+
         if (is_null($id))
             $handle = Handle::query()
-                ->create([
-                    "title" => $request->title ?? null,
-                    'price' => $request->price ?? 0,
-                    'color' => $request->color ?? null,
-                    'variants' => $variants
-                ]);
+                ->create($tmp);
         else {
             $handle = Handle::query()->find($id);
 
             if (is_null($handle))
                 return response()->noContent(404);
 
-            $handle->update([
-                "title" => $request->title ?? null,
-                'price' => $request->price ?? 0,
-                'color' => $request->color ?? null,
-                'variants' => $variants
-            ]);
+            $handle->update($tmp);
 
         }
 

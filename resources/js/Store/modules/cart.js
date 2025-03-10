@@ -80,6 +80,20 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async contractProcessing(context, payload = {processingForm: null}) {
+        let link = `${BASE_CART_LINK}/contract-processing`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.processingForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async checkoutItems(context, payload = {clientForm: null}) {
         let link = `${BASE_CART_LINK}/checkout`
 

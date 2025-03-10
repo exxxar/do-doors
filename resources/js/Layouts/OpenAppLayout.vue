@@ -32,5 +32,7 @@ export default {
 }
 </script>
 <style lang="scss">
-
+.btn-dark {
+    background-color: black !important;
+}
 </style>

@@ -1,5 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+import UserForm from "@/Components/Admin/Users/UserForm.vue";
 </script>
 <template>
     <form class="row">
@@ -25,7 +26,7 @@ import Pagination from "@/Components/Pagination.vue";
         </div>
     </form>
 
-    <div style="overflow-y: auto;">
+
         <table class="table" v-if="items.length>0">
             <thead>
             <tr>
@@ -35,6 +36,7 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center" v-if="!forSelect">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('email')">Почта
                     <span v-if="sort.direction === 'desc'&&sort.column === 'email'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -60,23 +62,12 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center" v-if="!forSelect">Действие</th>
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center" @click="selectItem(item)">
-                    {{ item.email || '-' }}
-                </td>
-                <td class="text-center">
-                    {{ item.name || 0 }}
-                </td>
-
-
-                <td class="text-center" v-if="!forSelect">
-                    {{ item.updated_at || '-' }}
-                </td>
                 <td class="text-center" v-if="!forSelect">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -94,11 +85,23 @@ import Pagination from "@/Components/Pagination.vue";
                         </ul>
                     </div>
                 </td>
+                <td class="text-center">
+                    {{ item.email || '-' }}
+                </td>
+                <td class="text-center">
+                    {{ item.name || 0 }}
+                </td>
+
+
+                <td class="text-center" v-if="!forSelect">
+                    {{ item.updated_at || '-' }}
+                </td>
+
             </tr>
 
             </tbody>
         </table>
-    </div>
+
     <div class="alert alert-success" role="alert" v-if="items.length===0">
         <h4 class="alert-heading">Ручки</h4>
         <p>К сожалению, раздел ручек пуст. Вы еще не добавили ни одной ручки, которые можно отобразить на этой
@@ -114,6 +117,24 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="user-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <UserForm
+                            :id="'user-form-2'"
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></UserForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -122,6 +143,8 @@ export default {
     props:["forSelect"],
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -145,6 +168,8 @@ export default {
     },
     mounted() {
         this.loadUsers();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('user-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -171,7 +196,18 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+            //this.$emit("select", item)
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateUser", {

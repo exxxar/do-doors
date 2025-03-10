@@ -3,6 +3,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 </script>
 <template>
 
+
     <form action="" v-on:submit.prevent="submit">
         <div class="form-floating mb-3">
             <input type="text"
@@ -12,12 +13,51 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             <label for="handle-title">Название ручки</label>
         </div>
 
-        <div class="form-floating mb-3">
-            <input type="number"
-                   v-model="form.price"
-                   class="form-control" id="handle-price"
-                   required>
-            <label for="handle-title">Цена ручки</label>
+        <div class="card rounded-0 mb-3 border-black">
+            <div class="card-header bg-dark text-white rounded-0 ">
+                <h6>Настройка цены</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input type="number"
+                                   v-model="form.price.wholesale"
+                                   class="form-control" id="price-wholesale"
+                                   required>
+                            <label for="price-wholesale">Опт</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating mb-3">
+                            <input type="number"
+                                   v-model="form.price.retail"
+                                   class="form-control" id="price-retail"
+                                   required>
+                            <label for="price-retail">Розница</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="number"
+                                   v-model="form.price.dealer"
+                                   class="form-control" id="price-dealer"
+                                   required>
+                            <label for="price-dealer">Дилер</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="number"
+                                   v-model="form.price.cost"
+                                   class="form-control" id="price-cost"
+                                   required>
+                            <label for="price-cost">Себестоимость</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="input-group mb-3">
@@ -69,10 +109,10 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             <div class="col-md-4 mb-2 image-preview d-flex align-items-start"
                  v-if="uploaded_variants_image.length>0"
                  v-for="(variant, index) in uploaded_variants_image">
-                <div class="card w-100">
+                <div class="card w-100 rounded-0">
                     <img
                         style="min-height: 200px;"
-                        :src="getPhoto(variant.image).imageUrl"
+                        v-lazy="getPhoto(variant.image).imageUrl"
                         class="card-img-top uploaded-image-mini"
                         alt="">
 
@@ -84,15 +124,15 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                     <div class="card-body">
 
 
-                        <div class="form-floating mb-3 ">
+                        <div class="form-floating mb-2 ">
                             <input type="text" v-model="uploaded_variants_image[index].title"
-                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                                   class="form-control border-gray-300 rounded-0" id="floatingInput" required>
                             <label for="floatingInput">Название</label>
                         </div>
 
 
                         <div class="form-floating">
-                            <textarea class="form-control"
+                            <textarea class="form-control rounded-0"
                                       v-model="uploaded_variants_image[index].description"
                                       placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
                             <label for="floatingTextarea">Описание</label>
@@ -106,17 +146,11 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.variants">
 
                 <div class="card w-100">
-                    <img
-                        style="min-height: 200px;"
-                        v-if="variant.image.indexOf('http')===-1"
-                        :src="'/images/'+variant.image"
-                        class="card-img-top uploaded-image-mini"
-                        alt="">
 
                     <img
-                        v-else
+
                         style="min-height: 200px;"
-                        :src="variant.image"
+                        v-lazy="prepareImage(variant.image)"
                         class="card-img-top uploaded-image-mini"
                         alt="">
                     <div class="card-body d-flex justify-center">
@@ -182,6 +216,9 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
         </div>
     </form>
 
+
+
+
     <!-- Modal -->
     <div class="modal fade" :id="'choose-color-handle'" tabindex="-1" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
@@ -207,13 +244,21 @@ export default {
     data() {
         return {
             messages: [],
+            need_import_from_google:false,
             uploaded_variants_image: [],
             loading: false,
             colorModal: null,
+
+
             form: {
                 id: null,
                 title: null,
-                price: null,
+                price: {
+                    wholesale: 0,
+                    dealer: 0,
+                    retail: 0,
+                    cost: 0,
+                },
                 color: null,
                 variants: [],
 
@@ -238,7 +283,12 @@ export default {
                 this.form = {
                     id: this.item.id || null,
                     title: this.item.title || null,
-                    price: this.item.price || 0,
+                    price: this.item.price || {
+                        wholesale: 0,
+                        dealer: 0,
+                        retail: 0,
+                        cost: 0,
+                    },
                     color: this.item.color || null,
                     variants: this.item.variants || [],
 
@@ -246,11 +296,17 @@ export default {
             })
     },
     methods: {
+
+        prepareImage(image) {
+            if (typeof image !== "string" || !image.trim()) return "/images/default.png"; // Защита от пустых и некорректных данных
+            return image.startsWith("http://") || image.startsWith("https://") ? image : `/images/${image}`;
+        },
         callbackSelectColor(item) {
             this.form.color = item.color.hex
 
             this.colorModal.hide()
         },
+
         selectColor() {
             this.colorModal.show()
         },
@@ -265,7 +321,12 @@ export default {
 
             this.form.id = null
             this.form.title = null
-            this.form.price = 0
+            this.form.price =   {
+                wholesale: 0,
+                dealer: 0,
+                retail: 0,
+                cost: 0,
+            }
             this.form.color = null
             this.form.variants = []
 
@@ -330,7 +391,111 @@ export default {
             })
 
 
-        }
+        },
+        importFromGoogleSubmit() {
+            let data = new FormData();
+
+
+            localStorage.setItem("google_excel_handles_export_sheet_id", this.importGoogleForm.sheet_id)
+
+            this.timer = 0
+            let tmpTimer = setInterval(() => {
+                this.timer++
+            }, 1000)
+
+            Object.keys(this.importGoogleForm)
+                .forEach(key => {
+                    const item = this.importGoogleForm[key] || ''
+                    if (typeof item === 'object')
+                        data.append(key, JSON.stringify(item))
+                    else
+                        data.append(key, item)
+                });
+
+            this.$store.dispatch("importHandlesFromGoogle", {
+                importForm: data
+            }).then((response) => {
+
+                window.open(response.url, '_blank').focus();
+
+                window.dispatchEvent(new CustomEvent("load-handles", {
+                    detail: null
+                }));
+
+                this.importHandlesModal.hide()
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно загрузили данные",
+                });
+
+                clearInterval(tmpTimer)
+                this.timer = null
+            }).catch(() => {
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка загрузки данных",
+                    type: "error"
+                });
+            })
+        },
+        importSubmit() {
+            let data = new FormData();
+
+
+            this.timer = 0
+            let tmpTimer = setInterval(() => {
+                this.timer++
+            }, 1000)
+
+            Object.keys(this.importForm)
+                .forEach(key => {
+                    const item = this.importForm[key] || ''
+                    if (typeof item === 'object')
+                        data.append(key, JSON.stringify(item))
+                    else
+                        data.append(key, item)
+                });
+
+            if (this.importForm.files.length > 0) {
+
+                data.delete("files")
+
+                for (let i = 0; i < this.importForm.files.length; i++) {
+                    data.append('files[]', this.importForm.files[i]);
+                }
+            }
+
+            this.$store.dispatch("importHandlesFromExcel", {
+                importForm: data
+            }).then((response) => {
+
+
+                window.dispatchEvent(new CustomEvent("load-handles", {
+                    detail: null
+                }));
+
+                this.importHandlesModal.hide()
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно загрузили данные",
+                });
+
+                clearInterval(tmpTimer)
+                this.timer = null
+
+            }).catch(() => {
+                clearInterval(tmpTimer)
+                this.timer = null
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка загрузки данных",
+                    type: "error"
+                });
+            })
+        },
+
     }
 }
 </script>

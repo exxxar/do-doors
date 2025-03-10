@@ -24,7 +24,10 @@
 		"revolution/laravel-google-sheets": "^6.3",
 		"spatie/laravel-permission": "^6.4",
 		"tightenco/ziggy": "^1.0",
-      "ext-intl": "*"
+      "ext-intl": "*",
+      "ext-curl": "*",
+        "ext-fileinfo": "*",
+      "ext-http": "*"
     },
 	"require-dev": {
 		"fakerphp/faker": "^1.9.1",

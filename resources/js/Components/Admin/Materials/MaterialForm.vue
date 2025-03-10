@@ -146,8 +146,8 @@
             <div class="col-12" v-if="uploaded_wrapper_image.length>0">
                 <h6 class="font-bold my-3">Новые фотографии к материалу</h6>
             </div>
-            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in uploaded_wrapper_image">
-                <div class="card w-100">
+            <div class="col-md-6 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in uploaded_wrapper_image">
+                <div class="card w-100 rounded-0">
                     <img
                         style="min-height: 200px;"
                         :src="getPhoto(variant.image).imageUrl"
@@ -158,19 +158,19 @@
                         <a href="javascript:void(0)"  class="text-danger" @click="removePhoto('uploaded_wrapper_image',index)">Удалить фото</a>
                     </div>
 
-                    <div class="card-body">
+                    <div class="card-body ">
 
 
-                        <div class="form-floating mb-3 ">
+                        <div class="form-floating mb-2 ">
                             <input type="text" v-model="uploaded_wrapper_image[index].title"
-                                   class="form-control border-gray-300 rounded-md" id="floatingInput">
+                                   class="form-control rounded-0 border-gray-300" id="floatingInput">
                             <label for="floatingInput">Название</label>
                         </div>
 
 
 
                         <div class="form-floating">
-                            <textarea class="form-control"
+                            <textarea class="form-control rounded-0"
                                       v-model="uploaded_wrapper_image[index].description"
                                       placeholder="Leave a comment here" id="floatingTextarea"></textarea>
                             <label for="floatingTextarea">Описание</label>
@@ -182,8 +182,8 @@
             <div class="col-12" v-if="form.wrapper_variants.length>0">
                 <h6 class="font-bold my-3">Текущие фотографии к материалу</h6>
             </div>
-            <div class="col-md-4 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.wrapper_variants">
-                <div class="card w-100">
+            <div class="col-md-6 mb-2 image-preview d-flex align-items-start" v-for="(variant, index) in form.wrapper_variants">
+                <div class="card w-100 p-1 rounded-0">
                     <img
                         style="min-height: 200px;"
                         v-if="variant.image.indexOf('http')===-1"
@@ -203,16 +203,16 @@
                     <div class="card-body">
 
 
-                        <div class="form-floating mb-3 ">
+                        <div class="form-floating mb-2 ">
                             <input type="text" v-model="form.wrapper_variants[index].title"
-                                   class="form-control border-gray-300 rounded-md" id="floatingInput" required>
+                                   class="form-control border-gray-300 rounded-0" id="floatingInput" required>
                             <label for="floatingInput">Название</label>
                         </div>
 
 
 
                         <div class="form-floating">
-                            <textarea class="form-control"
+                            <textarea class="form-control rounded-0"
                                       v-model="form.wrapper_variants[index].description"
                                       placeholder="Leave a comment here" id="floatingTextarea" required></textarea>
                             <label for="floatingTextarea">Описание</label>

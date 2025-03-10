@@ -1,5 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+import PermissionForm from "@/Components/Admin/Permissions/PermissionForm.vue";
 </script>
 <template>
     <form class="row">
@@ -35,6 +36,9 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col"
+                    v-if="!forSelect"
+                    class="text-center">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('name')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'name'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -61,25 +65,13 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col"
-                    v-if="!forSelect"
-                    class="text-center">Действие</th>
+
             </tr>
             </thead>
             <tbody>
 
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center cursor-pointer" @click="selectItem(item)">
-                    <i class="fa-solid fa-lock mr-2 color-danger" v-if="(selected||[]).indexOf(item.id)!==-1"></i> {{ item.name || '-' }}
-                </td>
-                <td class="text-center">
-                    {{ item.slug || '-' }}
-                </td>
-
-                <td class="text-center"  v-if="!forSelect">
-                    {{ item.updated_at || '-' }}
-                </td>
                 <td class="text-center" v-if="!forSelect">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -97,6 +89,17 @@ import Pagination from "@/Components/Pagination.vue";
                         </ul>
                     </div>
                 </td>
+                <td class="text-center cursor-pointer" @click="selectItem(item)">
+                    <i class="fa-solid fa-lock mr-2 color-danger" v-if="(selected||[]).indexOf(item.id)!==-1"></i> {{ item.name || '-' }}
+                </td>
+                <td class="text-center">
+                    {{ item.slug || '-' }}
+                </td>
+
+                <td class="text-center"  v-if="!forSelect">
+                    {{ item.updated_at || '-' }}
+                </td>
+
             </tr>
 
             </tbody>
@@ -117,6 +120,23 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="permission-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <PermissionForm
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></PermissionForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -130,6 +150,8 @@ export default {
                 direction: "desc"
             },
             search: null,
+            editor_modal: null,
+            selected_item: null,
             current_page: 0,
             paginate_object: null,
             items: [
@@ -148,6 +170,8 @@ export default {
     },
     mounted() {
         this.loadPermissions();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('permission-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -174,7 +198,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+           // this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicatePermission", {

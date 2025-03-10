@@ -32,6 +32,10 @@ class OrderController extends Controller
         return Inertia::render('Admin/OrdersPage');
     }
 
+    public function editDoorInOrder(Request $request){
+
+    }
+
     public function updateContractTemplates(Request $request)
     {
 
@@ -49,7 +53,7 @@ class OrderController extends Controller
             return response()->noContent(400);
 
         $name = $type == 0 ? "договор с ИП.docx" : ($type == 1 ? "договор с ООО.docx" : "договор с ФЛ.docx");
-        
+
         if (file_exists($path . "/" . $name))
             unlink($path . "/" . $name);
         $file->move($path, $name);
@@ -136,7 +140,8 @@ class OrderController extends Controller
         $dt = $request->dt ?? null;
 
 
-        $orders = Order::query();
+        $orders = Order::query()
+            ->with(['details']);
 
         if (!is_null($search))
             $orders = $orders

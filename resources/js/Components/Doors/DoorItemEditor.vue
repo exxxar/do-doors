@@ -2,724 +2,643 @@
 import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 import ColorSelector from "@/Components/Calc/ColorSelector.vue";
+import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
+import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue";
 </script>
 
 <template>
 
-    <div class="row" v-if="loaded">
+    <form class="row" v-on:submit.prevent="submitForm" v-if="loaded">
 
         <div class="col-md-6">
-            <form
-                v-on:submit.prevent="submitForm"
-            >
 
-                <div class="row">
-                    <div class="col-md-6 col-12 mb-2">
-                        <button
-                            type="button"
-                            @click="openConfirmModal('Внимание!','Вы очищает текущую работу в калькуляторе! Продолжить?')"
-                            class="btn rounded-0 w-100 btn-dark p-3">Очистить форму
+
+            <div class="row">
+                <div class="col-md-6 col-12 mb-2">
+                    <button
+                        type="button"
+                        @click="openConfirmModal('Внимание!','Вы очищает текущую работу в калькуляторе! Продолжить?')"
+                        class="btn rounded-0 w-100 btn-dark p-3">Очистить форму
+                    </button>
+                </div>
+
+                <div class="col-md-6 col-12">
+                    <div class="input-group mb-2">
+                        <div class="form-floating">
+                            <input type="text"
+                                   min="0"
+                                   v-model="doorForm.purpose"
+                                   class="form-control" id="floatingInput">
+                            <label for="floatingInput"><i class="fa-solid fa-signs-post"></i> Назначение
+                                двери</label>
+                        </div>
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
                         </button>
+                        <ul class="dropdown-menu dropdown-menu-end rounded-0">
+                            <li><a class="dropdown-item"
+                                   @click="doorForm.purpose = null"
+                                   href="javascript:void(0)">Не выбрано</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item"
+                                   @click="doorForm.purpose = item"
+                                   v-bind:class="{'bg-primary text-white':doorForm.purpose===item}"
+                                   href="javascript:void(0)" v-for="item in getDictionary.purpose_variants">{{
+                                    item
+                                }}</a>
+                            </li>
+                        </ul>
                     </div>
+                </div>
 
-                    <div class="col-md-6 col-12">
-                        <div class="input-group mb-2">
-                            <div class="form-floating">
-                                <input type="text"
-                                       min="0"
-                                       v-model="doorForm.purpose"
-                                       class="form-control" id="floatingInput">
-                                <label for="floatingInput"><i class="fa-solid fa-signs-post"></i> Назначение
-                                    двери</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item"
-                                       @click="doorForm.purpose = null"
-                                       href="javascript:void(0)">Не выбрано</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item"
-                                       @click="doorForm.purpose = item"
-                                       v-bind:class="{'bg-primary text-white':doorForm.purpose===item}"
-                                       href="javascript:void(0)" v-for="item in getDictionary.purpose_variants">{{
-                                        item
-                                    }}</a>
-                                </li>
-                            </ul>
+
+                <div class="col-md-6 col-12">
+                    <div class="input-group mb-2">
+                        <div class="form-floating">
+                            <input type="number"
+                                   min="0"
+                                   @invalid="alert('Вы не выбрали \ ввели высоту двери!')"
+                                   v-model="doorForm.height"
+                                   class="form-control" id="floatingInput" required>
+                            <label for="floatingInput"><i class="fa-solid fa-ruler-vertical"></i> Высота, мм</label>
                         </div>
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end rounded-0">
+                            <li><a class="dropdown-item" href="javascript:void(0)" @click="selectDoorSize(null)">Не
+                                выбрано</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li class="p-1">
+                                <div class="form-floating">
+                                    <input type="search"
+                                           v-model="filterHeight"
+                                           class="form-control" id="filtered-height" placeholder="name@example.com">
+                                    <label for="filtered-height">Фильтр высоты</label>
+                                </div>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li class="scrollable-menu p-2">
+
+                                <a class="dropdown-item"
+                                   @click="selectDoorSize(item)"
+                                   v-bind:class="{'bg-primary':doorForm.width===item.width&&doorForm.width===item.height}"
+                                   href="javascript:void(0)" v-for="item in filteredHeight">
+
+
+                                    {{ item.height }}x{{ item.width }}
+                                </a>
+                                <p v-if="filteredHeight.length===0" class="text-center">Ничего не найдено</p>
+                            </li>
+                        </ul>
                     </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="input-group mb-2">
 
-
-                    <div class="col-md-6 col-12">
-                        <div class="input-group mb-2">
-                            <div class="form-floating">
-                                <input type="number"
-                                       min="0"
-                                       @invalid="alert('Вы не выбрали \ ввели высоту двери!')"
-                                       v-model="doorForm.height"
-                                       class="form-control" id="floatingInput" required>
-                                <label for="floatingInput"><i class="fa-solid fa-ruler-vertical"></i> Высота, мм</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)" @click="selectDoorSize(null)">Не
-                                    выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li class="p-1">
-                                    <div class="form-floating">
-                                        <input type="search"
-                                               v-model="filterHeight"
-                                               class="form-control" id="filtered-height" placeholder="name@example.com">
-                                        <label for="filtered-height">Фильтр высоты</label>
-                                    </div>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li class="scrollable-menu p-2">
-
-                                    <a class="dropdown-item"
-                                       @click="selectDoorSize(item)"
-                                       v-bind:class="{'bg-primary':doorForm.width===item.width&&doorForm.width===item.height}"
-                                       href="javascript:void(0)" v-for="item in filteredHeight">
-
-
-                                        {{ item.height }}x{{ item.width }}
-                                    </a>
-                                    <p v-if="filteredHeight.length===0" class="text-center">Ничего не найдено</p>
-                                </li>
-                            </ul>
+                        <div class="form-floating">
+                            <input type="number"
+                                   min="0"
+                                   @invalid="alert('Вы не выбрали \ ввели ширину двери!')"
+                                   v-model="doorForm.width"
+                                   class="form-control" id="floatingInput" required>
+                            <label for="floatingInput"><i class="fa-solid fa-ruler-horizontal"></i> Ширина,
+                                мм</label>
                         </div>
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end rounded-0">
+                            <li><a class="dropdown-item" href="javascript:void(0)" @click="selectDoorSize(null)">Не
+                                выбрано</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li class="p-1">
+                                <div class="form-floating">
+                                    <input type="search"
+                                           v-model="filterWidth"
+                                           class="form-control" id="filtered-height" placeholder="name@example.com">
+                                    <label for="filtered-height">Фильтр ширины</label>
+                                </div>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li class="scrollable-menu p-2">
+
+                                <a class="dropdown-item"
+                                   @click="selectDoorSize(item)"
+                                   v-bind:class="{'bg-primary text-white':doorForm.width===item.width&&doorForm.width===item.height}"
+                                   href="javascript:void(0)" v-for="item in filteredWidth">
+
+
+                                    {{ item.height }}x{{ item.width }}
+                                </a>
+                                <p v-if="filteredWidth.length===0" class="text-center">Ничего не найдено</p>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="col-md-6 col-12">
-                        <div class="input-group mb-2">
-
-                            <div class="form-floating">
-                                <input type="number"
-                                       min="0"
-                                       @invalid="alert('Вы не выбрали \ ввели ширину двери!')"
-                                       v-model="doorForm.width"
-                                       class="form-control" id="floatingInput" required>
-                                <label for="floatingInput"><i class="fa-solid fa-ruler-horizontal"></i> Ширина,
-                                    мм</label>
-                            </div>
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                                <li><a class="dropdown-item" href="javascript:void(0)" @click="selectDoorSize(null)">Не
-                                    выбрано</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li class="p-1">
-                                    <div class="form-floating">
-                                        <input type="search"
-                                               v-model="filterWidth"
-                                               class="form-control" id="filtered-height" placeholder="name@example.com">
-                                        <label for="filtered-height">Фильтр ширины</label>
-                                    </div>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li class="scrollable-menu p-2">
-
-                                    <a class="dropdown-item"
-                                       @click="selectDoorSize(item)"
-                                       v-bind:class="{'bg-primary text-white':doorForm.width===item.width&&doorForm.width===item.height}"
-                                       href="javascript:void(0)" v-for="item in filteredWidth">
-
-
-                                        {{ item.height }}x{{ item.width }}
-                                    </a>
-                                    <p v-if="filteredWidth.length===0" class="text-center">Ничего не найдено</p>
-                                </li>
-                            </ul>
-                        </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-floating mb-2">
+                        <select class="form-select"
+                                v-model="doorForm.opening_type"
+                                @invalid="alert('Вы не выбрали вариант открывания и толщину двери!')"
+                                id="floatingSelect" aria-label="Floating label select example" required>
+                            <option :value="{title:null}">Выберите один из вариантов</option>
+                            <option :value="item" v-for="item in getDictionary.opening_variants">{{ item.title }}
+                                (толщина
+                                {{ item.depth }}
+                                мм)
+                            </option>
+                        </select>
+                        <label for="floatingSelect"><i class="fa-brands fa-openid"></i> Тип открытия двери и
+                            толщина</label>
                     </div>
-                    <div class="col-md-6 col-12">
-                        <div class="form-floating mb-2">
+                </div>
+
+                <div class="col-md-6 col-12">
+
+
+                    <div class="form-floating mb-2">
+
+                        <select class="form-select"
+                                v-model="doorForm.door_type"
+                                @invalid="alert('Вы не выбрали тип двери!')"
+                                id="door-type" aria-label="door-type" required>
+                            <option :value="item" v-for="item in getDictionary.door_variants">{{
+                                    item.title
+                                }}
+                            </option>
+                        </select>
+                        <label for="door-type"><i class="fa-solid fa-door-open"></i> Выберите тип двери</label>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-12">
+
+                    <div class="form-floating mb-2">
+                        <select class="form-select"
+                                v-model="doorForm.hinge_manufacturer"
+                                @invalid="alert('Вы не выбрали расположение петель!')"
+                                id="floatingSelect" aria-label="Floating label select example" required>
+                            <option :value="item" v-for="item in getDictionary.hinge_manufacturer_variants">{{
+                                    item.title
+                                }}
+                            </option>
+                        </select>
+                        <label for="floatingSelect"><i class="fa-solid fa-industry"></i> Производитель
+                            петель</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-12">
+                    <div class="form-floating mb-2">
+                        <select class="form-select"
+                                v-model="doorForm.loops"
+                                @invalid="alert('Вы не выбрали сторону петель!')"
+                                id="floatingSelect" aria-label="Floating label select example" required>
+                            <option :value="item" v-for="item in getDictionary.loops_variants">{{
+                                    item.title
+                                }}
+                            </option>
+                        </select>
+                        <label for="floatingSelect"><i class="fa-solid fa-angles-left"></i> Сторона петель</label>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-12  mb-2">
+
+                    <div class="input-group">
+
+                        <div class="form-floating">
                             <select class="form-select"
-                                    v-model="doorForm.opening_type"
-                                    @invalid="alert('Вы не выбрали вариант открывания и толщину двери!')"
+
+                                    @invalid="alert('Вы не выбрали отделку первой стороны двери!')"
+                                    v-model="doorForm.front_side_finish"
                                     id="floatingSelect" aria-label="Floating label select example" required>
                                 <option :value="{title:null}">Выберите один из вариантов</option>
-                                <option :value="item" v-for="item in getDictionary.opening_variants">{{ item.title }}
-                                    (толщина
-                                    {{ item.depth }}
-                                    мм)
-                                </option>
-                            </select>
-                            <label for="floatingSelect"><i class="fa-brands fa-openid"></i> Тип открытия двери и
-                                толщина</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
-
-
-                        <div class="form-floating mb-2">
-
-                            <select class="form-select"
-                                    v-model="doorForm.door_type"
-                                    @invalid="alert('Вы не выбрали тип двери!')"
-                                    id="door-type" aria-label="door-type" required>
-                                <option :value="item" v-for="item in getDictionary.door_variants">{{
+                                <option :value="item" v-for="item in getDictionary.finishes_variants">
+                                    {{
                                         item.title
                                     }}
                                 </option>
                             </select>
-                            <label for="door-type"><i class="fa-solid fa-door-open"></i> Выберите тип двери</label>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-6 col-12">
-
-                        <div class="form-floating mb-2">
-                            <select class="form-select"
-                                    v-model="doorForm.hinge_manufacturer"
-                                    @invalid="alert('Вы не выбрали расположение петель!')"
-                                    id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="item" v-for="item in getDictionary.hinge_manufacturer_variants">{{
-                                        item.title
-                                    }}
-                                </option>
-                            </select>
-                            <label for="floatingSelect"><i class="fa-solid fa-industry"></i> Производитель
-                                петель</label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
-                        <div class="form-floating mb-2">
-                            <select class="form-select"
-                                    v-model="doorForm.loops"
-                                    @invalid="alert('Вы не выбрали сторону петель!')"
-                                    id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="item" v-for="item in getDictionary.loops_variants">{{
-                                        item.title
-                                    }}
-                                </option>
-                            </select>
-                            <label for="floatingSelect"><i class="fa-solid fa-angles-left"></i> Сторона петель</label>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-6 col-12  mb-2">
-
-                        <div class="input-group">
-
-                            <div class="form-floating">
-                                <select class="form-select"
-
-                                        @invalid="alert('Вы не выбрали отделку первой стороны двери!')"
-                                        v-model="doorForm.front_side_finish"
-                                        id="floatingSelect" aria-label="Floating label select example" required>
-                                    <option :value="{title:null}">Выберите один из вариантов</option>
-                                    <option :value="item" v-for="item in getDictionary.finishes_variants">
-                                        {{
-                                            item.title
-                                        }}
-                                    </option>
-                                </select>
-                                <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка первой
-                                    стороны
-                                </label>
-                            </div>
-
-                            <button
-                                v-if="(doorForm.front_side_finish.door_variants || []).length !== 0"
-                                @click="selectFrontSideFinish"
-                                class="btn btn-outline-secondary rounded-0" type="button">
-                                <i class="fa-solid fa-images"></i>
-                            </button>
-
-
+                            <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка первой
+                                стороны
+                            </label>
                         </div>
 
+                        <button
+                            v-if="(doorForm.front_side_finish.door_variants || []).length !== 0"
+                            @click="selectFrontSideFinish"
+                            class="btn btn-outline-secondary rounded-0" type="button">
+                            <i class="fa-solid fa-images"></i>
+                        </button>
 
-                        <p v-if="priceForSide('front_side_finish')===0" style="line-height: 100%;"><small><em><strong
-                            class="text-danger">Внимание!</strong>
-                            сочетание размера и материала не доступно для заказа!</em></small></p>
+
                     </div>
 
 
-                    <div class="col-md-6 col-12 mb-2">
-                        <ColorSelector
-                            :filter="'front_side_finish_color'"
-                            v-if="doorForm.front_side_finish.title!=='Под покраску'"
-                            @invalid="alert('Вы не выбрали цвет отделки первой стороны')"
-                            v-model="doorForm.front_side_finish_color">
-                            <template #name>
-                                Цвет отделки первой стороны
-                            </template>
-                        </ColorSelector>
-                        <div class="card rounded-0" v-else>
-                            <div class="card-body p-3 disabled-element">
-                                <p class="text-center">Выбрано "Под покраску"</p>
-                            </div>
+                    <p v-if="priceForSide('front_side_finish')===0" style="line-height: 100%;"><small><em><strong
+                        class="text-danger">Внимание!</strong>
+                        сочетание размера и материала не доступно для заказа!</em></small></p>
+                </div>
+
+
+                <div class="col-md-6 col-12 mb-2">
+                    <ColorSelector
+                        :filter="'front_side_finish_color'"
+                        v-if="doorForm.front_side_finish.title!=='Под покраску'"
+                        @invalid="alert('Вы не выбрали цвет отделки первой стороны')"
+                        v-model="doorForm.front_side_finish_color">
+                        <template #name>
+                            Цвет отделки первой стороны
+                        </template>
+                    </ColorSelector>
+                    <div class="card rounded-0" v-else>
+                        <div class="card-body p-3 disabled-element">
+                            <p class="text-center">Выбрано "Под покраску"</p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-md-6 col-12 mb-2">
-                        <div class="input-group">
-                            <div class="form-floating ">
-                                <select class="form-select"
-                                        @invalid="alert('Вы не выбрали отделку второй стороны двери!')"
-                                        v-model="doorForm.back_side_finish"
-                                        id="floatingSelect" aria-label="Floating label select example" required>
-                                    <option :value="{title:null}">Выберите один из вариантов</option>
-                                    <option :value="item" v-for="item in getDictionary.finishes_variants">{{
-                                            item.title
-                                        }}
-                                    </option>
-                                </select>
-                                <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка второй
-                                    стороны</label>
-                            </div>
-                            <button
-                                v-if="(doorForm.back_side_finish.door_variants || []).length !== 0"
-                                @click="selectBackSideFinish"
-                                class="btn btn-outline-secondary rounded-0" type="button">
-                                <i class="fa-solid fa-images"></i>
-                            </button>
-
-                        </div>
-                        <p v-if="priceForSide('back_side_finish')===0" style="line-height: 100%;"><small><em><strong
-                            class="text-danger">Внимание!</strong>
-                            сочетание размера и материала не доступно для заказа!</em></small></p>
-
-                    </div>
-
-                    <div class="col-md-6 col-12 mb-2">
-                        <ColorSelector
-                            :filter="'back_side_finish_color'"
-                            v-if="doorForm.back_side_finish.title!=='Под покраску'"
-                            @invalid="alert('Вы не выбрали цвет отделки второй стороны')"
-                            v-model="doorForm.back_side_finish_color">
-                            <template #name>
-                                Цвет отделки второй стороны
-                            </template>
-                        </ColorSelector>
-                        <div class="card rounded-0" v-else>
-                            <div class="card-body p-3 disabled-element">
-                                <p class="text-center">Выбрано "Под покраску"</p>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-6 col-12">
-
-                        <ColorSelector
-                            v-if="!color_sync_update"
-                            :filter="'box_and_frame_color'"
-                            v-on:change="syncColors('box_and_frame_color',$event)"
-                            @invalid="alert('Вы не выбрали цвет короба и каркаса')"
-                            v-model="doorForm.box_and_frame_color">
-                            <template #name>
-                                Цвет короба и каркаса
-                            </template>
-                        </ColorSelector>
-
-
-                    </div>
-
-                    <div class="col-md-6 col-12">
-                        <ColorSelector
-                            v-if="!color_sync_update"
-                            :filter="'seal_color'"
-                            @invalid="alert('Вы не выбрали цвет уплотнителя')"
-                            v-model="doorForm.seal_color">
-                            <template #name>
-                                Цвет уплотнителя
-                            </template>
-                        </ColorSelector>
-
-                    </div>
-
-                    <div class="col-md-6 col-12">
-
-                        <ColorSelector
-                            v-if="!color_sync_update"
-                            :filter="'fittings_color'"
-                            @invalid="alert('Вы не выбрали цвет фурнитуры')"
-                            v-model="doorForm.fittings_color">
-                            <template #name>
-                                Цвет фурнитуры
-                            </template>
-                        </ColorSelector>
-
-                    </div>
-
-                    <div class="col-md-6 col-12"
-                         v-if="doorForm.fittings_color.title!=null&&doorForm.fittings_color.is_ral">
-
-                        <div class="form-floating w-100">
-                            <select class="form-select"
-                                    v-model="doorForm.service_painting"
-                                    id="door-service-painting" aria-label="Floating label select example">
-                                <option :value="service" v-for="service in getServiceByType('service_painting')">
-                                    {{ service.title || '-' }}
-                                </option>
-                            </select>
-                            <label for="door-service-painting">Выберите вариант</label>
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-12">
+                <div class="col-md-6 col-12 mb-2">
+                    <div class="input-group">
                         <div class="form-floating ">
+                            <select class="form-select"
+                                    @invalid="alert('Вы не выбрали отделку второй стороны двери!')"
+                                    v-model="doorForm.back_side_finish"
+                                    id="floatingSelect" aria-label="Floating label select example" required>
+                                <option :value="{title:null}">Выберите один из вариантов</option>
+                                <option :value="item" v-for="item in getDictionary.finishes_variants">{{
+                                        item.title
+                                    }}
+                                </option>
+                            </select>
+                            <label for="floatingSelect"><i class="fa-solid fa-paint-roller"></i> Отделка второй
+                                стороны</label>
+                        </div>
+                        <button
+                            v-if="(doorForm.back_side_finish.door_variants || []).length !== 0"
+                            @click="selectBackSideFinish"
+                            class="btn btn-outline-secondary rounded-0" type="button">
+                            <i class="fa-solid fa-images"></i>
+                        </button>
+
+                    </div>
+                    <p v-if="priceForSide('back_side_finish')===0" style="line-height: 100%;"><small><em><strong
+                        class="text-danger">Внимание!</strong>
+                        сочетание размера и материала не доступно для заказа!</em></small></p>
+
+                </div>
+
+                <div class="col-md-6 col-12 mb-2">
+                    <ColorSelector
+                        :filter="'back_side_finish_color'"
+                        v-if="doorForm.back_side_finish.title!=='Под покраску'"
+                        @invalid="alert('Вы не выбрали цвет отделки второй стороны')"
+                        v-model="doorForm.back_side_finish_color">
+                        <template #name>
+                            Цвет отделки второй стороны
+                        </template>
+                    </ColorSelector>
+                    <div class="card rounded-0" v-else>
+                        <div class="card-body p-3 disabled-element">
+                            <p class="text-center">Выбрано "Под покраску"</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-12">
+
+                    <ColorSelector
+                        v-if="!color_sync_update"
+                        :filter="'box_and_frame_color'"
+                        v-on:change="syncColors('box_and_frame_color',$event)"
+                        @invalid="alert('Вы не выбрали цвет короба и каркаса')"
+                        v-model="doorForm.box_and_frame_color">
+                        <template #name>
+                            Цвет короба и каркаса
+                        </template>
+                    </ColorSelector>
+
+
+                </div>
+
+                <div class="col-md-6 col-12">
+                    <ColorSelector
+                        v-if="!color_sync_update"
+                        :filter="'seal_color'"
+                        @invalid="alert('Вы не выбрали цвет уплотнителя')"
+                        v-model="doorForm.seal_color">
+                        <template #name>
+                            Цвет уплотнителя
+                        </template>
+                    </ColorSelector>
+
+                </div>
+
+                <div class="col-md-6 col-12">
+
+                    <ColorSelector
+                        v-if="!color_sync_update"
+                        :filter="'fittings_color'"
+                        @invalid="alert('Вы не выбрали цвет фурнитуры')"
+                        v-model="doorForm.fittings_color">
+                        <template #name>
+                            Цвет фурнитуры
+                        </template>
+                    </ColorSelector>
+
+                </div>
+
+                <div class="col-md-6 col-12"
+                     v-if="doorForm.fittings_color.title!=null&&doorForm.fittings_color.is_ral">
+
+                    <div class="form-floating w-100">
+                        <select class="form-select"
+                                v-model="doorForm.service_painting"
+                                id="door-service-painting" aria-label="Floating label select example">
+                            <option :value="service" v-for="service in getServiceByType('service_painting')">
+                                {{ service.title || '-' }}
+                            </option>
+                        </select>
+                        <label for="door-service-painting">Выберите вариант</label>
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+                    <div class="form-floating ">
                             <textarea class="form-control border-secondary rounded-0"
                                       v-model="doorForm.comment"
                                       style="min-height: 100px;"
                                       placeholder="Оставьте комментарий" id="door-comment"></textarea>
-                            <label for="door-comment">Комментарий к двери</label>
-                        </div>
+                        <label for="door-comment">Комментарий к двери</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row py-3" v-if="need_addition">
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               v-model="doorForm.need_handle_holes"
+                               type="checkbox" role="switch" id="need-handle-holes" checked>
+                        <label class="form-check-label" for="need-handle-holes">
+                            Нужна ручка \ не нужна ручка
+                        </label>
                     </div>
 
                 </div>
 
-                <div class="row py-3" v-if="need_addition">
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="doorForm.need_handle_holes"
-                                   type="checkbox" role="switch" id="need-handle-holes" checked>
-                            <label class="form-check-label" for="need-handle-holes">
-                                Нужна ручка \ не нужна ручка
-                            </label>
-                        </div>
-
+                <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes">
+                    <div class="form-floating mb-2">
+                        <select class="form-select"
+                                @invalid="alert('Вы не выбрали отверстие под ручку!')"
+                                v-model="doorForm.handle_holes"
+                                id="floatingSelect" aria-label="Floating label select example" required>
+                            <!--                                <option :value="{title:null}">Выберите один из вариантов</option>-->
+                            <option :value="item" v-for="item in getDictionary.handle_holes_variants">{{
+                                    item.title
+                                }}
+                            </option>
+                        </select>
+                        <label for="floatingSelect">Отверстия под ручку</label>
                     </div>
+                </div>
 
-                    <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes">
-                        <div class="form-floating mb-2">
-                            <select class="form-select"
-                                    @invalid="alert('Вы не выбрали отверстие под ручку!')"
-                                    v-model="doorForm.handle_holes"
-                                    id="floatingSelect" aria-label="Floating label select example" required>
-                                <!--                                <option :value="{title:null}">Выберите один из вариантов</option>-->
-                                <option :value="item" v-for="item in getDictionary.handle_holes_variants">{{
-                                        item.title
-                                    }}
-                                </option>
-                            </select>
-                            <label for="floatingSelect">Отверстия под ручку</label>
+                <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
+                    <HandleSearchModal v-model="doorForm"/>
+                </div>
+
+                <div
+                    v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
+                    class="col-12 d-flex align-items-center">
+
+
+                </div>
+
+                <div class="col-12"
+                     v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
+                    <div class="row">
+
+                        <div class="col-12 d-flex justify-content-between">
+                            <p class="mb-2">Цвет ручки "{{ doorForm.handle_holes_type.color || 'не указан' }}"
+                                <span
+                                    class="d-inline-block"
+                                    v-bind:style="{'background-color': doorForm.handle_holes_type.color }"
+                                    style="width:50px; height: 10px;"
+                                    v-if="doorForm.handle_holes_type.color"
+                                >
+                                </span>
+
+
+                            </p>
+                            <a
+                                @click="showDetails(doorForm.handle_holes_type)"
+                                href="javascript:void(0)"
+                                class="fst-italic cursor-pointer btn btn-link p-0">Дополнительные параметры ручки</a>
                         </div>
-                    </div>
+                        <div class="col-lg-3 col-md-3 col-12 mb-2"
+                             v-for="(item, index) in doorForm.handle_holes_type.variants">
+                            <div class="card rounded-0 border-black"
+                                 v-bind:class="{'border-secondary shadow-lg':item.selected}">
+                                <a :href="item.image" target="_blank">
+                                    <img
+                                        style="min-height: 200px;display: flex; justify-content: center; align-items: center;"
+                                        v-lazy="item.image" class="card-img-top object-fit-contain" alt="...">
+                                </a>
+                                <div class="card-body" v-if="item.title||item.description">
+                                    <h6 class="font-bold" v-if="item.title">{{ item.title || 'не указано' }}</h6>
+                                    <p class="card-text" v-if="item.description">{{
+                                            item.description || 'не указано'
+                                        }}</p>
 
-                    <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
-                        <div class="form-floating">
-                            <select class="form-select"
-                                    @invalid="alert('Вы не выбрали внешний вид ручки!')"
-                                    v-model="doorForm.handle_holes_type"
-                                    id="floatingSelect" aria-label="Floating label select example" required>
-                                <option :value="{title:null}">Выберите один из вариантов</option>
-                                <option :value="item" v-for="item in getDictionary.handle_holes_type_variants">{{
-                                        item.title
-                                    }}
-                                </option>
-                            </select>
-                            <label for="floatingSelect">Выбор ручки</label>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
-                        class="col-12 d-flex align-items-center">
-                        <div class="form-floating w-100 mb-2">
-                            <select class="form-select"
-                                    v-model="doorForm.service_handle"
-                                    id="door-service-door_closer"
-                                    aria-label="Floating label select example">
-                                <option :value="{title:null}">Не выбрано</option>
-                                <option :value="service" v-for="service in getServiceByType('service_handle')">
-                                    {{ service.title || '-' }}
-                                </option>
-                            </select>
-                            <label for="door-service-door_closer">Вариант дополнительного сервиса</label>
-                        </div>
-
-                    </div>
-
-                    <div class="col-12"
-                         v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
-                        <div class="row">
-
-                            <div class="col-12">
-                                <p class="mb-2">Цвет ручки {{ doorForm.handle_holes_type.color || 'не указан' }}
-                                    <span
-                                        class="d-inline-block"
-                                        v-bind:style="{'background-color': doorForm.handle_holes_type.color }"
-                                        style="width:50px; height: 10px;"
-                                        v-if="doorForm.handle_holes_type.color"
-                                    >
-                        </span>
-                                </p>
-
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-12 mb-2"
-                                 v-for="(item, index) in doorForm.handle_holes_type.variants">
-                                <div class="card cursor-pointer"
-                                     v-bind:class="{'border-secondary shadow-lg':item.selected}"
-                                     @click="selectSideFinish('handle_holes_type','variants',index)">
-                                    <img v-lazy="item.image" class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h6 class="font-bold" v-if="item.title">{{ item.title || 'не указано' }}</h6>
-                                        <p class="card-text" v-if="item.description">{{
-                                                item.description || 'не указано'
-                                            }}</p>
-
-                                    </div>
                                 </div>
                             </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col-12"
-                         v-if="(doorForm.handle_holes_type.variants||[]).length===0&&doorForm.need_handle_holes">
-
-                        <div class="alert alert-warning rounded-0" role="alert">
-                            <p>Вариантов изображений ручки нет</p>
-                        </div>
-                    </div>
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch ">
-                            <input class="form-check-input"
-                                   v-model="doorForm.need_upper_jumper"
-                                   type="checkbox" role="switch" id="need-upper-jumper" checked>
-                            <label class="form-check-label" for="need-upper-jumper">
-                                Нужна верхняя перемычка
-                            </label>
                         </div>
 
                     </div>
+                </div>
 
+                <div class="col-12"
+                     v-if="(doorForm.handle_holes_type.variants||[]).length===0&&doorForm.need_handle_holes">
 
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   type="checkbox"
-
-                                   v-model="doorForm.need_automatic_doorstep"
-                                   role="switch" id="need-automatic-doorstep" checked>
-                            <label class="form-check-label" for="need-automatic-doorstep">
-                                Нужен автоматический порог \ не нужен
-                            </label>
-                        </div>
-
-
+                    <div class="alert alert-warning rounded-0" role="alert">
+                        <p>Вариантов изображений ручки нет</p>
                     </div>
+                </div>
 
-
-                    <div
-                        v-if="doorForm.need_automatic_doorstep"
-                        class="col-12 d-flex align-items-center">
-                        <div class="form-floating w-100 my-3">
-                            <select class="form-select"
-                                    v-model="doorForm.service_doorstep"
-                                    id="door-service-doorstep" aria-label="Floating label select example">
-                                <option :value="service" v-for="service in getServiceByType('service_doorstep')">
-                                    {{ service.title || '-' }}
-                                </option>
-                            </select>
-                            <label for="door-service-doorstep">Выберите вариант</label>
-                        </div>
-
-                    </div>
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   type="checkbox" role="switch"
-                                   v-model="doorForm.need_hidden_stopper"
-                                   id="need-hidden-stopper" checked>
-                            <label class="form-check-label" for="need-hidden-stopper">
-                                Нужен скрытый стопор \ не нужен
-                            </label>
-                        </div>
-                    </div>
-
-
-                    <div
-                        v-if="doorForm.need_hidden_stopper"
-                        class="col-12 d-flex align-items-center">
-                        <div class="form-floating w-100 my-3">
-                            <select class="form-select"
-                                    v-model="doorForm.service_stopper"
-                                    id="door-service-stopper"
-                                    aria-label="Floating label select example">
-                                <option :value="service" v-for="service in getServiceByType('service_stopper')">
-                                    {{ service.title || '-' }}
-                                </option>
-                            </select>
-                            <label for="door-service-stopper">Выберите вариант</label>
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="doorForm.need_hidden_door_closer"
-                                   type="checkbox" role="switch" id="need-hidden-door-closer" checked>
-                            <label class="form-check-label" for="need-hidden-door-closer">
-                                Нужен скрытый доводчик \ не нужен
-                            </label>
-                        </div>
-
-
-                    </div>
-
-                    <div
-                        v-if="doorForm.need_hidden_door_closer"
-                        class="col-12 d-flex align-items-center">
-                        <div class="form-floating w-100 my-3">
-                            <select class="form-select"
-                                    v-model="doorForm.service_door_closer"
-                                    id="door-service-door_closer"
-                                    aria-label="Floating label select example">
-                                <option :value="service" v-for="service in getServiceByType('service_door_closer')">
-                                    {{ service.title || '-' }}
-                                </option>
-                            </select>
-                            <label for="door-service-door_closer">Выберите вариант</label>
-                        </div>
-
-                    </div>
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   v-model="doorForm.need_hidden_skirting_board"
-                                   type="checkbox" role="switch" id="need-hidden-skirting-board" checked>
-                            <label class="form-check-label" for="need-hidden-skirting-board">
-                                Нужен скрытый плинтус \ не нужен
-                            </label>
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   v-model="doorForm.need_door_install"
-                                   role="switch" id="need-door-install" checked>
-                            <label class="form-check-label" for="need-door-install">
-                                Нужна установка двери \ не нужна
-                            </label>
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="col-12 d-flex align-items-center">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   v-model="doorForm.need_wrapper"
-                                   role="switch" id="need-door-wrapper" checked>
-                            <label class="form-check-label" for="need-door-wrapper">
-                                Нужна упаковка двери \ не нужна
-                            </label>
-                        </div>
-
-
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch ">
+                        <input class="form-check-input"
+                               v-model="doorForm.need_upper_jumper"
+                               type="checkbox" role="switch" id="need-upper-jumper" checked>
+                        <label class="form-check-label" for="need-upper-jumper">
+                            Нужна верхняя перемычка
+                        </label>
                     </div>
 
                 </div>
 
 
-                <div class="footer-nav w-100">
-                    <div class="row bg-white p-2 m-0 border-gray-100 border shadow-md">
-                        <div class="p-0 mb-2"
-                             v-bind:class="{'col-md-2':doorForm.price_type.id===3,'col-md-4':doorForm.price_type.id!==3}">
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+
+                               v-model="doorForm.need_automatic_doorstep"
+                               role="switch" id="need-automatic-doorstep" checked>
+                        <label class="form-check-label" for="need-automatic-doorstep">
+                            Нужен автоматический порог \ не нужен
+                        </label>
+                    </div>
 
 
-                            <div class="form-floating">
-                                <select class="form-select"
-                                        v-model="doorForm.price_type"
-                                        @invalid="alert('Вы не выбрали тип цены!')"
-                                        id="door-type" aria-label="door-type" required>
+                </div>
 
-                                    <option :value="item"
-                                            v-for="item in getDictionary.price_type_variants">{{
-                                            item.title
-                                        }}
-                                    </option>
-                                </select>
-                                <label for="door-type">Тип цены</label>
-                            </div>
-                        </div>
-                        <div class="col-md-2 mb-2"
-                             v-if="doorForm.price_type.id===3">
-                            <div class="form-floating">
-                                <input type="number"
-                                       min="0"
-                                       @invalid="alert('Вы не ввели процент дилера!')"
-                                       v-model="doorForm.dealer_percent"
-                                       class="form-control text-center" id="floatingInput" required>
-                                <label for="floatingInput">Процент дилера</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 d-flex justify-between mb-2">
-                            <button type="button"
-                                    @click="changeDoorCount('sub')"
-                                    class="btn btn-dark rounded-0 mr-2 px-3">
-                                <i class="fa-solid fa-minus"></i>
-                            </button>
-                            <div class="input-group">
-                                <input type="number"
-                                       @invalid="alert('Вы не указали количество дверей')"
-                                       v-model="doorForm.count"
-                                       min="1" value="1" class="form-control rounded-0 text-center">
-                            </div>
 
-                            <button type="button"
-                                    @click="changeDoorCount('add')"
-                                    class="btn btn-dark rounded-0 ml-2 px-3">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
+                <div
+                    v-if="doorForm.need_automatic_doorstep"
+                    class="col-12 d-flex align-items-center">
+                    <div class="form-floating w-100 my-3">
+                        <select class="form-select"
+                                v-model="doorForm.service_doorstep"
+                                id="door-service-doorstep" aria-label="Floating label select example">
+                            <option :value="service" v-for="service in getServiceByType('service_doorstep')">
+                                {{ service.title || '-' }}
+                            </option>
+                        </select>
+                        <label for="door-service-doorstep">Выберите вариант</label>
+                    </div>
 
-                        </div>
-                        <div class="col-md-2 d-flex justify-center align-items-center mb-2">
-                            <p class="text-center text-primary font-bold text-black" style="font-size: 16px;">
-                                {{ resultPrice }}х{{ doorForm.count }}={{ resultPrice * doorForm.count }}₽</p>
-                        </div>
-                        <div class="col-md-2 d-flex">
-                            <button
-                                :disabled="!doorForm.price_type.key"
-                                class="btn btn-dark rounded-0 w-100"><i class="fa-solid fa-floppy-disk"></i> Сохранить
-                            </button>
-                        </div>
+                </div>
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox" role="switch"
+                               v-model="doorForm.need_hidden_stopper"
+                               id="need-hidden-stopper" checked>
+                        <label class="form-check-label" for="need-hidden-stopper">
+                            Нужен скрытый стопор \ не нужен
+                        </label>
                     </div>
                 </div>
-            </form>
+
+
+                <div
+                    v-if="doorForm.need_hidden_stopper"
+                    class="col-12 d-flex align-items-center">
+                    <div class="form-floating w-100 my-3">
+                        <select class="form-select"
+                                v-model="doorForm.service_stopper"
+                                id="door-service-stopper"
+                                aria-label="Floating label select example">
+                            <option :value="service" v-for="service in getServiceByType('service_stopper')">
+                                {{ service.title || '-' }}
+                            </option>
+                        </select>
+                        <label for="door-service-stopper">Выберите вариант</label>
+                    </div>
+
+                </div>
+
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               v-model="doorForm.need_hidden_door_closer"
+                               type="checkbox" role="switch" id="need-hidden-door-closer" checked>
+                        <label class="form-check-label" for="need-hidden-door-closer">
+                            Нужен скрытый доводчик \ не нужен
+                        </label>
+                    </div>
+
+
+                </div>
+
+                <div
+                    v-if="doorForm.need_hidden_door_closer"
+                    class="col-12 d-flex align-items-center">
+                    <div class="form-floating w-100 my-3">
+                        <select class="form-select"
+                                v-model="doorForm.service_door_closer"
+                                id="door-service-door_closer"
+                                aria-label="Floating label select example">
+                            <option :value="service" v-for="service in getServiceByType('service_door_closer')">
+                                {{ service.title || '-' }}
+                            </option>
+                        </select>
+                        <label for="door-service-door_closer">Выберите вариант</label>
+                    </div>
+
+                </div>
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               v-model="doorForm.need_hidden_skirting_board"
+                               type="checkbox" role="switch" id="need-hidden-skirting-board" checked>
+                        <label class="form-check-label" for="need-hidden-skirting-board">
+                            Нужен скрытый плинтус \ не нужен
+                        </label>
+                    </div>
+
+                </div>
+
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               v-model="doorForm.need_door_install"
+                               role="switch" id="need-door-install" checked>
+                        <label class="form-check-label" for="need-door-install">
+                            Нужна установка двери \ не нужна
+                        </label>
+                    </div>
+
+
+                </div>
+
+
+                <div class="col-12 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               v-model="doorForm.need_wrapper"
+                               role="switch" id="need-door-wrapper" checked>
+                        <label class="form-check-label" for="need-door-wrapper">
+                            Нужна упаковка двери \ не нужна
+                        </label>
+                    </div>
+
+
+                </div>
+
+            </div>
+
 
         </div>
         <div class="col-md-6">
@@ -809,6 +728,70 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
         </div>
 
 
+        <div class="col-12 mt-2">
+            <div class="row bg-white ">
+                <div
+                    v-bind:class="{'col-md-2':doorForm.price_type.id===3,'col-md-4':doorForm.price_type.id!==3}">
+
+
+                    <div class="form-floating">
+                        <select class="form-select"
+                                v-model="doorForm.price_type"
+                                @invalid="alert('Вы не выбрали тип цены!')"
+                                id="door-type" aria-label="door-type" required>
+
+                            <option :value="item"
+                                    v-for="item in getDictionary.price_type_variants">{{
+                                    item.title
+                                }}
+                            </option>
+                        </select>
+                        <label for="door-type">Тип цены</label>
+                    </div>
+                </div>
+                <div class="col-md-2"
+                     v-if="doorForm.price_type.id===3">
+                    <div class="form-floating">
+                        <input type="number"
+                               min="0"
+                               @invalid="alert('Вы не ввели процент дилера!')"
+                               v-model="doorForm.dealer_percent"
+                               class="form-control text-center" id="floatingInput" required>
+                        <label for="floatingInput">Процент дилера</label>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex justify-between">
+                    <button type="button"
+                            @click="changeDoorCount('sub')"
+                            class="btn btn-dark rounded-0 mr-2 px-3">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                    <div class="input-group">
+                        <input type="number"
+                               @invalid="alert('Вы не указали количество дверей')"
+                               v-model="doorForm.count"
+                               min="1" value="1" class="form-control rounded-0 text-center">
+                    </div>
+
+                    <button type="button"
+                            @click="changeDoorCount('add')"
+                            class="btn btn-dark rounded-0 ml-2 px-3">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+
+                </div>
+                <div class="col-md-2 d-flex justify-center align-items-center">
+                    <p class="text-center text-primary font-bold text-black" style="font-size: 16px;">
+                        {{ resultPrice }}х{{ doorForm.count }}={{ resultPrice * doorForm.count }}₽</p>
+                </div>
+                <div class="col-md-2 d-flex">
+                    <button
+                        :disabled="!doorForm.price_type.key"
+                        class="btn btn-dark rounded-0 w-100"><i class="fa-solid fa-floppy-disk"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="col-12">
 
             <div
@@ -821,7 +804,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
         </div>
 
-    </div>
+    </form>
 
     <div class="row" v-else>
         <div class="col-12">
@@ -833,7 +816,8 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
             </div>
         </div>
     </div>
-    <div class="modal fade  " id="editor-confirm-dialog-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade  " id="editor-confirm-dialog-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0">
 
@@ -911,6 +895,28 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="show-current-handle-details" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Просмотр деталей</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <template v-if="selectedHandle">
+                        <HandleDetail :selected-handle="selectedHandle">
+                        </HandleDetail>
+                    </template>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -920,13 +926,14 @@ import {uuid} from 'vue-uuid';
 export default {
 
     name: 'MyComponent',
-    props: ['door'],
+    props: ['door', 'editOrder'],
     data() {
         return {
             loaded: false,
+            selectedHandle: null,
             type_dictionary: {
                 size: 'Петли',
-                handle_holes_type: 'Отверстие под ручку',
+                handle_holes_type: 'Ручка',
                 opening_type: 'Тип открытия двери и толщина',
                 box_and_frame_color: 'Цвет короба и каркаса',
                 door_type: 'Тип двери',
@@ -941,7 +948,7 @@ export default {
                 service_doorstep: 'Работа с порогом',
                 service_painting: 'Покраска фурнитуры',
                 service_door_closer: 'Работа с доводчиком',
-                service_handle: 'Работа с ручками',
+                service_handle: 'Услуги по монтажу ручки',
                 service_stopper: 'Работа со стопором',
 
             },
@@ -1041,7 +1048,7 @@ export default {
                             let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
                             sum += parseInt(price || 0)
 
-                            console.log("opening_type",price,item )
+                            console.log("opening_type", price, item)
                             this.tmp_prices.push({
                                 type: item,
                                 price: price
@@ -1288,7 +1295,7 @@ export default {
                 }
             }
 
-            let intRound = (arg)=> {
+            let intRound = (arg) => {
                 return Math.round(parseInt(arg) / 10) * 10;
             }
 
@@ -1419,7 +1426,7 @@ export default {
     },
 
     mounted() {
-
+        this.detailsModal = new bootstrap.Modal(document.getElementById('show-current-handle-details'), {})
         //this.loadRalColors()
 
         window.addEventListener("clear-cart", (e) => {
@@ -1444,41 +1451,49 @@ export default {
             this.$store.dispatch("loadFormattedSizes").then(resp => {
                 this.loaded = false
                 this.$nextTick(() => {
-                    this.doorForm.id = this.door.product.id
-                    this.doorForm.width = this.door.product.width
-                    this.doorForm.height = this.door.product.height
-                    this.doorForm.depth = this.door.product.depth
-                    this.doorForm.count = this.door.quantity
-                    this.doorForm.size = this.door.product.size
-                    this.doorForm.purpose = this.door.product.purpose || "Входная"
-                    this.doorForm.handle_holes = this.door.product.handle_holes || {title: null}
-                    this.doorForm.handle_holes_type = this.door.product.handle_holes_type || {title: null}
-                    this.doorForm.opening_type = this.door.product.opening_type || {title: null}
-                    this.doorForm.box_and_frame_color = this.door.product.box_and_frame_color || {title: null}
-                    this.doorForm.door_type = this.door.product.door_type || {title: null}
-                    this.doorForm.front_side_finish = this.door.product.front_side_finish || {title: null}
-                    this.doorForm.back_side_finish = this.door.product.back_side_finish || {title: null}
-                    this.doorForm.front_side_finish_color = this.door.product.front_side_finish_color || {title: null}
-                    this.doorForm.back_side_finish_color = this.door.product.back_side_finish_color || {title: null}
-                    this.doorForm.seal_color = this.door.product.seal_color || {title: null}
-                    this.doorForm.fittings_color = this.door.product.fittings_color || {title: null}
-                    this.doorForm.loops = this.door.product.loops || {title: null}
-                    this.doorForm.loops_count = this.door.product.loops_count || 0
-                    this.doorForm.price_type = this.door.product.price_type || {title: null}
-                    this.doorForm.hinge_manufacturer = this.door.product.hinge_manufacturer || {title: null}
-                    this.doorForm.need_handle_holes = this.door.product.need_handle_holes || true
-                    this.doorForm.need_upper_jumper = this.door.product.need_upper_jumper || true
-                    this.doorForm.need_automatic_doorstep = this.door.product.need_automatic_doorstep || false
-                    this.doorForm.need_hidden_stopper = this.door.product.need_hidden_stopper || false
-                    this.doorForm.need_hidden_door_closer = this.door.product.need_hidden_door_closer || false
-                    this.doorForm.need_hidden_skirting_board = this.door.product.need_hidden_skirting_board || false
-                    this.doorForm.need_door_install = this.door.product.need_door_install || false
-                    this.doorForm.need_wrapper = this.door.product.need_wrapper || true
-                    this.doorForm.service_doorstep = this.door.product.service_doorstep || {title: null}
-                    this.doorForm.service_painting = this.door.product.service_painting || {title: null}
-                    this.doorForm.service_stopper = this.door.product.service_stopper || {title: null}
-                    this.doorForm.service_door_closer = this.door.product.service_door_closer || {title: null}
-                    this.doorForm.service_handle = this.door.product.service_handle || {title: null}
+
+                    let door = this.door.product ? this.door.product : this.door.door
+
+                    console.log(door)
+
+                    this.doorForm.id = this.editOrder ? this.door.id : this.door.product.id
+
+
+                    this.doorForm.width = door.width
+                    this.doorForm.height = door.height
+                    this.doorForm.depth = door.depth
+                    this.doorForm.count = this.editOrder ? this.door.count : door.quantity
+                    this.doorForm.size = door.size
+                    this.doorForm.purpose = door.purpose || "Входная"
+                    this.doorForm.handle_holes = door.handle_holes || {title: null}
+                    this.doorForm.handle_holes_type = door.handle_holes_type || {title: null}
+                    this.doorForm.opening_type = door.opening_type || {title: null}
+                    this.doorForm.box_and_frame_color = door.box_and_frame_color || {title: null}
+                    this.doorForm.door_type = door.door_type || {title: null}
+                    this.doorForm.front_side_finish = door.front_side_finish || {title: null}
+                    this.doorForm.back_side_finish = door.back_side_finish || {title: null}
+                    this.doorForm.front_side_finish_color = door.front_side_finish_color || {title: null}
+                    this.doorForm.back_side_finish_color = door.back_side_finish_color || {title: null}
+                    this.doorForm.seal_color = door.seal_color || {title: null}
+                    this.doorForm.fittings_color = door.fittings_color || {title: null}
+                    this.doorForm.loops = door.loops || {title: null}
+                    this.doorForm.loops_count = door.loops_count || 0
+                    this.doorForm.price_type = door.price_type || {title: null}
+                    this.doorForm.hinge_manufacturer = door.hinge_manufacturer || {title: null}
+                    this.doorForm.need_handle_holes = door.need_handle_holes || true
+                    this.doorForm.need_upper_jumper = door.need_upper_jumper || true
+                    this.doorForm.need_automatic_doorstep = door.need_automatic_doorstep || false
+                    this.doorForm.need_hidden_stopper = door.need_hidden_stopper || false
+                    this.doorForm.need_hidden_door_closer = door.need_hidden_door_closer || false
+                    this.doorForm.need_hidden_skirting_board = door.need_hidden_skirting_board || false
+                    this.doorForm.need_door_install = door.need_door_install || false
+                    this.doorForm.need_wrapper = door.need_wrapper || true
+                    this.doorForm.service_doorstep = door.service_doorstep || {title: null}
+                    this.doorForm.service_painting = door.service_painting || {title: null}
+                    this.doorForm.service_stopper = door.service_stopper || {title: null}
+                    this.doorForm.service_door_closer = door.service_door_closer || {title: null}
+                    this.doorForm.service_handle = door.service_handle || {title: null}
+
 
                     this.loaded = true
                 })
@@ -1495,7 +1510,16 @@ export default {
 
     },
     methods: {
+        showDetails(item) {
+            this.selectedHandle = null
 
+            this.$nextTick(() => {
+                this.selectedHandle = item
+                this.detailsModal.show()
+            })
+
+
+        },
         loadRalColors() {
             this.$store.dispatch("loadRalColors")
         },
@@ -1670,46 +1694,46 @@ export default {
                 {
                     color: 'Silver',
                     box_and_frame_color: {
-                        title:'Серебро',
-                        code:'#c0c0c0',
+                        title: 'Серебро',
+                        code: '#c0c0c0',
                     },
                     seal_color: {
-                        title:'Серый',
-                        code:'#808080'
+                        title: 'Серый',
+                        code: '#808080'
                     },
                     fittings_color: {
-                        title:'Серебро',
-                        code:'#c0c0c0',
+                        title: 'Серебро',
+                        code: '#c0c0c0',
                     },
                 },
                 {
                     color: 'Black',
                     box_and_frame_color: {
-                        title:'Черный',
-                        code:'#000000',
+                        title: 'Черный',
+                        code: '#000000',
                     },
                     seal_color: {
-                        title:'Черный',
-                        code:'#000000',
+                        title: 'Черный',
+                        code: '#000000',
                     },
                     fittings_color: {
-                        title:'Черный',
-                        code:'#000000',
+                        title: 'Черный',
+                        code: '#000000',
                     },
                 },
                 {
                     color: 'Gold',
                     box_and_frame_color: {
-                        title:'Золотой',
-                        code:'#ffd700',
+                        title: 'Золотой',
+                        code: '#ffd700',
                     },
-                    seal_color:  {
-                        title:'Бежевый',
-                        code:'#f5f5dc',
+                    seal_color: {
+                        title: 'Бежевый',
+                        code: '#f5f5dc',
                     },
                     fittings_color: {
-                        title:'Золотой',
-                        code:'#ffd700',
+                        title: 'Золотой',
+                        code: '#ffd700',
                     },
                 }
             ]
@@ -1758,6 +1782,29 @@ export default {
         },
         submitForm() {
             this.messages = []
+
+            if (this.editOrder) {
+                let data = new FormData();
+                Object.keys(this.doorForm)
+                    .forEach(key => {
+                        const item = this.doorForm[key] || ''
+                        if (typeof item === 'object')
+                            data.append(key, JSON.stringify(item))
+                        else
+                            data.append(key, item)
+                    });
+
+
+                this.$store.dispatch("editDoorInOrder", {
+                    doorForm: data
+                }).then((response) => {
+                    this.$emit("callback")
+                    this.resetForm()
+                }).catch(error => {
+
+                })
+                return;
+            }
 
             this.$store.dispatch("addProductToCart", {
                 product: this.doorForm,

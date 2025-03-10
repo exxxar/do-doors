@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import HandleTable from "@/Components/Admin/Handles/HandleTable.vue";
 import HandleForm from "@/Components/Admin/Handles/HandleForm.vue";
 import {Head} from '@inertiajs/vue3';
+import HandlesUploadModal from "@/Components/Admin/Handles/HandlesUploadModal.vue";
 </script>
 
 <template>
@@ -17,7 +18,9 @@ import {Head} from '@inertiajs/vue3';
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+
                     <div class="p-6 text-gray-900">
+                        <HandlesUploadModal></HandlesUploadModal>
                         <HandleForm
                             v-if="!loading"
                             :item="selectedHandle"
@@ -40,6 +43,9 @@ export default {
             loading: false,
             selectedHandle: null,
         }
+    },
+    mounted() {
+        this.$store.dispatch("loadRalColors")
     },
     methods: {
         selectHandle(item) {

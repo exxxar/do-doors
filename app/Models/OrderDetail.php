@@ -23,6 +23,7 @@ class OrderDetail extends Model
         'comment',
         'purpose',
         'door',
+        'bitrix24_product_id',
     ];
 
     /**

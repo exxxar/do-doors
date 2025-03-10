@@ -113,7 +113,7 @@ import PermissionTable from "@/Components/Admin/Permissions/PermissionTable.vue"
     </form>
 
     <!-- Modal -->
-    <div class="modal fade " id="search-roles" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade " :id="id+'-search-roles'" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg ">
             <div class="modal-content rounded-0 border-secondary">
                 <div class="modal-header">
@@ -133,7 +133,9 @@ import PermissionTable from "@/Components/Admin/Permissions/PermissionTable.vue"
             </div>
         </div>
     </div>
-    <div class="modal fade " id="search-permissions" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div
+        style="z-index: 10000;"
+        class="modal fade " :id="id+'-search-permissions'" tabindex="-1" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog modal-lg ">
             <div class="modal-content rounded-0 border-secondary">
@@ -158,7 +160,7 @@ import PermissionTable from "@/Components/Admin/Permissions/PermissionTable.vue"
 </template>
 <script>
 export default {
-    props: ["item"],
+    props: ["item","id"],
     data() {
         return {
             roleSearchModal: null,
@@ -193,8 +195,8 @@ export default {
         }
     },
     mounted() {
-        this.roleSearchModal = new bootstrap.Modal(document.getElementById('search-roles'), {})
-        this.permissionSearchModal = new bootstrap.Modal(document.getElementById('search-permissions'), {})
+        this.roleSearchModal = new bootstrap.Modal(document.getElementById(this.id+'-search-roles'), {})
+        this.permissionSearchModal = new bootstrap.Modal(document.getElementById(this.id+'-search-permissions'), {})
 
         if (this.item)
             this.$nextTick(() => {

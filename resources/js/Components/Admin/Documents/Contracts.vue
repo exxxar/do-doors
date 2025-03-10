@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-12">
-            <h6 class="font-bold">Справочная информация</h6>
+            <h4 class="font-bold">Справочная информация</h4>
 
             <div class="alert alert-light my-3" role="alert">
                 Ниже представлены ключи, которые подставляются в шаблоны договоров клиента.
@@ -95,7 +95,7 @@
                     <td style="width: 100px;"><strong>${rsch}</strong></td>
                     <td>р/сч</td>
                 </tr>
-                
+
 
                 <tr>
                     <th scope="row" style="width: 30px;">16</th>

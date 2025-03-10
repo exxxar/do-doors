@@ -163,17 +163,21 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
     </form>
 
     <!-- Modal -->
-    <div class="modal fade" :id="'choose-color'" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div
+        style="z-index: 10000;"
+        class="modal fade" :id="id+'-choose-color'" tabindex="-1" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog ">
-            <div class="modal-content">
+            <div class="modal-content rounded-0">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Выбор цвета RAL</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
-                    <RalColorSelector v-on:select="callbackSelectColor"></RalColorSelector>
+                    <RalColorSelector
+                        :need-load-color="true"
+                        v-on:select="callbackSelectColor"></RalColorSelector>
 
                 </div>
 
@@ -184,7 +188,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 </template>
 <script>
 export default {
-    props: ["item"],
+    props: ["item","id"],
     data() {
         return {
             messages: [],
@@ -295,8 +299,12 @@ export default {
             this.colorModal.hide()
         },
         selectColor() {
-            this.colorModal = new bootstrap.Modal(document.getElementById('choose-color'), {})
+            this.loadRalColors()
+            this.colorModal = new bootstrap.Modal(document.getElementById(this.id+'-choose-color'), {})
             this.colorModal.show()
+        },
+        loadRalColors() {
+            this.$store.dispatch("loadRalColors")
         },
 
         alert(msg) {

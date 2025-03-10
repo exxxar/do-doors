@@ -30,6 +30,17 @@ class Order extends Model
         'paid',
         'debt',
         'profit',
+        'work_days',
+        'bitrix24_lead_id',
+
+        'delivery_terms',
+        'info',
+        'total_price',
+        'total_count',
+        'current_payed',
+        'payed_percent',
+        'client_data',
+
     ];
 
     /**
@@ -45,6 +56,11 @@ class Order extends Model
         'paid' => 'double',
         'debt' => 'double',
         'profit' => 'double',
+        'total_price' => 'double',
+        'total_count' => 'double',
+        'client_data' => 'array',
+        'current_payed' => 'double',
+        'payed_percent' => 'integer',
         'contract_date' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];

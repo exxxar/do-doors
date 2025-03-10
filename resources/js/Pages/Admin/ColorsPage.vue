@@ -19,6 +19,7 @@ import {Head} from '@inertiajs/vue3';
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <ColorForm
+                            :id="'color-form-1'"
                             v-if="!loading"
                             :item="selectedColor"
                             v-on:callback="callbackColorForm"></ColorForm>

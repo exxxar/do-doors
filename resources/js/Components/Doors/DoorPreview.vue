@@ -1,3 +1,8 @@
+<script setup>
+
+import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
+</script>
+
 <template>
 
     <div class="row" v-if="door">
@@ -104,32 +109,33 @@
             </div>
         </div>
         <div class="col-md-4 col-12">
-            <ul class="list-group list-group-numbered rounded-0 cursor-pointer">
+            <ul
+                class="list-group list-group-numbered rounded-0 cursor-pointer">
                 <li
-                    @click="door.need_upper_jumper=!door.need_upper_jumper"
+                    @click="disabled?null:door.need_upper_jumper=!door.need_upper_jumper"
                     v-bind:class="{'bg-dark text-white':door.need_upper_jumper}"
                     class="list-group-item">Верхняя перемычка</li>
                 <li
-                    @click="door.need_automatic_doorstep=!door.need_automatic_doorstep"
+                    @click="disabled?null:door.need_automatic_doorstep=!door.need_automatic_doorstep"
                     v-bind:class="{'bg-dark text-white':door.need_automatic_doorstep}"
                     class="list-group-item">Скрытый порог</li>
                 <li
-                    @click="door.need_hidden_skirting_board=!door.need_hidden_skirting_board"
+                    @click="disabled?null:door.need_hidden_skirting_board=!door.need_hidden_skirting_board"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_skirting_board}"
                     class="list-group-item">Скрытый плинтус</li>
                 <li
-                    @click="door.need_hidden_stopper=!door.need_hidden_stopper"
+                    @click="disabled?null:door.need_hidden_stopper=!door.need_hidden_stopper"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_stopper}"
                     class="list-group-item">Скрытый стопор</li>
                 <li
-                    @click="door.need_hidden_door_closer=!door.need_hidden_door_closer"
+                    @click="disabled?null:door.need_hidden_door_closer=!door.need_hidden_door_closer"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_door_closer}"
                     class="list-group-item">Скрытый доводчик</li>
                 <li
-                    @click="door.need_handle_holes=!door.need_handle_holes"
+                    @click="disabled?null:door.need_handle_holes=!door.need_handle_holes"
                     v-bind:class="{'bg-dark text-white':door.need_handle_holes&&door.loops.type}"
                     class="list-group-item">Дверная ручка</li>
-                <li class="list-group-item">Петли</li>
+                <li class="list-group-item bg-dark text-white">Петли</li>
 
             </ul>
 
@@ -139,14 +145,17 @@
     </div>
 
 
+
+
 </template>
 <script>
 export default {
-    props: ["modelValue"],
+    props: ["modelValue","disabled"],
     data() {
         return {
             side: 0,
-            door:null
+            door:null,
+
         }
     },
     watch: {
@@ -159,7 +168,10 @@ export default {
     },
     mounted() {
       this.door = this.modelValue
+
+
     },
+
     computed: {
         sideColor() {
             return this.side === 0 ? this.door.front_side_finish_color.code : this.door.back_side_finish_color.code

@@ -1,6 +1,7 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
 import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue";
+import SizeForm from "@/Components/Admin/Sizes/SizeForm.vue";
 </script>
 <template>
 
@@ -107,6 +108,7 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('width')">Ширина, см
                     <span v-if="sort.direction === 'desc'&&sort.column === 'width'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -156,6 +158,7 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                     <span v-if="sort.direction === 'asc'&&sort.column === 'material_id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+<!--
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
                     <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
@@ -163,12 +166,35 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center">Действие</th>
+-->
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
+
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+
+                            <li><a class="dropdown-item"
+                                   @click="duplicateItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
+                            </li>
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
                 <td class="text-center" @click="selectItem(item)">
                     {{ item.width || 0 }}
                 </td>
@@ -233,34 +259,12 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
                     </p>
                     <p v-else>Материал не выбран</p>
                 </td>
+<!--
                 <td class="text-center">
                     {{ item.updated_at || '-' }}
                 </td>
-                <td class="text-center">
-                    <div class="dropdown">
-                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item"
-                                   @click="selectItem(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
-                            <li><a class="dropdown-item"
-                                   @click="recountByKoef(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-bolt mr-2"></i>Пересчитать по
-                                коэффициенту</a></li>
+-->
 
-                            <li><a class="dropdown-item"
-                                   @click="duplicateItem(item.id)"
-                                   href="javascript:void(0)"><i class="fa-regular fa-copy mr-2"></i>Дублировать</a>
-                            </li>
-                            <li><a class="dropdown-item text-danger"
-                                   @click="removeItem(item.id)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
             </tr>
 
             </tbody>
@@ -284,6 +288,23 @@ import MaterialDropdown from "@/Components/Admin/Materials/MaterialDropdown.vue"
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="size-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <SizeForm
+                            :id="'size-form-2'"
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></SizeForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 </template>
 <script>
@@ -297,6 +318,8 @@ export default {
                 direction: "desc",
                 type: "sizes"
             },
+            editor_modal: null,
+            selected_item: null,
             search: null,
             current_page: 0,
             paginate_object: null,
@@ -317,6 +340,7 @@ export default {
     mounted() {
         this.loadSizes();
 
+        this.editor_modal = new bootstrap.Modal(document.getElementById('size-editor-modal'), {})
         window.addEventListener("load-sizes", () => {
             this.loadSizes();
 
@@ -365,7 +389,18 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+            //this.$emit("select", item)
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateSize", {

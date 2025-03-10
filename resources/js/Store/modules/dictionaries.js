@@ -1402,6 +1402,21 @@ const mutations = {
                 price: item.price,
                 color: item.color,
                 variants: item.variants,
+                sku: item.sku,
+                comment: item.comment,
+                brand: item.brand,
+                weight: item.weight,
+                material: item.material,
+                material_description: item.material_description,
+                coverage: item.coverage,
+                serial: item.serial,
+                model: item.model,
+                characteristics: item.characteristics,
+                base_shape: item.base_shape,
+                socket_diameter: item.socket_diameter,
+                square_length: item.square_length,
+                guarantee: item.guarantee,
+                dimensions: item.dimensions
             })
         })
 

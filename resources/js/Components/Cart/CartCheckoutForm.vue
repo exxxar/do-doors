@@ -2,6 +2,7 @@
 import CartResultForm from "@/Components/Cart/CartResultForm.vue";
 import LawDataForm from "@/Components/Cart/LawDataForm.vue";
 import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
+
 </script>
 
 <template>
@@ -10,14 +11,20 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
             <div class="form-floating">
                 <input type="text" class="form-control" v-model="clientForm.name" id="checkout-name"
                        placeholder="name@example.com" required>
-                <label for="checkout-name">Ваше Ф.И.О.</label>
+                <label for="checkout-name">Название компании\Ф.И.О. ИП</label>
             </div>
             <button v-if="self_clients.length>0" class="btn btn-outline-secondary" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end rounded-0">
-                <li><a class="dropdown-item" @click="selectInfo(null)" href="javascript:void(0)">Не выбрано</a></li>
+                <li><a class="dropdown-item" @click="selectInfo(null)" href="javascript:void(0)"><i
+                    class="fa-solid fa-ban"></i> Не выбрано</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" @click="showEditorForm" href="javascript:void(0)"><i
+                    class="fa-solid fa-plus"></i> Создать нового</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -37,7 +44,20 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
         <IndividualDataForm v-if="(type||0)===1"
                             v-model="clientForm"/>
 
-        <CartResultForm v-model="clientForm"/>
+        <CartResultForm
+            :disabled="timer"
+            v-model="clientForm">
+            <template #loader>
+                <div
+                    v-if="timer"
+                    class="d-flex justify-content-center my-3">
+                    <div class="spinner-border text-primary mx-2" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    Отправляем...
+                </div>
+            </template>
+        </CartResultForm>
 
         <button type="button" class="btn btn-outline-secondary w-100 rounded-0" @click="back">Назад
         </button>
@@ -47,6 +67,8 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
             <p>Вы должны добавить в корзину хотя бы одно изделие</p>
         </div>
     </div>
+
+
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -64,7 +86,9 @@ export default {
     data() {
         return {
             tab: 0,
+            timer:null,
             step: 0,
+            editor_modal: null,
             self_clients: [],
             clientForm: {
                 id: null,
@@ -82,16 +106,27 @@ export default {
 
                 passport: null,
                 passport_issued: null,
+                need_delivery:false,
                 delivery_address: null,
+                delivery_price: null,
+                delivery_city: null,
 
             }
         }
     },
     mounted() {
         this.loadSelfClients()
+
+
     },
     methods: {
 
+        showEditorForm(){
+            window.location.href = "/clients"
+        },
+        selectItem() {
+
+        },
         back() {
             this.$emit("back")
         },
@@ -160,6 +195,10 @@ export default {
             })
         },
         submit() {
+            this.timer = 0
+            let tmpTimer = setInterval(() => {
+                this.timer++
+            }, 1000)
 
             this.clientForm.items = this.cartProducts
 
@@ -179,6 +218,9 @@ export default {
             this.$store.dispatch("checkoutItems", {
                 clientForm: data
             }).then((response) => {
+
+                clearInterval(tmpTimer)
+                this.timer = null
 
                 this.step = 0
 
@@ -202,6 +244,9 @@ export default {
                 });
 
             }).catch(error => {
+                clearInterval(tmpTimer)
+                this.timer = null
+
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибочка...",

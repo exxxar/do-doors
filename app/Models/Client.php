@@ -51,40 +51,94 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getMainRequisites(){
-        $main_requisites = []; 
+    public function getBueryData()
+    {
+        $main_requisites = [];
         foreach ($this->requisites ?? [] as $item) {
-            if($item["is_main"]){
-                 $main_requisites = $item;
+            if ($item["is_main"]) {
+                $main_requisites = $item;
             }
         }
-   
-      if(empty($main_requisites)){
-        $main_requisites["bik"] = "-";
-        $main_requisites["checking_account"] = "-";
-        $main_requisites["correspondent_account"] = "-";
-        $main_requisites["bank"] = "-";
-      }
 
-        return $main_requisites;
+        $buyerData = [
+            'buyer_title' => $this->fio ?? '-',
+            'buyer_phone' => $this->phone ?? '-',
+            'buyer_inn' => $this->inn ?? '-',
+            'buyer_kpp' => $this->kpp ?? '-',
+            'buyer_ogrn' => $this->ogrn ?? '-',
+            'buyer_email' => $this->email ?? '-',
+            'buyer_representative' => null,
+            'buyer_bank_name' => $main_requisites["bank"] ?? '-',
+            'buyer_bank_bic' => $main_requisites["bik"] ?? '-',
+            'buyer_legal_address' => $this->law_address ?? '-',
+            'buyer_correspondent_account' => $main_requisites["correspondent_account"] ?? '-',
+            'buyer_checking_account' => $main_requisites["checking_account"] ?? '-',
+            'buyer_settlement_account' => null,
+        ];
+
+        return $buyerData;
     }
-    public function getInitials(){
+
+    public function getBitrix24LeadData()
+    {
+
+        $fio = explode(" ", $this->fio, 3);
+
+        $fname = $fio[0] ?? '';
+        $sname = $fio[1] ?? '';
+        $tname = $fio[2] ?? '';
+
+        $leadData = [
+            'TITLE' => $this->fio,
+            'NAME' => $fname,
+            'SECOND_NAME' => $sname,
+            'LAST_NAME' => $tname,
+            'COMMENTS' => 'Лид из конструктора',
+            'SOURCE_ID' => 'OTHER',
+            'SOURCE_DESCRIPTION' => env("SOURCE_DESCRIPTION"),
+            'STATUS_ID' => 'NEW',//NEW, IN_PROCESS, PROCESSED, JUNK, CONVERTED
+            'PHONE' => [['VALUE' => $this->phone, 'VALUE_TYPE' => 'WORK']],
+            'EMAIL' => [['VALUE' => $this->email, 'VALUE_TYPE' => 'WORK']]
+        ];
+    }
+
+    public function getFName()
+    {
+        $fio = explode(" ", $this->fio, 3);
+        return $fio[0] ?? '';
+    }
+
+    public function getSName()
+    {
+        $fio = explode(" ", $this->fio, 3);
+        return $fio[1] ?? '';
+    }
+
+    public function getTName()
+    {
+        $fio = explode(" ", $this->fio, 3);
+        return $fio[2] ?? '';
+    }
+
+    public function getInitials()
+    {
 
         $candidat_fio = $this->fio;
-        if($this->status == 'individual'){
+        if ($this->status == 'individual') {
             $candidat_fio = $this->title;
         }
-        if(is_null($candidat_fio) && $candidat_fio == ''){
+        if (is_null($candidat_fio) && $candidat_fio == '') {
             return null;
         }
-        $fio = explode(" ",$candidat_fio, 3);
-        
+        $fio = explode(" ", $candidat_fio, 3);
+
         return $fio[0] . " " . mb_substr($fio[1], 0, 1) . "." . mb_substr($fio[2], 0, 1) . ".";
     }
 
-    public function getShortClientStatus(){
+    public function getShortClientStatus()
+    {
         $statusClient = '';
-        switch($this->status){
+        switch ($this->status) {
             case 'individual':
                 $statusClient = "ФЛ";
                 break;
@@ -93,7 +147,7 @@ class Client extends Model
                 break;
             case 'legal_entity':
                 $statusClient = "ООО";
-                break;    
+                break;
         }
         return $statusClient;
     }

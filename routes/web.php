@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Order;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,7 +27,59 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
+Route::get("/2test", function () {
+    $bitrix = new \App\Services\BitrixService();
 
+    return $bitrix->getLeadFields();
+
+    $leadData = [
+        'TITLE' => 'ADADASDASD',
+        'NAME' => 'Иван',
+        'SECOND_NAME' => 'Иванов',
+        'LAST_NAME' => 'Тестовый',
+        'COMMENTS' => 'Комментарий к заказу',
+        'SOURCE_ID' => 'OTHER',
+        'SOURCE_DESCRIPTION' => env("SOURCE_DESCRIPTION"),
+        'STATUS_ID' => 'NEW',//NEW, IN_PROCESS, PROCESSED, JUNK, CONVERTED
+        'PHONE' => [['VALUE' => '+79991234561', 'VALUE_TYPE' => 'WORK']],
+        'EMAIL' => [['VALUE' => 'exxxar@gmail.com', 'VALUE_TYPE' => 'WORK']]
+    ];
+
+    $leadId = $bitrix->createLead($leadData)["result"] ?? null;
+
+
+    // $result = $bitrix->getLeads();
+    $productData = [
+        'NAME' => "LINK1522123123",
+        'CURRENCY_ID' => 'RUB',
+        'PRICE' => 100.0,
+        'DESCRIPTION' => "https://do-doors.online/link/15",
+        'MEASURE' => 6,
+        'QUANTITY' => 100 // Единица измерения (шт.)
+    ];
+    $response = $bitrix->addProduct($productData);
+    //dd($response);
+
+
+    $response = $bitrix->addProductToLead($leadId, [
+        [
+            "PRODUCT_ID" => $response["result"] ?? null,
+            "PRICE" => 3000,
+            "QUANTITY" => 1,
+        ],
+    ]);
+
+    //$response = $bitrix->getLeadProducts(2);
+    //$response = $bitrix->addProduct($productData);
+
+
+    $response = $bitrix->addDocumentToLead($leadId, "test.xlsx", base64_encode(file_get_contents(storage_path() . "\\app\\public\\documents\\3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx", "3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx")));
+    $response = $bitrix->getLeads();
+    //$response = $bitrix->getLeadFields();
+    //  $response = $bitrix->getFolders(1);
+    // $response = $bitrix->uploadDocument(1,storage_path()."\\app\\public\\documents\\3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx","3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx");
+    return $response;
+});
 
 Route::get("/test", function () {
     $path = storage_path() . "\\app";
@@ -62,10 +117,7 @@ Route::get("/test", function () {
     }
 
 
-
 });
-
-
 
 
 Route::get('/login/google/callback', [GoogleLoginController::class, 'callback'])->name('login.google-callback');
@@ -89,7 +141,6 @@ Route::get('/open-calc', function (\Illuminate\Http\Request $request) {
 })->name('open.calc.page');
 
 
-
 Route::get('/', function () {
     return Inertia::render('Landing', [  //Welcome
         'canLogin' => Route::has('login'),
@@ -98,7 +149,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
 
 
 Route::get('/dashboard', function () {
@@ -141,6 +191,23 @@ Route::get('/basket', function () {
     return Inertia::render('CartPage');
 })->middleware(['auth', 'verified'])->name('basket');
 
+Route::get('/link/{orderId}', function ($orderId) {
+    $order = Order::query()
+        ->with(["details"])
+        ->where("id", $orderId)
+        ->first();
+
+    if (is_null(Auth::user()->id ?? null)) {
+        return Inertia::render('OrderInfo', [
+            "order" => $order->toArray(),
+            "doors" => $order->details
+        ]);
+    }
+    return Inertia::render('OrderEditor', [
+        "order" => $order->toArray(),
+        "doors" => $order->details
+    ]);
+})->name('order.info');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -155,7 +222,16 @@ Route::prefix("/calc")
     ->controller(App\Http\Controllers\CalcController::class)
     ->group(function () {
         Route::post("/checkout", "checkout")->name('checkout');
+        Route::post("/contract-processing", "contractProcessing")->name('contract-processing');
         Route::post("/download-excel", "downloadCartExcel")->name('download.cart.excel');
+    });
+
+
+Route::prefix("/documents")
+    ->middleware(['auth', 'verified'])
+    ->group(function () {
+        Route::get('/config', [DocumentController::class, 'getConfig']); // Получить текущий конфиг
+        Route::post('/config', [DocumentController::class, 'updateConfig']); // Обновить конфиг или отдельные поля
     });
 
 
@@ -190,8 +266,6 @@ Route::prefix("/services")
     });
 
 
-
-
 Route::prefix("/colors")
     ->middleware(['auth', 'verified'])
     ->controller(App\Http\Controllers\ColorController::class)
@@ -219,6 +293,8 @@ Route::prefix("/handles")
         Route::get("/", "index")->name('handles');
         Route::post("/", "getHandleList");
         Route::post("/store", "store");
+        Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink']);
+        Route::post('/import-from-excel', "import");
         Route::delete("/{id}", "destroy");
     });
 
@@ -265,6 +341,7 @@ Route::prefix("/orders")
         Route::post("/", "getOrderList");
         Route::post("/update-contract-templates", "updateContractTemplates");
         Route::post("/store", "store");
+        Route::post("/edit-door-in-order", "editDoorInOrder");
         Route::delete("/{id}", "destroy");
     });
 
@@ -307,7 +384,7 @@ Route::prefix("/sizes")
         Route::post("/store", "store");
         Route::post("/import", "import");
         Route::post("/update-param", "updateParam");
-        Route::post('/import-from-google', [GoogleLoginController::class,'getGoogleLink'])->name('login.google-redirect');
+        Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink'])->name('login.google-redirect');
         Route::delete("/{id}", "destroy");
 
     });
@@ -323,14 +400,11 @@ Route::prefix("/users")
     });
 
 
-
 Route::prefix("/")
-
     ->controller(App\Http\Controllers\LandingController::class)
     ->group(function () {
 
         Route::post("/sendReqCallToBot", "sendReqCallToBot")->name('sendReqCallToBot');
-
 
 
     });

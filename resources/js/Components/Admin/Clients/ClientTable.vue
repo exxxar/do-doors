@@ -1,6 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
-
+import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
 </script>
 <template>
     <form class="row">
@@ -35,6 +35,7 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -124,19 +125,36 @@ import Pagination from "@/Components/Pagination.vue";
                 </th>
 
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+<!--                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
                     <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col" class="text-center">Действие</th>
+                </th>-->
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
                 <td class="text-center" @click="selectItem(item)">
                     {{ item.title || '-' }}
                 </td>
@@ -180,26 +198,10 @@ import Pagination from "@/Components/Pagination.vue";
                 </td>
 
 
-                <td class="text-center">
+<!--                <td class="text-center">
                     {{ item.updated_at || '-' }}
-                </td>
-                <td class="text-center">
-                    <div class="dropdown">
-                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item"
-                                   @click="selectItem(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
+                </td>-->
 
-                            <li><a class="dropdown-item text-danger"
-                                   @click="removeItem(item.id)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
             </tr>
 
             </tbody>
@@ -221,7 +223,23 @@ import Pagination from "@/Components/Pagination.vue";
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="client-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
 
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+
+                        <ClientForm
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></ClientForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -229,6 +247,8 @@ import {mapGetters} from "vuex";
 export default {
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -268,6 +288,8 @@ export default {
     mounted() {
         this.loadClients();
         this.statuses = this.getDictionary.statuses || []
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('client-editor-modal'), {})
     },
     methods: {
         preparedLawStatus(item) {
@@ -298,7 +320,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+           // this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateClient", {

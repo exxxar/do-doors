@@ -1,6 +1,7 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
 import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
+import CalcPreview from "@/Components/Calc/CalcPreview.vue";
 </script>
 
 
@@ -85,6 +86,7 @@ import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center">Действие</th>
                 <th
                     v-if="table.contract_number.value"
                     scope="col" class="text-center cursor-pointer" @click="sortAndLoad('contract_number')">Номер
@@ -219,7 +221,7 @@ import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
 
                 </th>
 
-
+<!--
                 <th
                     scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
@@ -227,13 +229,48 @@ import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col" class="text-center">Действие</th>
+                </th>-->
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
+                <td class="text-center">
+                    <div class="dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item"
+                                   target="_blank"
+                                   :href="'/orders/download-order-excel/'+item.id"><i
+                                class="fa-regular fa-file-excel mr-2"></i>Скачать
+                                Excel-документ по заказу</a></li>
+
+
+                            <li><a class="dropdown-item"
+                                   @click="openConfirmModal('Подготовка договора','Вам необходимо выбрать как вам предпочтительнее работать', item)"
+                                   href="javascript:void(0)">
+                                <i class="fa-solid fa-file-signature mr-2"></i>Скачать
+                                договор</a></li>
+                            <li><a class="dropdown-item"
+                                   @click="selectItemForEdit(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a></li>
+
+<!--
+                            <li><a class="dropdown-item"
+                                   @click="selectItem(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Детали заказа</a></li>
+-->
+
+                            <li><a class="dropdown-item text-danger"
+                                   @click="removeItem(item.id)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
                 <td
                     v-if="table.contract_number.value"
                     class="text-center" @click="selectItem(item)">
@@ -312,38 +349,10 @@ import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
                 </td>
 
 
-                <td class="text-center">
+<!--                <td class="text-center">
                     {{ item.updated_at || '-' }}
-                </td>
-                <td class="text-center">
-                    <div class="dropdown">
-                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bars"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item"
-                                   target="_blank"
-                                   :href="'/orders/download-order-excel/'+item.id"><i
-                                class="fa-regular fa-file-excel mr-2"></i>Скачать
-                                Excel-документ по заказу</a></li>
+                </td>-->
 
-
-                            <li><a class="dropdown-item"
-                                   @click="openConfirmModal('Подготовка договора','Вам необходимо выбрать как вам предпочтительнее работать', item)"
-                                   href="javascript:void(0)">
-                                <i class="fa-solid fa-file-signature mr-2"></i>Скачать
-                                договор</a></li>
-                            <li><a class="dropdown-item"
-                                   @click="selectItem(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактировать</a></li>
-
-                            <li><a class="dropdown-item text-danger"
-                                   @click="removeItem(item.id)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-trash-can mr-2"></i>Удалить</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
             </tr>
 
             </tbody>
@@ -443,6 +452,26 @@ import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="order-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body">
+                    <template v-if="selected_item">
+
+                        <CalcPreview
+                            :can-edit="true"
+                            :doors="selected_item.details"
+                            :order="selected_item"></CalcPreview>
+
+
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 </template>
 <script>
@@ -455,6 +484,8 @@ export default {
     components: {VueDatePicker},
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             table: {
                 contract_number: {
                     title: 'Номер договора',
@@ -556,6 +587,7 @@ export default {
         this.loadOrders();
         this.order_detail_modal = new bootstrap.Modal(document.getElementById('order-details'), {})
         this.confirm_modal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
+        this.editor_modal = new bootstrap.Modal(document.getElementById('order-editor-modal'), {})
     },
     methods: {
         resetColumns(){
@@ -629,6 +661,20 @@ export default {
 
             }).catch(() => {
                 this.loading = false
+            })
+        },
+        selectItemForEdit(item) {
+            //this.$emit("select", item)
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
             })
         },
         selectItem(item) {

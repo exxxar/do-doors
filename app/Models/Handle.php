@@ -21,6 +21,22 @@ class Handle extends Model
         'price',
         'variants',
 
+        "sku",
+        "comment",
+        "brand",
+        "weight",
+        "material",
+        "material_description",
+        "coverage",
+        "serial",
+        "model",
+        "characteristics",
+        "base_shape",
+        "socket_diameter",
+        "square_length",
+        "guarantee",
+        "dimensions",
+
     ];
 
     /**

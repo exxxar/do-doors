@@ -20,12 +20,14 @@ import {Head} from '@inertiajs/vue3';
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <SizeForm
+                            :id="'size-form-1'"
+                            :need-controls="true"
                             v-if="!loading"
                             :item="selectedSize"
                             v-on:callback="callbackSizeForm"></SizeForm>
                         <hr class="hr my-5"/>
 
-                        <div class="d-flex justify-center my-2">
+<!--                        <div class="d-flex justify-center my-2">
                             <ul class="nav nav-tabs">
                                 <li class="nav-item">
                                     <a class="nav-link" aria-current="page"
@@ -41,7 +43,7 @@ import {Head} from '@inertiajs/vue3';
                                 </li>
 
                             </ul>
-                        </div>
+                        </div>-->
                         <template v-if="tab===0">
                             <SizeTable
                                 v-on:select="selectSize"

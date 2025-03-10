@@ -1,5 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+import RoleForm from "@/Components/Admin/Roles/RoleForm.vue";
 </script>
 <template>
     <form class="row">
@@ -35,6 +36,7 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center" v-if="!forSelect">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('name')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'name'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -60,22 +62,12 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
-                <th scope="col" class="text-center" v-if="!forSelect">Действие</th>
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center" @click="selectItem(item)">
-                    {{ item.name || '-' }}
-                </td>
-                <td class="text-center" @click="selectItem(item)">
-                    {{ item.slug || '-' }}
-                </td>
-
-                <td class="text-center" v-if="!forSelect">
-                    {{ item.updated_at || '-' }}
-                </td>
                 <td class="text-center" v-if="!forSelect">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -93,6 +85,17 @@ import Pagination from "@/Components/Pagination.vue";
                         </ul>
                     </div>
                 </td>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.name || '-' }}
+                </td>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.slug || '-' }}
+                </td>
+
+                <td class="text-center" v-if="!forSelect">
+                    {{ item.updated_at || '-' }}
+                </td>
+
             </tr>
 
             </tbody>
@@ -113,6 +116,23 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="role-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <RoleForm
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></RoleForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -121,6 +141,8 @@ export default {
     props:["forSelect"],
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -144,6 +166,8 @@ export default {
     },
     mounted() {
         this.loadRoles();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('role-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -170,7 +194,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
+           // this.$emit("select", item)
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateRole", {

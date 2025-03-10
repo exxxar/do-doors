@@ -24,7 +24,7 @@
                     <input class="form-check-input" type="radio" value="1" v-model="clientForm.work_with_nds"
                            name="flexRadioDefault" id="work-with-nds">
                     <label class="form-check-label" for="work-with-nds">
-                        Для ООО
+                        С НДС
                     </label>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                     <input class="form-check-input" type="radio" value="0" name="flexRadioDefault"
                            v-model="clientForm.work_with_nds" id="work-without-nds">
                     <label class="form-check-label" for="work-without-nds">
-                        Для ИП
+                        Без НДС
                     </label>
                 </div>
             </div>

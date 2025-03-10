@@ -1,5 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+import DoorVariantForm from "@/Components/Admin/DoorVariants/DoorVariantForm.vue";
 </script>
 <template>
     <form class="row">
@@ -34,6 +35,7 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col" class="text-center">Действие</th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -56,6 +58,15 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'price'"><i
                         class="fa-solid fa-caret-up"></i></span>
 
+                    <table class="w-100">
+                        <thead>
+                        <th style="width: 100px;">опт</th>
+                        <th style="width: 100px;">дилер</th>
+                        <th style="width: 100px;">розница</th>
+                        <th style="width: 100px;">себестоимость</th>
+                        </thead>
+
+                    </table>
                 </th>
 
 
@@ -66,47 +77,12 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>-->
-                <th scope="col" class="text-center">Действие</th>
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center" @click="selectItem(item)">
-                    {{ item.title || '-' }}
-                </td>
-                <td class="text-center" style="width: 50px;">
-                    {{ item.need_percent_price ? "да":"нет" }}
-                </td>
-                <td class="text-center">
-                    <table class="w-100">
-                        <thead>
-                        <th>опт<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
-                        <th>дилер<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
-                        <th>розница<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
-                        <th>себестоимость<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span></th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}
-                            </td>
-                            <td style="min-width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}
-                            </td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.retail|| 0}}
-                            </td>
-                            <td style="min-width: 100px; text-align: center;">{{items[index].price.cost || 0}}
-                            </td>
-                        </tr>
-
-
-                        </tbody>
-                    </table>
-                </td>
-
-
-<!--                <td class="text-center">
-                    {{ item.updated_at || '-' }}
-                </td>-->
                 <td class="text-center">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -124,6 +100,37 @@ import Pagination from "@/Components/Pagination.vue";
                         </ul>
                     </div>
                 </td>
+                <td class="text-center" @click="selectItem(item)">
+                    {{ item.title || '-' }}
+                </td>
+                <td class="text-center" style="width: 50px;">
+                    {{ item.need_percent_price ? "да":"нет" }}
+                </td>
+                <td class="text-center">
+                    <table class="w-100">
+
+                        <tbody>
+                        <tr>
+                            <td style="width: 100px; text-align: center;">{{items[index].price.wholesale|| 0}}<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span>
+                            </td>
+                            <td style="width: 100px; text-align: center;" >{{items[index].price.dealer|| 0}}<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span>
+                            </td>
+                            <td style="width: 100px; text-align: center;">{{items[index].price.retail|| 0}}<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span>
+                            </td>
+                            <td style="width: 100px; text-align: center;">{{items[index].price.cost || 0}}<span v-if="items[index].need_percent_price">, %</span><span v-else>, ₽</span>
+                            </td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                </td>
+
+
+<!--                <td class="text-center">
+                    {{ item.updated_at || '-' }}
+                </td>-->
+
             </tr>
 
             </tbody>
@@ -145,6 +152,24 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="door-variant-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <DoorVariantForm
+                            v-if="!loading"
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></DoorVariantForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -152,6 +177,8 @@ import {mapGetters} from "vuex";
 export default {
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -173,6 +200,8 @@ export default {
     },
     mounted() {
         this.loadDoorVariants();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('door-variant-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -199,7 +228,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+           // this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateDoorVariant", {

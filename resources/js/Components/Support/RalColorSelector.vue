@@ -39,6 +39,7 @@
 import {mapGetters} from "vuex";
 
 export default {
+
     data() {
         return {
             search: null,
@@ -100,6 +101,8 @@ export default {
     },
     mounted() {
         this.colors = this.getRalColors
+
+
     },
     methods: {
         addFilter(item) {

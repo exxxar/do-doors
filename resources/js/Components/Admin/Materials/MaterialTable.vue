@@ -1,5 +1,6 @@
 <script setup>
 import Pagination from "@/Components/Pagination.vue";
+import MaterialForm from "@/Components/Admin/Materials/MaterialForm.vue";
 </script>
 <template>
     <form class="row">
@@ -35,6 +36,10 @@ import Pagination from "@/Components/Pagination.vue";
                     <span v-if="sort.direction === 'asc'&&sort.column === 'id'"><i
                         class="fa-solid fa-caret-up"></i></span>
                 </th>
+                <th scope="col"
+                    v-if="!simple"
+                    class="text-center">Действие
+                </th>
                 <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('title')">Название
                     <span v-if="sort.direction === 'desc'&&sort.column === 'title'"><i
                         class="fa-solid fa-caret-down"></i></span>
@@ -43,13 +48,13 @@ import Pagination from "@/Components/Pagination.vue";
 
                 </th>
 
-                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('is_base')">База
+<!--                <th scope="col" class="text-center cursor-pointer" @click="sortAndLoad('is_base')">База
                     <span v-if="sort.direction === 'desc'&&sort.column === 'is_base'"><i
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'is_base'"><i
                         class="fa-solid fa-caret-up"></i></span>
 
-                </th>
+                </th>-->
 
                 <th scope="col"
                     v-if="!simple"
@@ -69,7 +74,7 @@ import Pagination from "@/Components/Pagination.vue";
                     v-if="!simple"
                     class="text-center">Варианты контура вокруг
                 </th>
-                <th scope="col"
+<!--                <th scope="col"
                     v-if="!simple"
                     class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
                     Дата изменения
@@ -77,42 +82,13 @@ import Pagination from "@/Components/Pagination.vue";
                         class="fa-solid fa-caret-down"></i></span>
                     <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
                         class="fa-solid fa-caret-up"></i></span>
-                </th>
-                <th scope="col"
-                    v-if="!simple"
-                    class="text-center">Действие
-                </th>
+                </th>-->
+
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
                 <th scope="row">{{ item.id || index }}</th>
-                <td class="text-center cursor-pointer" @click="selectItem(item)">
-                    {{ item.title || '-' }}
-                </td>
-
-                <td class="text-center cursor-pointer">
-                    {{ item.is_base ? "Да" : "Нет" }}
-                </td>
-                <td class="text-center"
-                    v-if="!simple">
-                    {{ item.order_position || 0 }}
-
-                </td>
-                <td class="text-center"
-                    v-if="!simple">
-                    {{ (item.door_variants || []).length }}
-
-                </td>
-                <td class="text-center"
-                    v-if="!simple">
-                    {{ (item.wrapper_variants || []).length }}
-
-                </td>
-                <td class="text-center"
-                    v-if="!simple">
-                    {{ item.updated_at || '-' }}
-                </td>
                 <td class="text-center"
                     v-if="!simple">
                     <div class="dropdown">
@@ -134,6 +110,33 @@ import Pagination from "@/Components/Pagination.vue";
                         </ul>
                     </div>
                 </td>
+                <td class="text-center cursor-pointer">
+                    {{ item.title || '-' }}
+                </td>
+
+<!--                <td class="text-center cursor-pointer">
+                    {{ item.is_base ? "Да" : "Нет" }}
+                </td>-->
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ item.order_position || 0 }}
+
+                </td>
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ (item.door_variants || []).length }}
+
+                </td>
+                <td class="text-center"
+                    v-if="!simple">
+                    {{ (item.wrapper_variants || []).length }}
+
+                </td>
+<!--                <td class="text-center"
+                    v-if="!simple">
+                    {{ item.updated_at || '-' }}
+                </td>-->
+
             </tr>
 
             </tbody>
@@ -155,6 +158,25 @@ import Pagination from "@/Components/Pagination.vue";
                 :pagination="paginate_object"/>
         </div>
     </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="material-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_item">
+                        <MaterialForm
+                            :item="selected_item"
+                            v-on:callback="selectItem(null)"></MaterialForm>
+
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {mapGetters} from "vuex";
@@ -163,6 +185,8 @@ export default {
     props: ["simple"],
     data() {
         return {
+            editor_modal: null,
+            selected_item: null,
             sort: {
                 column: null,
                 direction: "desc"
@@ -185,6 +209,8 @@ export default {
     },
     mounted() {
         this.loadMaterials();
+
+        this.editor_modal = new bootstrap.Modal(document.getElementById('material-editor-modal'), {})
     },
     methods: {
         sortAndLoad(column) {
@@ -211,7 +237,19 @@ export default {
             })
         },
         selectItem(item) {
-            this.$emit("select", item)
+            //this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_item = null
+                this.editor_modal.hide()
+                return;
+            }
+
+            this.selected_item = null
+            this.$nextTick(() => {
+                this.selected_item = item
+                this.editor_modal.show()
+            })
         },
         duplicateItem(id) {
             this.$store.dispatch("duplicateMaterial", {

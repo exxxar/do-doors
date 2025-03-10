@@ -72,6 +72,21 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async editDoorInOrder(context, payload = { doorForm: null }) {
+        let link = `${BASE_ORDERS_LINK}/edit-door-in-order`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.doorForm)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async storeOrder(context, payload = { orderForm: null }) {
         let link = `${BASE_ORDERS_LINK}/store`
 

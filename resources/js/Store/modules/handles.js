@@ -17,6 +17,30 @@ const getters = {
 }
 
 const actions = {
+    async importHandlesFromGoogle(context, payload = {importForm: null}) {
+        let link = `${BASE_HANDLES_LINK}/import-from-google`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.importForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+    async importHandlesFromExcel(context, payload = {importForm: null}) {
+        let link = `${BASE_HANDLES_LINK}/import-from-excel`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.importForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadHandles(context, payload = {dataObject: null, page: 0, size: 50}) {
         let page = payload.page || 0
         let size = payload.size || 50

@@ -117,6 +117,9 @@ class GoogleLoginController extends Controller
         $request->validate([
             "sheet_id" => "required",
         ]);
+
+        $part = $request->part ?? "sizes";
+
         $client = new Client();
         $client->setAuthConfig((array)json_decode(file_get_contents(storage_path("app/credentials.json"))));
         $client->setScopes([Sheets::DRIVE, Sheets::SPREADSHEETS]);
@@ -128,6 +131,7 @@ class GoogleLoginController extends Controller
             "need_rewrite" => ($request->need_rewrite ?? false) == "true",
             "use_price_koef" => ($request->use_price_koef ?? false) == "true",
             "sheet_id" => $request->sheet_id,
+            "part"=>$part,
         ])));
 
         return response()->json(["url" => $client->createAuthUrl()]);
@@ -153,6 +157,7 @@ class GoogleLoginController extends Controller
         $sheetId = $state->sheet_id ?? null;
         $needRewrite = $state->need_rewrite ?? false;
         $usePriceKoef = $state->use_price_koef ?? false;
+        $part = $state->part ?? "sizes";
 
         // 1_WidWiOLk9FANYSJdcyo32OFGq48QEAZCqJ4rMKrFQo
 
@@ -165,45 +170,46 @@ class GoogleLoginController extends Controller
         $client->setAccessType("offline");
 
 
-        if (!is_null($code)) {
+        if ($part=="sizes") {
+            if (!is_null($code)) {
 
-            if ($needRewrite) {
-                Schema::disableForeignKeyConstraints();
-                Size::query()->truncate();
-                Schema::enableForeignKeyConstraints();
+                if ($needRewrite) {
+                    Schema::disableForeignKeyConstraints();
+                    Size::query()->truncate();
+                    Schema::enableForeignKeyConstraints();
 
-                $materials = Material::query()->get();
-                foreach ($materials as $material){
-                    $material->deleted_at = Carbon::now();
-                    $material->save();
+                    $materials = Material::query()->get();
+                    foreach ($materials as $material){
+                        $material->deleted_at = Carbon::now();
+                        $material->save();
+                    }
                 }
-            }
 
 
-            if (is_null($sheetId))
-                throw new HttpException(404, "Идентификатор таблицы или название листа не верные");
+                if (is_null($sheetId))
+                    throw new HttpException(404, "Идентификатор таблицы или название листа не верные");
 
-            try {
-                $client->fetchAccessTokenWithAuthCode($code);
-                $service = new \Google\Service\Sheets($client);
-                $sheets = new RSheets();
-                $sheets->setService($service);
+                try {
+                    $client->fetchAccessTokenWithAuthCode($code);
+                    $service = new \Google\Service\Sheets($client);
+                    $sheets = new RSheets();
+                    $sheets->setService($service);
 
-                $sheetList = $sheets
-                    ->spreadsheet($sheetId)
-                    ->sheetList();
-                //->sheet($sheetTitle)
-                //->all();
-
-                $sheetList = array_values($sheetList);
-
-                foreach ($sheetList as $sheet) {
-                    $values = $sheets
+                    $sheetList = $sheets
                         ->spreadsheet($sheetId)
-                        ->sheet($sheet)
-                        ->all();
+                        ->sheetList();
+                    //->sheet($sheetTitle)
+                    //->all();
 
-                    switch ($sheet) {
+                    $sheetList = array_values($sheetList);
+
+                    foreach ($sheetList as $sheet) {
+                        $values = $sheets
+                            ->spreadsheet($sheetId)
+                            ->sheet($sheet)
+                            ->all();
+
+                        switch ($sheet) {
                             case "Размеры":
 
                                 for ($i = 0; $i < count($values); $i++)
@@ -223,21 +229,26 @@ class GoogleLoginController extends Controller
                                 break;
                         }
 
+                    }
+
+
+                } catch (Exception $exception) {
+
+                    return view("error", [
+                        "message" => "Неверный идентификатор листа или название листа"
+                    ]);
                 }
 
+                if ($usePriceKoef)
+                    $this->importRecountPrice();
 
-            } catch (Exception $exception) {
-
-                return view("error", [
-                    "message" => "Неверный идентификатор листа или название листа"
-                ]);
+                return view("success");
+                // Log::info(print_r($result,true));
             }
+        }
 
-            if ($usePriceKoef)
-                $this->importRecountPrice();
-
-            return view("success");
-            // Log::info(print_r($result,true));
+        if ($part == "handles") {
+            dd("Test");
         }
 
         return response()->noContent();

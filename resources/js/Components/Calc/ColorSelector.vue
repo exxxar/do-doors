@@ -37,7 +37,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                     <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item" href="javascript:void(0)"
-                       @click="openRalModal">Справочник цветов RAL</a>
+                       @click="openRalModal">Справочник цветов</a>
                 </li>
             </ul>
         </div>

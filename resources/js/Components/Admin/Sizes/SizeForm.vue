@@ -4,7 +4,7 @@ import SizeControls from "@/Components/Admin/Sizes/SizeControls.vue";
 </script>
 <template>
 
-    <div class="row">
+    <div class="row" v-if="needControls">
         <div class="col-md-6 col-12">
             <SizeControls></SizeControls>
         </div>
@@ -44,6 +44,8 @@ import SizeControls from "@/Components/Admin/Sizes/SizeControls.vue";
                         </span>
                     </button>
                 </div>
+
+
             </div>
             <div class="col-12 col-md-6" v-else>
                 <div class="card rounded-0">
@@ -199,11 +201,14 @@ import SizeControls from "@/Components/Admin/Sizes/SizeControls.vue";
 
             </div>
         </div>
+
     </form>
 
     <!-- Modal -->
-    <div class="modal fade" id="select-material-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
+    <div
+        style="z-index: 10200;"
+        class="modal fade" :id="id+'-select-material-modal'" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-md ">
             <div class="modal-content rounded-0">
 
@@ -223,7 +228,7 @@ import SizeControls from "@/Components/Admin/Sizes/SizeControls.vue";
 </template>
 <script>
 export default {
-    props: ["item"],
+    props: ["item","needControls","id"],
     data() {
         return {
             tab: 0,
@@ -254,8 +259,8 @@ export default {
         'form.type': {
             handler(val) {
                 this.form.value = null
-                this.form.material_id = null
-                this.selectedMaterial = null
+               // this.form.material_id = null
+               // this.selectedMaterial = null
             },
             deep: true
         },
@@ -273,7 +278,7 @@ export default {
         }
     },
     mounted() {
-        this.materialModal = new bootstrap.Modal(document.getElementById('select-material-modal'), {})
+        this.materialModal = new bootstrap.Modal(document.getElementById(this.id+'-select-material-modal'), {})
 
         if (this.item)
             this.$nextTick(() => {
@@ -291,6 +296,7 @@ export default {
                     price_koef: this.item.price_koef || null,
                     loops_count: this.item.loops_count || null,
                     material_id: this.item.material_id || null,
+                    type: this.item.type || 'sizes'
                 }
 
                 this.selectedMaterial = this.item.material || null
@@ -305,13 +311,17 @@ export default {
             this.materialModal.show();
         },
         selectMaterial(item) {
+            this.materialModal.hide();
             this.selectedMaterial = item;
             this.form.material_id = item.id
+            console.log('material', item)
+
             this.loadingMaterial = true
             this.$nextTick(() => {
                 this.loadingMaterial = false
+
             })
-            this.materialModal.hide();
+
         },
         alert(msg) {
             this.messages.push(msg)
