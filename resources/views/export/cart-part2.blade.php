@@ -28,6 +28,7 @@
         @php
         $summary = 0;
         @endphp
+
         @foreach($items as $index=>$item)
             <tr>
                 <td style="width: 50px;">{{$index+1}}</td>
