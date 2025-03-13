@@ -63,6 +63,12 @@ class BitrixService
         ]);
     }
 
+    public function getLeadDealFields()
+    {
+        return $this->request("crm.deal.userfield.list", [
+        ]);
+    }
+
     public function getLeadFields()
     {
         return $this->request("crm.lead.fields", [

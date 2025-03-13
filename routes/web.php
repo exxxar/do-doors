@@ -27,6 +27,15 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
+Route::get("/bitrix-field", function () {
+    $bitrix = new \App\Services\BitrixService();
+
+    return (object)[
+        "lead" => $bitrix->getLeadFields(),
+        "deal" => $bitrix->getLeadDealFields()
+    ];
+});
+
 Route::get("/2test", function () {
     $bitrix = new \App\Services\BitrixService();
 
