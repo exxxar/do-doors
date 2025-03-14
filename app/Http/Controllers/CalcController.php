@@ -240,7 +240,7 @@ class CalcController extends Controller
 
         $bitrixFiles = [
             [
-                "name" => "спецификация от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("\\app\\$excelFileName"))),
+                "name" => "спецификация от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName"))),
             ],
             [
                 "name" => "информация о заказе от " . $timeFragment . ".pdf", "path" => base64_encode($file),
