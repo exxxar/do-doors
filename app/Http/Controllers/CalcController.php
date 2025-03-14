@@ -138,7 +138,7 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302937139"] = 20000.0;
         $leadData["UF_CRM_1733302997393"] = 19000.0;
         $leadData["WEB"] = [['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER']];
-        $leadId = $bitrix->createLead($leadData)["result"] ?? null;
+        $leadId = $bitrix->createDeal($leadData)["result"] ?? null;
 
         $order->bitrix24_lead_id = $leadId;
         $order->save();
