@@ -118,6 +118,29 @@ class BitrixService
     }
 
     // Добавление документа к лиду
+    public function addDocumentsToDeal($dealId, array $files, $param = null)
+    {
+
+        //   $param = is_null($param) ? env('DOCUMENT_FILED_CODE_SPECIFICATION') : null;
+
+        $documents = [];
+
+        foreach ($files as $file) {
+            $documents[] = [
+                "fileData" => [$file["name"], $file["path"]]
+            ];
+        }
+
+        return $this->request('crm.deal.update', [
+            'id' => $dealId,
+            'fields' => [
+                "$param" => $documents // UF_CRM_XXXXXX - поле "Файл"
+            ]
+        ]);
+
+    }
+
+    // Добавление документа к лиду
     public function addDocumentsToLead($leadId, array $files, $param = null)
     {
 

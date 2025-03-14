@@ -329,7 +329,7 @@ class CalcController extends Controller
             }
 
         }
-        $R = $bitrix->addDocumentToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
+        $R = $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
 
         if (env("SEND_DOCS_TO_TELEGRAM_CHANNEL") ?? false) {
 
