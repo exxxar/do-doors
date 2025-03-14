@@ -136,7 +136,7 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302866734"] = "Тестовый город";
         $leadData["UF_CRM_1733302917133"] = 1000.0;
         $leadData["UF_CRM_1733302937139"] = 20000.0;
-        $leadData["UF_CRM_1733302997393"] = 19000.0;
+        $leadData["UF_CRM_1733302958322"] = 19000.0;
         $leadData["WEB"] = [['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER']];
         $leadId = $bitrix->createDeal($leadData)["result"] ?? null;
 
@@ -219,7 +219,7 @@ class CalcController extends Controller
             ];
         }
 
-        $result = $bitrix->addProductToLead($leadId, $productsForBitrix);
+        $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
 
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
@@ -268,8 +268,8 @@ class CalcController extends Controller
 
         $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) . ")";
 
-        $nc = new NCLNameCaseRu();
-        $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);
+ /*       $nc = new NCLNameCaseRu();
+        $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);*/
 
         if (file_exists($path . "/$fileName")) {
             try {
@@ -277,7 +277,7 @@ class CalcController extends Controller
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
                 $templateProcessor->setValue('numb_doc', $order->id);
                 $templateProcessor->setValue('title', $name);
-                $templateProcessor->setValue('member', $member ?? '-');
+                $templateProcessor->setValue('member', $client->fio ?? '-');
                 $templateProcessor->setValue('fio', $fam_initial ?? '-');
                 $templateProcessor->setValue('email', $email);
                 $templateProcessor->setValue('phone', $phone);
@@ -314,7 +314,7 @@ class CalcController extends Controller
 
                 $templateProcessor->saveAs($path . $newName);
 
-                $bitrix->addDocumentToLead($leadId, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
+                $bitrix->addDocumentToDeal($leadId, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
                 // $bitrixFiles[] = ["name" => $newName, "path" => base64_encode(file_get_contents($path . $newName))];
 
             } catch (CopyFileException $e) {
@@ -324,7 +324,7 @@ class CalcController extends Controller
             }
 
         }
-        $R = $bitrix->addDocumentsToLead($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
+        $R = $bitrix->addDocumentToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
 
         if (env("SEND_DOCS_TO_TELEGRAM_CHANNEL") ?? false) {
 

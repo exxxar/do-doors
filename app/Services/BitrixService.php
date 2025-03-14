@@ -53,6 +53,14 @@ class BitrixService
         ]);
     }
 
+    // Добавление товара к лиду
+    public function addProductToDeal($dealId, array $productRows)
+    {
+        return $this->request("crm.deal.productrows.set", [
+            'id' => $dealId,
+            'rows' => $productRows
+        ]);
+    }
 
     // Добавление товара к лиду
     public function addProductToLead($leadId, array $productRows)
@@ -75,6 +83,22 @@ class BitrixService
         return $this->request("crm.lead.fields", [
             "select"=>["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL"]
         ]);
+    }
+
+    // Добавление документа к лиду
+    public function addDocumentToDeal($dealId, $fName, $fPath, $param = null)
+    {
+
+
+        return $this->request('crm.deal.update', [
+            'id' => $dealId,
+            'fields' => [
+                "$param" => [
+                    "fileData" => [$fName, $fPath]
+                ]
+            ]
+        ]);
+
     }
 
     // Добавление документа к лиду
