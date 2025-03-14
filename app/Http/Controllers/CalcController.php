@@ -127,6 +127,16 @@ class CalcController extends Controller
         $leadData = $client->getBitrix24LeadData();
         $leadData["TITLE"] = $name;
         $leadData["COMMENTS"] = $info;
+        $leadData["UF_CRM_1733302565"] = "ул. Тестовая";
+        $leadData["UF_CRM_1733302582"] = "25.05.2025";
+        $leadData["UF_CRM_1733302597"] = "20.05.2025";
+        $leadData["UF_CRM_1733302797738"] = "Договор №1";
+        $leadData["UF_CRM_1733302818544"] = "14.05.2025";
+        $leadData["UF_CRM_1733302846046"] = 63;
+        $leadData["UF_CRM_1733302866734"] = "Тестовый город";
+        $leadData["UF_CRM_1733302917133"] = 1000.0;
+        $leadData["UF_CRM_1733302937139"] = 20000.0;
+        $leadData["UF_CRM_1733302997393"] = 19000.0;
         $leadData["WEB"] = [['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER']];
         $leadId = $bitrix->createLead($leadData)["result"] ?? null;
 

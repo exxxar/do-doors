@@ -66,7 +66,7 @@ class BitrixService
     public function getLeadDealFields()
     {
         return $this->request("crm.deal.userfield.list", [
-            "select"=>  ["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL", "LIST_COLUMN_LABEL"]
+            "select"=>  ["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL", "LIST_COLUMN_LABEL","LIST_FILTER_LABEL"]
         ]);
     }
 
