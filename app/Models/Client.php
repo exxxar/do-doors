@@ -79,6 +79,32 @@ class Client extends Model
         return $buyerData;
     }
 
+    public function getBitrix24DealData()
+    {
+
+        $fio = explode(" ", $this->fio, 3);
+
+        $fname = $fio[0] ?? '';
+        $sname = $fio[1] ?? '';
+        $tname = $fio[2] ?? '';
+
+        $leadData = [
+            'TITLE' => $this->fio,
+            'NAME' => $fname,
+            'TYPE_ID' => 1, // "crm.status.list",
+            'SECOND_NAME' => $sname,
+            'LAST_NAME' => $tname,
+            'COMMENTS' => 'Лид из конструктора',
+            'SOURCE_ID' => 'OTHER',
+            'SOURCE_DESCRIPTION' => env("SOURCE_DESCRIPTION"),
+            'STATUS_ID' => 'NEW',//NEW, IN_PROCESS, PROCESSED, JUNK, CONVERTED
+            'PHONE' => [['VALUE' => $this->phone, 'VALUE_TYPE' => 'WORK']],
+            'EMAIL' => [['VALUE' => $this->email, 'VALUE_TYPE' => 'WORK']]
+        ];
+
+        return $leadData;
+    }
+
     public function getBitrix24LeadData()
     {
 
@@ -100,6 +126,8 @@ class Client extends Model
             'PHONE' => [['VALUE' => $this->phone, 'VALUE_TYPE' => 'WORK']],
             'EMAIL' => [['VALUE' => $this->email, 'VALUE_TYPE' => 'WORK']]
         ];
+
+        return $leadData;
     }
 
     public function getFName()

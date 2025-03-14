@@ -124,9 +124,11 @@ class CalcController extends Controller
 
         $bitrix = new \App\Services\BitrixService();
 
-        $leadData = $client->getBitrix24LeadData();
+        $leadData = $client->getBitrix24DealData();
         $leadData["TITLE"] = $name;
         $leadData["COMMENTS"] = $info;
+        $leadData["UF_CRM_1733302313"] = 45; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
+        $leadData["UF_CRM_1733302527"] = 59; //59 - нужен, 61 - не нужен
         $leadData["UF_CRM_1733302565"] = "ул. Тестовая";
         $leadData["UF_CRM_1733302582"] = "25.05.2025";
         $leadData["UF_CRM_1733302597"] = "20.05.2025";
@@ -134,9 +136,12 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302818544"] = "14.05.2025";
         $leadData["UF_CRM_1733302846046"] = 63;
         $leadData["UF_CRM_1733302866734"] = "Тестовый город";
+        $leadData["UF_CRM_1733302493"] = 51; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
         $leadData["UF_CRM_1733302917133"] = 1000.0;
         $leadData["UF_CRM_1733302937139"] = 20000.0;
         $leadData["UF_CRM_1733302958322"] = 19000.0;
+        $leadData["UF_CRM_1733302997393"] = $request->delivery_price ?? 0;
+       // $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
         $leadData["WEB"] = [['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER']];
         $leadId = $bitrix->createDeal($leadData)["result"] ?? null;
 
@@ -461,7 +466,7 @@ class CalcController extends Controller
 
 
                 $bitrix = new \App\Services\BitrixService();
-                $r = $bitrix->addDocumentToLead($order->bitrix24_lead_id, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
+                $r = $bitrix->addDocumentToDeal($order->bitrix24_lead_id, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
 
 
                 // $bitrixFiles[] = ["name" => $newName, "path" => base64_encode(file_get_contents($path . $newName))];
