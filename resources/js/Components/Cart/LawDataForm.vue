@@ -19,7 +19,7 @@
             <label for="checkout-info">Дополнительная информация</label>
         </div>
         <div class="row  my-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" value="1" v-model="clientForm.work_with_nds"
                            name="flexRadioDefault" id="work-with-nds">
@@ -28,12 +28,21 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" value="0" name="flexRadioDefault"
                            v-model="clientForm.work_with_nds" id="work-without-nds">
                     <label class="form-check-label" for="work-without-nds">
                         Без НДС
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" value="2" name="flexRadioDefault"
+                           v-model="clientForm.work_with_nds" id="work-without-nds">
+                    <label class="form-check-label" for="work-without-nds">
+                        Физ-лицо
                     </label>
                 </div>
             </div>

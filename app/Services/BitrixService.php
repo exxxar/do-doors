@@ -78,6 +78,15 @@ class BitrixService
         ]);
     }
 
+
+
+    public function getStatusList()
+    {
+        return $this->request("crm.status.list", [
+
+        ]);
+    }
+
     public function getLeadFields()
     {
         return $this->request("crm.lead.fields", [
@@ -238,6 +247,51 @@ class BitrixService
             'id' => $leadId,
             'fields' => $updateData
         ]);
+    }
+
+    // Поиск контакта по номеру телефона
+    public function findContactByPhone($phone)
+    {
+        return $this->request('crm.contact.list', [
+            'filter' => ['PHONE' => $phone],
+            'select' => ['ID']
+        ]);
+    }
+
+    // Создание нового контакта
+    public function createContact(array $contactData)
+    {
+        return $this->request('crm.contact.add', [
+            'fields' => $contactData
+        ]);
+    }
+
+    // Обновление существующего контакта
+    public function updateContact($contactId, array $updateData)
+    {
+        return $this->request('crm.contact.update', [
+            'id' => $contactId,
+            'fields' => $updateData
+        ]);
+    }
+
+    // Создание или обновление контакта по номеру телефона
+    public function upsertContact(array $contactData)
+    {
+        $phone = $contactData['PHONE'][0]['VALUE'] ?? null;
+
+        if (!$phone) {
+            return ['error' => 'Phone number is required'];
+        }
+
+        $existingContact = $this->findContactByPhone($phone);
+
+        if (!empty($existingContact['result'])) {
+            $contactId = $existingContact['result'][0]['ID'];
+            return $this->updateContact($contactId, $contactData);
+        }
+
+        return $this->createContact($contactData);
     }
 
     // Вспомогательный метод для запросов к API

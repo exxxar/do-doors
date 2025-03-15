@@ -142,7 +142,7 @@ class Client extends Model
         return $fio[1] ?? '';
     }
 
-    public function getTName()
+    public function getLName()
     {
         $fio = explode(" ", $this->fio, 3);
         return $fio[2] ?? '';

@@ -32,7 +32,8 @@ Route::get("/bitrix-field", function () {
 
     return (object)[
         "lead" => $bitrix->getLeadFields(),
-        "deal" => $bitrix->getLeadDealFields()
+        "deal" => $bitrix->getLeadDealFields(),
+        "statuses" => $bitrix->getStatusList()
     ];
 });
 

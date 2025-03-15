@@ -24,6 +24,21 @@
             </div>
 
             <p><small>Процент внесенной суммы от полной стоимости</small></p>
+            <p class="my-2">
+                <span
+                    @click="selectPayedPercentType(0)"
+                    v-bind:class="{'btn-dark text-white':clientForm.payed_percent_type === 0}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2" style="font-size: 10px;">50\50</span>
+                <span
+                    @click="selectPayedPercentType(1)"
+                    v-bind:class="{'btn-dark text-white':clientForm.payed_percent_type === 1}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2" style="font-size: 10px;">70\30</span>
+                <span
+                    @click="selectPayedPercentType(2)"
+                    v-bind:class="{'btn-dark text-white':clientForm.payed_percent_type === 2}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2"
+                    style="font-size: 10px;">100% предоплата</span>
+            </p>
             <div class="form-floating mb-2">
                 <input type="text" class="form-control"
                        @change="changePayedPercent"
@@ -51,13 +66,45 @@
                 <label for="checkout-name">Срок передачи товара покупателю</label>
             </div>
 
+
+            <div class=" my-2">
+
+                <button
+                    type="button"
+                    @click="clientForm.delivery_type = 0"
+                    v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 0}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Доставка до адреса</button>
+
+                <button
+                    type="button"
+                    @click="clientForm.delivery_type = 1"
+                    v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 1}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Самовывоз</button>
+
+                <button
+                    type="button"
+                    @click="clientForm.delivery_type = 2"
+                    v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 2}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >ТК</button>
+
+
+                <button
+                    type="button"
+                    @click="clientForm.delivery_type = 3"
+                    v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 3}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Доставка до проходной</button>
+
+            </div>
+
+<!--
             <div class="form-check form-switch mb-2">
-                <input  v-model="clientForm.need_delivery" class="form-check-input" type="checkbox"
+                <input v-model="clientForm.need_delivery" class="form-check-input" type="checkbox"
                        role="switch" id="need-delivery">
                 <label class="form-check-label" for="need-delivery">Нужна доставка</label>
             </div>
+-->
 
-            <template v-if="clientForm.need_delivery">
+            <template v-if="clientForm.delivery_type === 0">
                 <div class="form-floating mb-2">
                     <input type="number"
                            min="0"
@@ -80,6 +127,29 @@
                            placeholder="name@example.com" required>
                     <label for="delivery-address">Адрес доставки</label>
                 </div>
+
+                <p class="mb-2">Подъем на этаж</p>
+                <div class=" my-2">
+
+
+
+                        <button
+                            type="button"
+                            @click="clientForm.ascent_floor = true"
+                            v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === true}"
+                            class="btn btn-outline-secondary text-black rounded-0 mr-2" >Нужен</button>
+
+
+
+                        <button
+                            type="button"
+                            @click="clientForm.ascent_floor = false"
+                            v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === false}"
+                            class="btn btn-outline-secondary text-black rounded-0 mr-2" >Не нужен</button>
+
+
+
+                </div>
             </template>
 
             <slot name="loader"></slot>
@@ -91,8 +161,9 @@
         </div>
         <template v-else>
             <button
-                    :disabled="disabled"
-                    class="btn btn-dark w-100 my-2 rounded-0 p-3">Отправить</button>
+                :disabled="disabled"
+                class="btn btn-dark w-100 my-2 rounded-0 p-3">Отправить
+            </button>
         </template>
 
     </template>
@@ -111,6 +182,8 @@ export default {
     },
     mounted() {
         this.clientForm = this.modelValue
+
+        this.selectPayedPercentType(1)
     },
     computed: {
         ...mapGetters(['getErrors',
@@ -128,6 +201,22 @@ export default {
 
     },
     methods: {
+        selectPayedPercentType(type) {
+            this.clientForm.payed_percent_type = type
+            switch (type) {
+                case 0:
+                    this.clientForm.payed_percent = 50;
+                    break;
+                default:
+                case 1:
+                    this.clientForm.payed_percent = 70;
+                    break;
+                case 2:
+                    this.clientForm.payed_percent = 100;
+                    break;
+            }
+            this.changePayedPercent()
+        },
         hasRoles(role) {
             let tmpRole = false
 

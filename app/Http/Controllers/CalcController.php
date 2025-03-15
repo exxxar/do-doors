@@ -62,7 +62,10 @@ class CalcController extends Controller
 
         $currentPayed = $request->current_payed ?? 0;
         $payedPercent = $request->payed_percent ?? 0;
+        $payedPercentType = $request->payed_percent_type ?? 0;
+        $ascentFloor = ($request->ascent_floor ?? false) == "true";
         $deliveryTerms = $request->delivery_terms ?? null;
+        $deliveryType = $request->delivery_type ?? 0;
 
         $workWithNds = $request->work_with_nds ?? 1;
 
@@ -74,7 +77,7 @@ class CalcController extends Controller
         $passport = $request->passport ?? 'не указано';
         $work_days = $request->work_days ?? 0;
         $passport_issued = $request->passport_issued ?? 'не указано';
-        $info = $request->info ?? 'не указана';
+        $info = $request->info ?? 'не указан';
         $totalPrice = $request->total_price ?? 0;
         $totalCount = $request->total_count ?? 0;
         $items = json_decode($request->items ?? '[]');
@@ -123,26 +126,38 @@ class CalcController extends Controller
         ]);
 
         $bitrix = new \App\Services\BitrixService();
+        $contactData = [
+            'NAME' => $client->getFName(),
+            'LAST_NAME' => $client->getLName(),
+            'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
+            'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
+        ];
+
+        dd("test");
+        $contact = $bitrix->upsertContact($contactData);
 
         $leadData = $client->getBitrix24DealData();
         $leadData["TITLE"] = $name;
+        if (isset($contact["result"]))
+            $leadData["CONTACT_IDS"] = [$contact["result"]];
         $leadData["COMMENTS"] = $info;
-        $leadData["UF_CRM_1733302313"] = 45; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
-        $leadData["UF_CRM_1733302527"] = 59; //59 - нужен, 61 - не нужен
-        $leadData["UF_CRM_1733302565"] = "ул. Тестовая";
-        $leadData["UF_CRM_1733302582"] = "25.05.2025";
-        $leadData["UF_CRM_1733302597"] = "20.05.2025";
-        $leadData["UF_CRM_1733302797738"] = "Договор №1";
-        $leadData["UF_CRM_1733302818544"] = "14.05.2025";
-        $leadData["UF_CRM_1733302846046"] = 63;
-        $leadData["UF_CRM_1733302866734"] = "Тестовый город";
-        $leadData["UF_CRM_1733302493"] = 51; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
-        $leadData["UF_CRM_1733302917133"] = 1000.0;
-        $leadData["UF_CRM_1733302937139"] = 20000.0;
-        $leadData["UF_CRM_1733302958322"] = 19000.0;
-        $leadData["UF_CRM_1733302997393"] = $request->delivery_price ?? 0;
-       // $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
-        $leadData["WEB"] = [['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER']];
+        $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
+        $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
+        $leadData["UF_CRM_1733302565"] = $request->delivery_address ?? '-';
+        $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+            Carbon::now()->addDays($request->work_days ?? 7))->format('DD.MM.YYYY'); //Предпологаемая дата сдачи, срок изготовления
+        $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('DD.MM.YYYY');//Срок актуальности КП
+        $leadData["UF_CRM_1733302797738"] = "Договор №____";
+        $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('DD.MM.YYYY');//Дата договора
+        $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
+        $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
+        $leadData["UF_CRM_1733302493"] = [51, 53, 55, 57][$deliveryType]; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
+        $leadData["UF_CRM_1733302917133"] = $currentPayed;//Аванс, руб
+        $leadData["UF_CRM_1733302937139"] = $totalPrice;//Окончательны платеж, руб.
+        $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
+        $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
+        $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
+        $leadData["UF_CRM_1742035413778"] = ['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER'];
         $leadId = $bitrix->createDeal($leadData)["result"] ?? null;
 
         $order->bitrix24_lead_id = $leadId;
@@ -273,8 +288,8 @@ class CalcController extends Controller
 
         $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) . ")";
 
- /*       $nc = new NCLNameCaseRu();
-        $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);*/
+        /*       $nc = new NCLNameCaseRu();
+               $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);*/
 
         if (file_exists($path . "/$fileName")) {
             try {
@@ -391,7 +406,7 @@ class CalcController extends Controller
             ->find($request->id);
 
         if (is_null($order))
-            throw  new HttpException( 404, "Заказ не найден в системе");
+            throw  new HttpException(404, "Заказ не найден в системе");
 
         $order->contract_number = $request->contract_number ?? null;
         $order->save();
