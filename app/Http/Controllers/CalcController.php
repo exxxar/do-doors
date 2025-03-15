@@ -141,6 +141,7 @@ class CalcController extends Controller
         if (isset($contact["result"]))
             $leadData["CONTACT_IDS"] = [$contact["result"]];
         $leadData["COMMENTS"] = $info;
+        $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
         $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
         $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
         $leadData["UF_CRM_1733302565"] = $request->delivery_address ?? '-';

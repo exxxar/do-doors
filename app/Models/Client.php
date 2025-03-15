@@ -91,7 +91,7 @@ class Client extends Model
         $leadData = [
             'TITLE' => $this->fio,
             'NAME' => $fname,
-            'TYPE_ID' => 3, // "crm.status.list",
+
             'SECOND_NAME' => $sname,
             'LAST_NAME' => $tname,
             'COMMENTS' => 'Лид из конструктора',
