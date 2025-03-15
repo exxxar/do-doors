@@ -13,6 +13,7 @@ use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -128,13 +129,16 @@ class CalcController extends Controller
         $bitrix = new \App\Services\BitrixService();
         $contactData = [
             'NAME' => $client->getFName() ?? $name,
+            'SECOND_NAME' => $client->getSName() ?? '',
             'LAST_NAME' => $client->getLName() ?? '',
+            'TYPE_ID' => "CLIENT",
             'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
             'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
         ];
 
-
         $contact = $bitrix->upsertContact($contactData);
+
+        Log::info("contact=>".print_r($contact, true));
 
         $leadData = $client->getBitrix24DealData();
         $leadData["TITLE"] = $name;
@@ -159,7 +163,10 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
         $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
         $leadData["UF_CRM_1742035413778"] = ['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER'];
-        $leadId = $bitrix->createDeal($leadData)["result"] ?? null;
+        $deal = $bitrix->createDeal($leadData);
+
+        $leadId = $deal["result"] ?? null;
+        Log::info("deal=>".print_r($deal, true));
 
         $order->bitrix24_lead_id = $leadId;
         $order->save();
