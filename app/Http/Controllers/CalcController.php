@@ -162,7 +162,7 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
         $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
         $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
-        $leadData["UF_CRM_1742035413778"] = ['VALUE' => env("APP_URL") . "/link/" . $order->id, 'VALUE_TYPE' => 'OTHER'];
+        $leadData["UF_CRM_1742035413778"] =  env("APP_URL") . "/link/" . $order->id;
         $deal = $bitrix->createDeal($leadData);
 
         $leadId = $deal["result"] ?? null;
