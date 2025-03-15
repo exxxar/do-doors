@@ -249,6 +249,15 @@ class BitrixService
         ]);
     }
 
+    public function updateDeal($dealId, array $updateData)
+    {
+        return $this->request('crm.deal.update', [
+            'id' => $dealId,
+            'fields' => $updateData
+        ]);
+    }
+
+
     // Поиск контакта по номеру телефона
     public function findContactByPhone($phone)
     {

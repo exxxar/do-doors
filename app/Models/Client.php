@@ -133,19 +133,19 @@ class Client extends Model
     public function getFName()
     {
         $fio = explode(" ", $this->fio, 3);
-        return $fio[0] ?? '';
+        return $fio[0] ?? null;
     }
 
     public function getSName()
     {
         $fio = explode(" ", $this->fio, 3);
-        return $fio[1] ?? '';
+        return $fio[1] ?? null;
     }
 
     public function getLName()
     {
         $fio = explode(" ", $this->fio, 3);
-        return $fio[2] ?? '';
+        return $fio[2] ?? null;
     }
 
     public function getInitials()
