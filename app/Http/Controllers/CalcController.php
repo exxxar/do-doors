@@ -138,7 +138,7 @@ class CalcController extends Controller
 
         $contact = $bitrix->upsertContact($contactData);
 
-        Log::info("contact=>".print_r($contact, true));
+        Log::info("contact=>" . print_r($contact, true));
 
         $leadData = $client->getBitrix24DealData();
         $leadData["TITLE"] = $name;
@@ -148,7 +148,7 @@ class CalcController extends Controller
         $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
         $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
         $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
-        $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '').','.($request->delivery_address ?? '');
+        $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
         $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
             Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
         $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
@@ -161,12 +161,12 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302937139"] = $totalPrice;//Окончательны платеж, руб.
         $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
         $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
-        $leadData["UF_CRM_1733303016351"] = $request->delivery_price ?? 0;
-        $leadData["UF_CRM_1742035413778"] =  env("APP_URL") . "/link/" . $order->id;
+        $leadData["UF_CRM_1733305761683"] = $request->delivery_price ?? 0;
+        $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
         $deal = $bitrix->createDeal($leadData);
 
         $leadId = $deal["result"] ?? null;
-        Log::info("deal=>".print_r($deal, true));
+        Log::info("deal=>" . print_r($deal, true));
 
         $order->bitrix24_lead_id = $leadId;
         $order->save();
@@ -228,7 +228,7 @@ class CalcController extends Controller
 
         }
 
-        if ($request->need_delivery ?? false) {
+        if (($request->delivery_type ?? 0) == 0) {
             $deliveryProductData = [
                 'NAME' => "Доставка комплекта дверей",
                 'CURRENCY_ID' => 'RUB',
@@ -489,7 +489,7 @@ class CalcController extends Controller
 
 
                 $bitrix = new \App\Services\BitrixService();
-                $deal["UF_CRM_1733302797738"] = "Договор №".$order->contract_number;
+                $deal["UF_CRM_1733302797738"] = "Договор №" . $order->contract_number;
                 $bitrix->updateDeal($deal);
                 $r = $bitrix->addDocumentToDeal($order->bitrix24_lead_id, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
 
