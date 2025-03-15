@@ -133,7 +133,7 @@ class CalcController extends Controller
             'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
         ];
 
-        dd("test");
+
         $contact = $bitrix->upsertContact($contactData);
 
         $leadData = $client->getBitrix24DealData();
