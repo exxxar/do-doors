@@ -126,20 +126,20 @@ class CalcController extends Controller
         ]);
 
         $bitrix = new \App\Services\BitrixService();
-        $contactData = [
+       /* $contactData = [
             'NAME' => $client->getFName(),
             'LAST_NAME' => $client->getLName(),
             'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
             'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
-        ];
+        ];*/
 
 
-        $contact = $bitrix->upsertContact($contactData);
+        //$contact = $bitrix->upsertContact($contactData);
 
         $leadData = $client->getBitrix24DealData();
         $leadData["TITLE"] = $name;
-        if (isset($contact["result"]))
-            $leadData["CONTACT_IDS"] = [$contact["result"]];
+     /*   if (isset($contact["result"]))
+            $leadData["CONTACT_IDS"] = [$contact["result"]];*/
         $leadData["COMMENTS"] = $info;
         $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
         $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
