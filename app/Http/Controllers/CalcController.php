@@ -436,9 +436,6 @@ class CalcController extends Controller
         $work_days = ($order->work_days ?? 7);
         $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) . ")";
 
-        $nc = new NCLNameCaseRu();
-        $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);
-
         $buyerData = $client->getBueryData();
 
         $passport = $client->client_data["passport"] ?? '';
@@ -450,7 +447,7 @@ class CalcController extends Controller
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
                 $templateProcessor->setValue('numb_doc', $order->contract_number);
                 $templateProcessor->setValue('title', $client->name);
-                $templateProcessor->setValue('member', $member ?? '-');
+                $templateProcessor->setValue('member', $client->fio ?? '-');
                 $templateProcessor->setValue('fio', $fam_initial ?? '-');
                 $templateProcessor->setValue('email', $client->email);
                 $templateProcessor->setValue('phone', $client->phone);
