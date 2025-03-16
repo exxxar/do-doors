@@ -490,7 +490,7 @@ class CalcController extends Controller
 
                 $bitrix = new \App\Services\BitrixService();
                 $deal["UF_CRM_1733302797738"] = "Договор №" . $order->contract_number;
-                $bitrix->updateDeal($deal);
+                $bitrix->updateDeal($order->bitrix24_lead_id, $deal);
                 $r = $bitrix->addDocumentToDeal($order->bitrix24_lead_id, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
 
 

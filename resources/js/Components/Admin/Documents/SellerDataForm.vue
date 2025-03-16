@@ -7,21 +7,21 @@
                     <input type="text" class="form-control" id="company" v-model="formData.title"/>
                     <label for="company">Компания или Название ИП</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_company}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_company}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="text" class="form-control" id="INN_KPP" v-model="formData.INN_KPP"/>
                     <label for="INN_KPP">ИНН/КПП</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_INN_KPP}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_inn} / ${seller_kpp}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="text" class="form-control" id="OGRN" v-model="formData.OGRN"/>
                     <label for="OGRN">ОГРН или ОГРНИП</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_OGRN}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_ogrn}</span>
             </div>
             <template v-if="formData.supplier_representative">
                 <h5 class="mb-2">Поставщик</h5>
@@ -31,7 +31,7 @@
                                v-model="formData.supplier_representative.full_name"/>
                         <label for="full_name">ФИО</label>
                     </div>
-                    <span class="input-group-text rounded-0 border-dark">{seller_full_name}</span>
+                    <span class="input-group-text rounded-0 border-dark">${seller_full_name}</span>
                 </div>
             </template>
 
@@ -44,7 +44,7 @@
                            v-model="formData.legal_address.postal_code"/>
                     <label for="postal_code">Почтовый индекс</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_postal_code}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_postal_code}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
@@ -52,14 +52,14 @@
                            v-model="formData.legal_address.region"/>
                     <label for="region">Регион</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_region}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_region}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="text" class="form-control" id="city" v-model="formData.legal_address.city"/>
                     <label for="city">Город</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_city}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_city}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
@@ -67,7 +67,7 @@
                            v-model="formData.legal_address.street"/>
                     <label for="street">Улица</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_street}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_street}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
@@ -75,7 +75,7 @@
                            v-model="formData.legal_address.building"/>
                     <label for="building">Дом</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_building}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_building}</span>
             </div>
         </div>
         <div class="col-12">
@@ -85,14 +85,14 @@
                     <input type="text" class="form-control" id="name" v-model="formData.bank.name"/>
                     <label for="name">Название банка</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_name}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_name}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="text" class="form-control" id="BIC" v-model="formData.bank.BIC"/>
                     <label for="BIC">БИК</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_BIC}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_bic}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
@@ -100,7 +100,7 @@
                            v-model="formData.bank.correspondent_account"/>
                     <label for="correspondent_account">Корреспондентский счет</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_correspondent_account}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_correspondent_account}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
@@ -108,21 +108,21 @@
                            v-model="formData.bank.checking_account"/>
                     <label for="checking_account">Расчетный счет</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_checking_account}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_checking_account}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="text" class="form-control" id="phone" v-model="formData.phone"/>
                     <label for="phone">Номер телефона</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_phone}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_phone}</span>
             </div>
             <div class="input-group mb-2 rounded-0 border-dark">
                 <div class="form-floating flex-grow-1">
                     <input type="email" class="form-control" id="email" v-model="formData.email"/>
                     <label for="email">Email</label>
                 </div>
-                <span class="input-group-text rounded-0 border-dark">{seller_email}</span>
+                <span class="input-group-text rounded-0 border-dark">${seller_email}</span>
             </div>
         </div>
 
