@@ -22,8 +22,8 @@ class MultiSheetsCartExport implements WithMultipleSheets
     {
         return [
             new SecondSheetCartExport(data: $this->items, buyer: $this->buyer),
-            new FirstSheetCartExport(data: $this->items),
-            //new ThirdSheetCartExport(data: $this->items),
+           // new FirstSheetCartExport(data: $this->items),
+            new ThirdSheetCartExport(data: $this->items),
         ];
     }
 }

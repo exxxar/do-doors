@@ -19,7 +19,7 @@ class TaskPageExport implements FromView
     public function view(): \Illuminate\Contracts\View\View
     {
         return view('export.tasks', [
-            'tasks' => $this->tasks,
+            'items' => $this->tasks,
             'sheet_title' => $this->sheetTitle,
         ]);
     }

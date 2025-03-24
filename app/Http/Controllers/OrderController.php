@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\DocumentLogic;
+use App\Exports\Cart\MultiSheetsCartExport;
 use App\Exports\OrderExport;
 use App\Http\Requests\OrderStoreRequest;
 use App\Http\Requests\OrderUpdateRequest;
@@ -19,6 +21,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
+use MessageFormatter;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -32,7 +35,8 @@ class OrderController extends Controller
         return Inertia::render('Admin/OrdersPage');
     }
 
-    public function editDoorInOrder(Request $request){
+    public function editDoorInOrder(Request $request)
+    {
 
     }
 
@@ -61,7 +65,8 @@ class OrderController extends Controller
         return response()->noContent(200);
     }
 
-    public function downloadFilteredOrdersExcel(Request $request){
+    public function downloadFilteredOrdersExcel(Request $request)
+    {
 
         $search = $request->search ?? null;
         $order = $request->order ?? "id";
@@ -79,11 +84,11 @@ class OrderController extends Controller
                 ->orWhere("contract_amount", 'like', "%$search%")
                 ->orWhere("id", 'like', "%$search%");
 
-        if (!is_null($df)&&!is_null($dt))
+        if (!is_null($df) && !is_null($dt))
             $orders = $orders
                 ->whereBetween("contract_date", [
-                    Carbon::createFromTimestamp( substr($df, 0,strlen($df)-3))->format('Y-m-d H:i:s'),
-                    Carbon::createFromTimestamp( substr($dt, 0,strlen($df)-3))->format('Y-m-d H:i:s'),
+                    Carbon::createFromTimestamp(substr($df, 0, strlen($df) - 3))->format('Y-m-d H:i:s'),
+                    Carbon::createFromTimestamp(substr($dt, 0, strlen($df) - 3))->format('Y-m-d H:i:s'),
                 ]);
 
         $orders = $orders->orderBy($order, $direction)
@@ -109,23 +114,40 @@ class OrderController extends Controller
     public function downloadOrderExcel(Request $request, $id)
     {
 
-        $orders = Order::query()
+        $order = Order::query()
             ->where("id", $id)
-            ->get();
+            ->first();
 
         $details = OrderDetail::query()
             ->where("order_id", $id)
             ->get();
 
-        if (count($orders) == 0)
+        if (is_null($order ?? null))
             return view("error", [
-                "message" => "Заказы с указанным идентификатором не найдены"
+                "message" => "Заказ с указанным идентификатором не найден"
             ]);
 
-        return Excel::download(new OrderExport(
+        $client = Client::query()
+            ->where("id", $order->client_id)
+            ->first();
+
+
+        $buyerData = $client->getBueryData();
+
+
+        $items = [];
+
+        foreach ($details as $detail) {
+            $door = (object)$detail->door;
+            $items[] = $door;
+        }
+
+        return Excel::download(new MultiSheetsCartExport($items, $buyerData), "заказ $id.xlsx");
+
+        /*return Excel::download(new OrderExport(
             $orders,
             $details,
-        ), "orders-tasks-$id.xlsx");
+        ), "orders-tasks-$id.xlsx");*/
     }
 
     public function getOrderList(Request $request): OrderCollection
@@ -150,7 +172,7 @@ class OrderController extends Controller
                 ->orWhere("contract_amount", 'like', "%$search%")
                 ->orWhere("id", 'like', "%$search%");
 
-        if (!is_null($df)&&!is_null($dt))
+        if (!is_null($df) && !is_null($dt))
             $orders = $orders
                 ->whereBetween("contract_date", [
                     Carbon::parse($df)->format('Y-m-d H:i:s'),
@@ -168,7 +190,7 @@ class OrderController extends Controller
             "type" => "required",
         ]);
 
-        $name =  $request->type == 0 ? "договор с ИП.docx" : ($request->type == 1 ? "договор с ООО.docx" : "договор с ФЛ.docx");
+        $name = $request->type == 0 ? "договор с ИП.docx" : ($request->type == 1 ? "договор с ООО.docx" : "договор с ФЛ.docx");
 
         $headers = array(
             'Content-Type:  application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -249,18 +271,52 @@ class OrderController extends Controller
                 "message" => "Не найден шаблон договора!"
             ]);
         }
+        $buyerData = $client->getBueryData();
+
+        $work_days_string = $order->work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $order->work_days]) . ")";
+
         $templateProcessor = new TemplateProcessor($path . "/$name");
-        $templateProcessor->setValue('title', $client->title ?? '-');
+
+        $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
+        $templateProcessor->setValue('numb_doc', $order->id);
+        $templateProcessor->setValue('title', $name);
+        $templateProcessor->setValue('member', $client->fio ?? '-');
+        $templateProcessor->setValue('fio', $fam_initial ?? '-');
         $templateProcessor->setValue('email', $client->email ?? '-');
         $templateProcessor->setValue('phone', $client->phone ?? '-');
         $templateProcessor->setValue('fact_address', $client->fact_address ?? '-');
         $templateProcessor->setValue('law_address', $client->law_address ?? '-');
         $templateProcessor->setValue('inn', $client->inn ?? '-');
-        $templateProcessor->setValue('kpp', $client->kpp ?? '-');
         $templateProcessor->setValue('ogrn', $client->ogrn ?? '-');
+        $templateProcessor->setValue('kpp', $client->kpp ?? '-');
         $templateProcessor->setValue('okpo', $client->okpo ?? '-');
+
+        $templateProcessor->setValue('order_id', $order->id);
+        $templateProcessor->setValue('info', $order->info ?? '-');
+        $templateProcessor->setValue('total_price', $order->total_price ?? 0);
+        $templateProcessor->setValue('total_count', $order->total_count ?? 0);
+        $templateProcessor->setValue('current_payed', $order->current_payed ?? 0);
+        $templateProcessor->setValue('payed_percent', $order->payed_percent ?? 0);
+        $templateProcessor->setValue('last_payment', floatval($order->total_price) - floatval($order->current_payed ));
+        $templateProcessor->setValue('delivery_terms', $order->delivery_terms ?? '-');
+        $templateProcessor->setValue('work_days', $work_days_string);
+
+        // requisites
+        $templateProcessor->setValue('bik', $buyerData["buyer_bank_bic"]);
+        $templateProcessor->setValue('ksch', $buyerData["buyer_correspondent_account"]);
+        $templateProcessor->setValue('rsch', $buyerData["buyer_checking_account"]);
+        $templateProcessor->setValue('bank_name', $buyerData["buyer_bank_name"]);
+    /*    $templateProcessor->setValue('passport', $passport);
+        $templateProcessor->setValue('passport_issued', $passport_issued);*/
         if (!is_null($preparedRequisites))
             $templateProcessor->setValue('requisites', $preparedRequisites);
+
+        $doc = new DocumentLogic();
+        $sellerParams = $doc->getAllSellerParameters($nds == 1);
+
+        foreach ($sellerParams as $key => $value)
+            $templateProcessor->setValue($key, $value);
+
         $templateProcessor->saveAs($path . "/$generatedName");
 
         $headers = array(

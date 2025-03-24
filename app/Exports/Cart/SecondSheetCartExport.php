@@ -57,14 +57,14 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
         $drawing1->setDescription('Первое изображение');
         $drawing1->setPath(public_path('docs/sign_ooo.jpg'));
         $drawing1->setHeight(100);
-        $drawing1->setCoordinates("D$signStartPos");
+        $drawing1->setCoordinates("C$signStartPos");
 
         $drawing2 = new Drawing();
         $drawing2->setName('Печать');
         $drawing2->setDescription('Второе изображение');
         $drawing2->setPath(public_path('docs/stamp_ooo.jpg'));
-        $drawing2->setHeight(300);
-        $drawing2->setCoordinates("D$stampStartPos");
+        $drawing2->setHeight(200);
+        $drawing2->setCoordinates("C$stampStartPos");
 
         return [$drawing1, $drawing2];
     }
