@@ -11,19 +11,26 @@ class MultiSheetsCartExport implements WithMultipleSheets
 
     public $buyer;
 
-    public function __construct($data, $buyer)
+    public $single;
+
+    public function __construct($data, $buyer, $single = false)
     {
         $this->items = $data ?? [];
         $this->buyer = $buyer;
-
+        $this->single = $single;
     }
 
     public function sheets(): array
     {
-        return [
-            new SecondSheetCartExport(data: $this->items, buyer: $this->buyer),
-           // new FirstSheetCartExport(data: $this->items),
-            new ThirdSheetCartExport(data: $this->items),
-        ];
+        if ($this->single)
+            return [
+                new SecondSheetCartExport(data: $this->items, buyer: $this->buyer),
+            ];
+        else
+            return [
+                new SecondSheetCartExport(data: $this->items, buyer: $this->buyer),
+                // new FirstSheetCartExport(data: $this->items),
+                new ThirdSheetCartExport(data: $this->items),
+            ];
     }
 }

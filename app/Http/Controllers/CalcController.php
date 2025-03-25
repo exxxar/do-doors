@@ -290,7 +290,7 @@ class CalcController extends Controller
         $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
 
 
-        Excel::store(new MultiSheetsCartExport($items, $buyerData), $excelFileName);
+        Excel::store(new MultiSheetsCartExport($items, $buyerData, true), $excelFileName);
 
         $bitrixFiles = [
             [
