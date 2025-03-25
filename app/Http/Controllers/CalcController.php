@@ -152,7 +152,7 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
             Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
         $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
-        $leadData["UF_CRM_1733302797738"] = "Договор №____";
+        $leadData["UF_CRM_1733302797738"] = "Не указан";
         $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
         $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
         $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
@@ -502,7 +502,7 @@ class CalcController extends Controller
 
 
                 $bitrix = new \App\Services\BitrixService();
-                $deal["UF_CRM_1733302797738"] = "Договор №" . $order->contract_number;
+                $deal["UF_CRM_1733302797738"] = $order->contract_number;
                 $bitrix->updateDeal($order->bitrix24_lead_id, $deal);
                 $r = $bitrix->addDocumentToDeal($order->bitrix24_lead_id, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
 
