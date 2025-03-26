@@ -145,6 +145,7 @@ class CalcController extends Controller
         if (isset($contact["result"]))
             $leadData["CONTACT_IDS"] = [$contact["result"]];
         $leadData["COMMENTS"] = $info;
+        $leadData["UF_CRM_1733302797738"] = $order->id;
         $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
         $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
         $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
@@ -152,7 +153,6 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
             Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
         $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
-        $leadData["UF_CRM_1733302797738"] = $info;
         $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
         $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
         $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
