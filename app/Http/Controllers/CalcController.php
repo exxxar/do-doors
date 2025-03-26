@@ -152,7 +152,7 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
             Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
         $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
-        $leadData["UF_CRM_1733302797738"] = "Не указан";
+        $leadData["UF_CRM_1733302797738"] = $info;
         $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
         $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
         $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
@@ -163,6 +163,30 @@ class CalcController extends Controller
         $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
         $leadData["UF_CRM_1733305761683"] = $request->delivery_price ?? 0;
         $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
+
+
+        $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
+        $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
+        $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
+        $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
+        $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
+        $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526";
+        $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976";
+        $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
+        $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
+        $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
+        $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
+        $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
+        $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";
+        $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
+        $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
+        $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
+        $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
+        $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
+        $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
+        $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";
+        $leadData["UF_CRM_1742976788"] = 2123;
+
         $deal = $bitrix->createDeal($leadData);
 
         $leadId = $deal["result"] ?? null;
