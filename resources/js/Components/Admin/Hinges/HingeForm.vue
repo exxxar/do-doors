@@ -184,6 +184,17 @@ export default {
                 hingeForm: data
             }).then((response) => {
                 this.$emit("callback")
+
+                this.$store.dispatch("updatedFormattedSizes").then(resp => {
+                    window.dispatchEvent(new CustomEvent("load-sizes", {
+                        detail: null
+                    }));
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Вы успешно обновили данные",
+                    });
+                })
+
                 this.resetForm()
             }).catch(error => {
 

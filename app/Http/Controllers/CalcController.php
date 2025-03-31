@@ -145,7 +145,7 @@ class CalcController extends Controller
         if (isset($contact["result"]))
             $leadData["CONTACT_IDS"] = [$contact["result"]];
         $leadData["COMMENTS"] = $info;
-        $leadData["UF_CRM_1733302797738"] = $order->id;
+        $leadData["UF_CRM_1733302797738"] = 'Еще не указан';//$order->id;
         $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
         $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
         $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
@@ -165,26 +165,26 @@ class CalcController extends Controller
         $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
 
 
-     /*   $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
-        $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
-        $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
-        $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
-        $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
-        $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
-        $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
-        $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
-        $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
-        $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
-        $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
-        $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
-        $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
-        $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
-        $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
-        $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
-        $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
-        $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
-        $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
-        $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
+        /*   $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
+           $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
+           $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
+           $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
+           $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
+           $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
+           $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
+           $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
+           $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
+           $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
+           $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
+           $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
+           $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
+           $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
+           $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
+           $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
+           $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
+           $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
+           $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
+           $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
 
         $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
 
@@ -198,31 +198,32 @@ class CalcController extends Controller
         $productsForBitrix = [];
         foreach ($items as $item) {
 
-        /*    $bitrixProductTitle = sprintf(
-                "DoDoors: %s, %s, петли %s.
-    Отделка с передней стороны: %s.
-    Отделка с задней стороны: %s.
-    Цвет короба и полотна: %s.
-    Цвет фурнитуры: %s.
-    Размер: %sx%s мм.
-    Количество: %s шт.
-    Стоимость за комплект: %s руб.
-    Итоговая стоимость: %s руб.",
-                $item->product->door_type->title ?? 'не указано',
-                $item->product->opening_type->title ?? 'не указано',
-                $item->product->loops->title ?? 'не указано',
-                $item->product->front_side_finish->title ?? 'не указано',
-                $item->product->back_side_finish->title ?? 'не указано',
-                $item->product->box_and_frame_color->title ?? 'не указано',
-                $item->product->fittings_color->title ?? 'не указано',
-                $item->product->height ?? 0,
-                $item->product->width ?? 0,
-                $item->quantity ?? 0,
-                $item->product->price ?? 0,
-                ($item->product->price ?? 0) * ($item->quantity ?? 0)
-            );*/
+            /*    $bitrixProductTitle = sprintf(
+                    "DoDoors: %s, %s, петли %s.
+        Отделка с передней стороны: %s.
+        Отделка с задней стороны: %s.
+        Цвет короба и полотна: %s.
+        Цвет фурнитуры: %s.
+        Размер: %sx%s мм.
+        Количество: %s шт.
+        Стоимость за комплект: %s руб.
+        Итоговая стоимость: %s руб.",
+                    $item->product->door_type->title ?? 'не указано',
+                    $item->product->opening_type->title ?? 'не указано',
+                    $item->product->loops->title ?? 'не указано',
+                    $item->product->front_side_finish->title ?? 'не указано',
+                    $item->product->back_side_finish->title ?? 'не указано',
+                    $item->product->box_and_frame_color->title ?? 'не указано',
+                    $item->product->fittings_color->title ?? 'не указано',
+                    $item->product->height ?? 0,
+                    $item->product->width ?? 0,
+                    $item->quantity ?? 0,
+                    $item->product->price ?? 0,
+                    ($item->product->price ?? 0) * ($item->quantity ?? 0)
+                );*/
 
-            $doorDescription = "DoDoors: " . ($item->product->door_type->title ?? 'КДС') . " " .
+            $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
+            $doorDescription = "DoDoors: " . (in_array($item->product->door_type->title, $shorts) ? $shorts[$item->product->door_type->title] : ($item->product->door_type->title ?? 'КДС')) . " " .
                 (($item->product->need_upper_jumper ?? false) == "true" ? '' : 'без верх. перемычки ') .
                 ($item->product->height ?? 0) . "х" . ($item->product->width ?? 0) . ", " .
                 "открывание " . ($item->product->opening_type->title ?? 'не указано') . ", " .

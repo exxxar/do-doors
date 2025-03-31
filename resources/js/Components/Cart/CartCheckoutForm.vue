@@ -109,7 +109,7 @@ export default {
                 passport: null,
                 passport_issued: null,
                 need_delivery:false,
-                delivery_type:0,
+                delivery_type:1,
                 delivery_address: null,
                 delivery_price: null,
                 delivery_city: null,

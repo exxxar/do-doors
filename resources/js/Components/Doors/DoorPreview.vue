@@ -7,12 +7,15 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
 
     <div class="row" v-if="door">
         <div class="col-12 mb-2">
-            <button class="btn mr-2 rounded-0 "
+            <button
+                type="button"
+                class="btn mr-2 rounded-0 "
                     v-bind:class="{'btn-dark':side===0,'btn-outline-secondary':side!==0}"
                     @click="side=0"> Лицевая сторона
             </button>
 
             <button class="btn rounded-0"
+                    type="button"
                     v-bind:class="{'btn-dark':side===1,'btn-outline-secondary':side!==1}"
                     @click="side=1"> Внутренняя сторона
             </button>

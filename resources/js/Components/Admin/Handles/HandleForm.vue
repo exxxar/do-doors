@@ -384,6 +384,22 @@ export default {
             this.$store.dispatch("storeHandle", {
                 handleForm: data
             }).then((response) => {
+
+                this.$store.dispatch("updatedFormattedSizes").then(resp => {
+                    window.dispatchEvent(new CustomEvent("load-sizes", {
+                        detail: null
+                    }));
+
+                    window.dispatchEvent(new CustomEvent("load-handles", {
+                        detail: null
+                    }));
+
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Вы успешно обновили данные",
+                    });
+                })
+
                 this.$emit("callback")
                 this.resetForm()
             }).catch(error => {

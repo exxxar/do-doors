@@ -303,6 +303,7 @@ Route::prefix("/handles")
         Route::get("/", "index")->name('handles');
         Route::post("/", "getHandleList");
         Route::post("/store", "store");
+        Route::post("/fast-store", "fastStore");
         Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink']);
         Route::post('/import-from-excel', "import");
         Route::delete("/{id}", "destroy");

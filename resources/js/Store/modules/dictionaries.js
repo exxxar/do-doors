@@ -1323,6 +1323,13 @@ const getters = {
 
 // actions
 const actions = {
+    async pushHandles(context, payload){
+        context.state.dictionary.handle_holes_type_variants.push({
+            id:null,
+            title:payload.title,
+            price:payload.price,
+        })
+    },
     async updatedFormattedSizes(context) {
 
         let link = `/sizes/formatted`

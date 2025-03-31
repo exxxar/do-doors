@@ -47,7 +47,6 @@ class HandleController extends Controller
         }
 
 
-
         return response()->noContent();
     }
 
@@ -79,6 +78,37 @@ class HandleController extends Controller
         return new HandleCollection($handles->paginate($size));
     }
 
+    public function fastStore(Request $request)
+    {
+        $request->validate([
+            "handles.*" => "required"
+        ]);
+
+        $handles = $request->handles ?? [];
+
+        foreach ($handles as $handle) {
+            $handle = (object)$handle;
+            $tmp = [
+                "title" => $handle->title ?? null,
+                'price' => (object)[
+                    "wholesale" => $handle->price ?? 0,
+                    "dealer" => $handle->price ?? 0,
+                    "retail" => $handle->price ?? 0,
+                    "cost" => $handle->price ?? 0,
+                ],
+                'color' => null,
+                'variants' => []
+            ];
+
+
+            $handle = Handle::query()
+                ->create($tmp);
+
+        }
+
+        return response()->noContent();
+
+    }
 
     public function store(Request $request)
     {

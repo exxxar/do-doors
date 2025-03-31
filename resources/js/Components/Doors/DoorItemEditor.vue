@@ -649,53 +649,40 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                 </DoorPreview>
                 <div class="card rounded-0 mt-3">
                     <div class="card-body">
-                        <h6>Характеристики</h6>
-                        <h6 class="text-muted font-bold">{{ doorForm.door_type.title }} {{
-                                doorForm.width
-                            }}x{{ doorForm.height }}x{{ doorForm.opening_type?.depth || 0 }}
+                        <h6>Характеристики </h6>
+                        <h6 class="text-muted font-bold">
+                            {{ shortDoorTitle }}
+                            {{ doorForm.width || 0 }}x{{ doorForm.height || 0 }}x{{ doorForm.opening_type?.depth || 0 }}
                         </h6>
                         <h6 class="text-black mb-0">
-
-                                            <span class="mr-1"
-                                                  v-if="doorForm.box_and_frame_color.title">({{
-                                                    doorForm.box_and_frame_color.title
-                                                }}),</span>
-
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.front_side_finish.title">первая сторона {{
-                                    doorForm.front_side_finish.title
-                                }}, </span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.back_side_finish.title">/вторая сторона {{
-                                    doorForm.back_side_finish.title
+                            <span class="mr-1" v-if="doorForm.box_and_frame_color?.title">({{
+                                    doorForm.box_and_frame_color.title
+                                }}),</span>
+                            <span class="mr-1" v-if="doorForm.front_side_finish_color?.title">первая сторона {{
+                                    doorForm.front_side_finish_color.title
                                 }},</span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.loops.title">петли {{ doorForm.loops.title }}</span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.hinge_manufacturer.title ">{{
-                                    doorForm.hinge_manufacturer.title
-                                }}</span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.fittings_color.title">({{
+                            <span class="mr-1" v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{
+                                    doorForm.back_side_finish_color.title
+                                }},</span>
+                            <span class="mr-1" v-if="doorForm.loops?.title">петли {{ doorForm.loops.title }}</span>
+                            <span class="mr-1" v-if="doorForm.fittings_color?.title">({{
                                     doorForm.fittings_color.title
                                 }}),</span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.opening_type.title">{{
+                            <span class="mr-1" v-if="doorForm.opening_type?.title">{{
                                     doorForm.opening_type.title
                                 }},</span>
-                            <span
-                                class="mr-1"
-                                v-if="doorForm.handle_holes.title">{{
-                                    doorForm.handle_holes.title
-                                }}</span>
+                            <span class="mr-1" v-if="doorForm.depth">Толщина профиля {{ doorForm.depth }} мм,</span>
+                            <span class="mr-1" v-if="doorForm.need_upper_jumper !== 'true'">без верх. перемычки,</span>
+                            <span class="mr-1"
+                                  v-if="doorForm.need_automatic_doorstep === 'true'">Автоматический порог,</span>
+                            <span class="mr-1" v-if="doorForm.need_hidden_stopper === 'true'">Скрытый стопор,</span>
+                            <span class="mr-1"
+                                  v-if="doorForm.need_hidden_door_closer === 'true'">Скрытый доводчик,</span>
+                            <span class="mr-1"
+                                  v-if="doorForm.need_hidden_skirting_board === 'true'">Скрытый плинтус,</span>
+                            <span class="mr-1" v-if="doorForm.need_door_install === 'true'">Установка двери,</span>
+                            <span class="mr-1" v-if="doorForm.need_handle_holes === 'true'">Ручка в комплекте</span>
                         </h6>
-
                     </div>
                 </div>
 
@@ -931,6 +918,7 @@ export default {
         return {
             loaded: false,
             selectedHandle: null,
+
             type_dictionary: {
                 size: 'Петли',
                 handle_holes_type: 'Ручка',
@@ -1020,7 +1008,14 @@ export default {
         summaryPriceWithDealer() {
             return Math.round((this.summaryPrice || 0) * (1 + ((this.doorForm.dealer_percent || 0) / 100)))
         },
+        shortDoorTitle() {
+            let key = this.doorForm.door_type?.title || 'КДС'
+            const abbreviations = {
+                "Комплект двери скрытого монтажа": "КДС",
+            };
 
+            return abbreviations[key] || key;
+        },
         summaryPrice() {
             let sum = 0;
 
