@@ -85,7 +85,6 @@ class CalcController extends Controller
         $needInstall = ($installation->need_door_install ?? false) == true;
 
 
-
         $workWithNds = $request->work_with_nds ?? 1;
 
         $clientId = $request->id ?? null;
@@ -297,12 +296,12 @@ class CalcController extends Controller
 
         if ($needInstall) {
             $installDoorsData = [
-                'NAME' => "Установка комплекта дверей x$installCount",
+                'NAME' => "Установка комплекта дверей",
                 'CURRENCY_ID' => 'RUB',
                 'PRICE' => $installPrice,
-                'DESCRIPTION' => "",
+                'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
                 'MEASURE' => 0,
-                'QUANTITY' => $installCount
+                'QUANTITY' => $installRecountType == 0 ? 1 : $installCount
             ];
 
             $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
@@ -310,7 +309,7 @@ class CalcController extends Controller
             $productsForBitrix[] = [
                 "PRODUCT_ID" => $bitrixProductId,
                 "PRICE" => $installPrice,
-                "QUANTITY" => $installCount,
+                "QUANTITY" =>  $installRecountType == 0 ? 1 : $installCount,
             ];
         }
 
