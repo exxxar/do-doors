@@ -296,7 +296,7 @@ class CalcController extends Controller
 
         if ($needInstall) {
             $installDoorsData = [
-                'NAME' => "Установка комплекта дверей",
+                'NAME' => "Установка комплекта дверей: ".($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
                 'CURRENCY_ID' => 'RUB',
                 'PRICE' => $installPrice,
                 'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
