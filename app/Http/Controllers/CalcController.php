@@ -74,8 +74,13 @@ class CalcController extends Controller
         $deliveryTerms = $request->delivery_terms ?? null;
         $deliveryType = $request->delivery_type ?? 0;
 
-        $designerWorkType = ($request->designer->is_fix ?? false) == "true";
+        $designerWorkType = ($request->designer->is_fix ?? false) == "true" ? 1 : 0;
         $designerMoney = $request->designer->value ?? 0;
+        $installPrice = $request->installation->price ?? 0;
+        $installCount = $request->installation->count ?? 0;
+        $installRecountType = $request->installation->recount_type ?? 0;
+        $needInstall = ($request->installation->need_door_install ?? false) == true;
+
 
 
         $workWithNds = $request->work_with_nds ?? 1;
@@ -177,32 +182,32 @@ class CalcController extends Controller
 
             $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
 
-            $leadData["UF_CRM_1733303016351"] = 1;
-            $leadData["UF_CRM_1733306662836"] = 2;
-            $leadData["UF_CRM_1733306683779"] = 3;
-            $leadData["UF_CRM_1733306708610"] = 4;
-            $leadData["UF_CRM_1733310041523"] = 5;
-/*
-            $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
-            $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
-            $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
-            $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
-            $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
-            $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
-            $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
-            $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
-            $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
-            $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
-            $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
-            $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
-            $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
-            $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
-            $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
-            $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
-            $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
-            $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
-            $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
-            $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
+            $leadData["UF_CRM_1733303016351"] = 0;//Прибыль, руб.
+            $leadData["UF_CRM_1733306662836"] = 0;//Комиссия менеджеру-партнеру, руб.
+            $leadData["UF_CRM_1733306683779"] = $designerWorkType ? $designerMoney : 0;;//Комиссия дизайнеру, руб.
+            $leadData["UF_CRM_1733306708610"] = $designerWorkType ? 0 : $designerMoney;//Процент дизайнера, %
+            $leadData["UF_CRM_1733310041523"] = 0;//Сумма рекламации, руб.
+            /*
+                        $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
+                        $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
+                        $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
+                        $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
+                        $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
+                        $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
+                        $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
+                        $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
+                        $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
+                        $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
+                        $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
+                        $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
+                        $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
+                        $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
+                        $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
+                        $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
+                        $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
+                        $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
+                        $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
+                        $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
 
             $deal = $bitrix->createDeal($leadData);
 
@@ -287,6 +292,25 @@ class CalcController extends Controller
 
         }
 
+        if ($needInstall) {
+            $installDoorsData = [
+                'NAME' => "Установка комплекта дверей x$installCount",
+                'CURRENCY_ID' => 'RUB',
+                'PRICE' => $installPrice,
+                'DESCRIPTION' => "",
+                'MEASURE' => 0,
+                'QUANTITY' => $installCount
+            ];
+
+            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+
+            $productsForBitrix[] = [
+                "PRODUCT_ID" => $bitrixProductId,
+                "PRICE" => $installPrice,
+                "QUANTITY" => $installCount,
+            ];
+        }
+
         if (($request->delivery_type ?? 0) == 0) {
             $deliveryProductData = [
                 'NAME' => "Доставка комплекта дверей",
@@ -309,9 +333,6 @@ class CalcController extends Controller
         if (in_array(0, $action) && !in_array(3, $action)) {
             $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
         }
-
-
-
 
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
