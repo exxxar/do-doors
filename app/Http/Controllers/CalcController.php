@@ -74,8 +74,8 @@ class CalcController extends Controller
         $deliveryTerms = $request->delivery_terms ?? null;
         $deliveryType = $request->delivery_type ?? 0;
 
-        $designer = (object)$request->designer ?? [];
-        $installation = (object)$request->installation ?? [];
+        $designer = json_decode($request->designer ?? '[]');
+        $installation = json_decode($request->installation ?? '[]');
 
         $designerWorkType = ($designer->is_fix ?? false) == "true" ? 1 : 0;
         $designerMoney = $designer->value ?? 0;
