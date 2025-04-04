@@ -177,7 +177,12 @@ class CalcController extends Controller
 
             $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
 
-
+            $leadData["UF_CRM_1733303016351"] = 1;
+            $leadData["UF_CRM_1733306662836"] = 2;
+            $leadData["UF_CRM_1733306683779"] = 3;
+            $leadData["UF_CRM_1733306708610"] = 4;
+            $leadData["UF_CRM_1733310041523"] = 5;
+/*
             $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
             $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
             $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
@@ -197,7 +202,7 @@ class CalcController extends Controller
             $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
             $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
             $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
-            $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";
+            $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
 
             $deal = $bitrix->createDeal($leadData);
 
