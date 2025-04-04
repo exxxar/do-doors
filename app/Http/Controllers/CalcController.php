@@ -74,12 +74,15 @@ class CalcController extends Controller
         $deliveryTerms = $request->delivery_terms ?? null;
         $deliveryType = $request->delivery_type ?? 0;
 
-        $designerWorkType = ($request->designer->is_fix ?? false) == "true" ? 1 : 0;
-        $designerMoney = $request->designer->value ?? 0;
-        $installPrice = $request->installation->price ?? 0;
-        $installCount = $request->installation->count ?? 0;
-        $installRecountType = $request->installation->recount_type ?? 0;
-        $needInstall = ($request->installation->need_door_install ?? false) == true;
+        $designer = (object)$request->designer ?? [];
+        $installation = (object)$request->installation ?? [];
+
+        $designerWorkType = ($designer->is_fix ?? false) == "true" ? 1 : 0;
+        $designerMoney = $designer->value ?? 0;
+        $installPrice = $installation->price ?? 0;
+        $installCount = $installation->count ?? 0;
+        $installRecountType = $installation->recount_type ?? 0;
+        $needInstall = ($installation->need_door_install ?? false) == true;
 
 
 
