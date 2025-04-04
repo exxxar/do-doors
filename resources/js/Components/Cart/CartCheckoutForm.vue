@@ -75,7 +75,7 @@ import {mapGetters} from "vuex";
 import {mask} from 'vue-the-mask'
 
 export default {
-    props: ["type"],
+    props: ["type", "action"],
     directives: {mask},
     computed: {
         ...mapGetters(['getErrors',
@@ -86,7 +86,7 @@ export default {
     data() {
         return {
             tab: 0,
-            timer:null,
+            timer: null,
             step: 0,
             editor_modal: null,
             self_clients: [],
@@ -103,13 +103,23 @@ export default {
                 payed_percent: 70,
                 payed_percent_type: 1,
                 delivery_terms: null,
-                ascent_floor:false,
+                ascent_floor: false,
                 work_days: 0,
 
+                installation: {
+                    need_door_install: false,
+                    count: 0,
+                    price: 0,
+                    recount_type: 0,
+                },
+                designer:{
+                    is_fix:false,
+                    value:0,
+                },
                 passport: null,
                 passport_issued: null,
-                need_delivery:false,
-                delivery_type:1,
+                need_delivery: false,
+                delivery_type: 1,
                 delivery_address: null,
                 delivery_price: null,
                 delivery_city: null,
@@ -120,11 +130,18 @@ export default {
     mounted() {
         this.loadSelfClients()
 
+        this.cartProducts.forEach(item => {
+            if (item.product.need_door_install) {
+                this.clientForm.installation.need_door_install = true
+                this.clientForm.installation.count += item.quantity
+            }
+
+        })
 
     },
     methods: {
 
-        showEditorForm(){
+        showEditorForm() {
             window.location.href = "/clients"
         },
         selectItem() {
@@ -215,6 +232,7 @@ export default {
                         data.append(key, item)
                 });
 
+            data.append("action", this.action)
             data.append("total_price", this.cartTotalPrice)
             data.append("total_count", this.cartTotalCount)
 

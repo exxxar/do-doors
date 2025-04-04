@@ -2,9 +2,7 @@
     <template v-if="clientForm">
         <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
             v-if="discount>0">(скидка {{ discount }}%)</span></h6>
-        <p class="mb-2"><small>Возможно в рассрочку!</small></p>
-        <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
-            зависит, просто уточните эти детали в беседе с менеджером</small></p>
+
         <div class="form-floating mb-2">
             <input type="text"
                    class="form-control" @keyup="findPromo" v-model="clientForm.promo" id="checkout-promo"
@@ -73,38 +71,43 @@
                     type="button"
                     @click="clientForm.delivery_type = 0"
                     v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 0}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Доставка до адреса</button>
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2">Доставка до адреса
+                </button>
 
                 <button
                     type="button"
                     @click="clientForm.delivery_type = 1"
                     v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 1}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Самовывоз</button>
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2">Самовывоз
+                </button>
 
                 <button
                     type="button"
                     @click="clientForm.delivery_type = 2"
                     v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 2}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >ТК</button>
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2">ТК
+                </button>
 
 
                 <button
                     type="button"
                     @click="clientForm.delivery_type = 3"
                     v-bind:class="{'btn-dark text-white':clientForm.delivery_type === 3}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2" >Доставка до проходной</button>
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2 mb-2">Доставка до проходной
+                </button>
 
             </div>
 
-<!--
-            <div class="form-check form-switch mb-2">
-                <input v-model="clientForm.need_delivery" class="form-check-input" type="checkbox"
-                       role="switch" id="need-delivery">
-                <label class="form-check-label" for="need-delivery">Нужна доставка</label>
-            </div>
--->
+            <!--
+                        <div class="form-check form-switch mb-2">
+                            <input v-model="clientForm.need_delivery" class="form-check-input" type="checkbox"
+                                   role="switch" id="need-delivery">
+                            <label class="form-check-label" for="need-delivery">Нужна доставка</label>
+                        </div>
+            -->
 
             <template v-if="clientForm.delivery_type === 0">
+                <h6 class="mb-2 fw-bold">Информация по доставке</h6>
                 <div class="form-floating mb-2">
                     <input type="number"
                            min="0"
@@ -130,33 +133,105 @@
 
                 <p class="mb-2">Подъем на этаж</p>
                 <div class=" my-2">
-
-
-
-                        <button
-                            type="button"
-                            @click="clientForm.ascent_floor = true"
-                            v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === true}"
-                            class="btn btn-outline-secondary text-black rounded-0 mr-2" >Нужен</button>
-
-
-
-                        <button
-                            type="button"
-                            @click="clientForm.ascent_floor = false"
-                            v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === false}"
-                            class="btn btn-outline-secondary text-black rounded-0 mr-2" >Не нужен</button>
-
-
-
+                    <button
+                        type="button"
+                        @click="clientForm.ascent_floor = true"
+                        v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === true}"
+                        class="btn btn-outline-secondary text-black rounded-0 mr-2">Нужен
+                    </button>
+                    <button
+                        type="button"
+                        @click="clientForm.ascent_floor = false"
+                        v-bind:class="{'btn-dark text-white':clientForm.ascent_floor === false}"
+                        class="btn btn-outline-secondary text-black rounded-0 mr-2">Не нужен
+                    </button>
                 </div>
             </template>
+
+            <h6 class="mb-2 fw-bold">Установка</h6>
+            <div class=" my-2">
+                <button
+                    type="button"
+                    @click="clientForm.installation.need_door_install = true"
+                    v-bind:class="{'btn-dark text-white':clientForm.installation.need_door_install === true}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Нужна
+                </button>
+                <button
+                    type="button"
+                    @click="clientForm.installation.need_door_install = false"
+                    v-bind:class="{'btn-dark text-white':clientForm.installation.need_door_install === false}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Не нужна
+                </button>
+            </div>
+
+            <template v-if="clientForm.installation.need_door_install">
+                <div class="form-floating mb-2">
+                    <input type="number" class="form-control"
+                           v-model="clientForm.installation.count" id="installation-count"
+                           placeholder="name@example.com">
+                    <label for="installation-count">Дверей к установке</label>
+                </div>
+
+                <p   style="font-size: 10px;">Производить расчет цены</p>
+                <button
+                    type="button"
+                    @click="clientForm.installation.recount_type = 0"
+                    style="font-size: 10px;"
+                    v-bind:class="{'btn-dark text-white':clientForm.installation.recount_type===0}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Суммарно
+                </button>
+                <button
+                    type="button"
+                    style="font-size: 10px;"
+                    @click="clientForm.installation.recount_type = 1"
+                    v-bind:class="{'btn-dark text-white':clientForm.installation.recount_type===1}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">За единицу
+                </button>
+
+
+                <div class="form-floating my-2">
+                    <input type="number" class="form-control"
+                           v-model="clientForm.installation.price" id="installation-price"
+                           placeholder="name@example.com">
+                    <label for="installation-price">Цена за установку, руб
+                        <span v-if="clientForm.installation.recount_type===1">(за единицу)</span>
+                        <span v-if="clientForm.installation.recount_type===0">(суммарно)</span>
+                    </label>
+                </div>
+            </template>
+
+            <h6 class="mb-2 fw-bold">Работа дизайнера</h6>
+            <div class=" my-2">
+                <button
+                    type="button"
+                    @click="clientForm.designer.is_fix = true"
+                    v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix  === true}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Фикс
+                </button>
+                <button
+                    type="button"
+                    @click="clientForm.designer.is_fix = false"
+                    v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix === false}"
+                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Процент
+                </button>
+            </div>
+
+            <div class="form-floating mb-2">
+                <input type="number" class="form-control"
+                       v-model="clientForm.designer.value" id="designer-value"
+                       placeholder="name@example.com">
+                <label for="installation-count">
+                    <span v-if="clientForm.designer.is_fix">Фиксированная оплата, руб</span>
+                    <span v-if="!clientForm.designer.is_fix">Процент за работу,%</span>
+                </label>
+            </div>
+
 
             <slot name="loader"></slot>
             <button
                 :disabled="disabled"
                 class="btn btn-dark w-100 my-2 rounded-0 p-3">
-                Отправить и скачать договор
+                Отправить
             </button>
         </div>
         <template v-else>

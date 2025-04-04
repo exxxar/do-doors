@@ -37,30 +37,59 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
         <div class="offcanvas-body" v-if="tab===1">
             <CartCheckoutForm
                 v-on:back="back"
+                :action="action"
                 v-if="step===1"></CartCheckoutForm>
         </div>
         <div class="offcanvas-footer p-3" v-if="cartProducts.length>0&&tab===0">
             <div class="card rounded-0">
                 <div class="card-body">
-                    <h6 class="font-bold">Итого цена {{ cartTotalPrice }} ₽</h6>
-                    <p class="mb-2"><small>Возможно в рассрочку!</small></p>
-                    <p class="mb-2" style="line-height: 80%;"><small>От цвета шпона или цвета покраски стекла цена не
-                        зависит, просто уточните эти детали в беседе с менеджером</small></p>
-
                     <div v-if="step===0">
-                        <button class="btn btn-dark rounded-0 w-100 mb-2" @click="checkout">Обсудить заказ с
-                            менеджером
+
+                        <label for="send-to-mail" class="mb-2">
+                            <button
+                                id="send-to-mail"
+                                v-bind:class="{'btn-outline-secondary':action.indexOf(1)!==-1}"
+                                class="btn btn-outline-light text-gray-400 rounded-0 mr-2" @click="preCheckAction(1)">
+                                <i
+                                    v-if="action.indexOf(1)!==-1"
+                                    v-bind:class="{'text-success':action.indexOf(1)!==-1}"
+                                    class="fa-solid fa-check-double"></i>
+
+                                <i v-else class="fa-solid fa-check"></i>
+
+                            </button>Отправить КП
+                            на почту клиента
+                        </label>
+                        <p
+                            v-if="action.indexOf(1)!==-1"
+                            class="alert alert-light rounded-0 mb-2"
+                            style="font-size:10px;">Вы отправите КП на почту клиента при отправке в CRM</p>
+
+
+                        <label for="send-to-telegram" class="mb-2">
+                            <button
+                                id="send-to-telegram"
+                                v-bind:class="{'btn-outline-secondary':action.indexOf(2)!==-1}"
+                                class="btn btn-outline-light text-gray-400 rounded-0 mr-2"
+                                @click="preCheckAction(2)">
+                                <i
+                                    v-if="action.indexOf(2)!==-1"
+                                    v-bind:class="{'text-success':action.indexOf(2)!==-1}"
+                                    class="fa-solid fa-check-double"></i>
+                                <i v-else class="fa-solid fa-check"></i>
+                            </button>Отправить КП
+                            в телеграм
+                        </label>
+                        <p
+                            v-if="action.indexOf(2)!==-1"
+                            class="alert alert-light rounded-0 mb-2" style="font-size:10px;">Вы отправите КП в телеграм компании при отправке в CRM, после чего сможете переслать его клиенту в телеграм</p>
+                        <button class="btn btn-success rounded-0 w-100 mb-2" @click="checkout(0)">Отправить сделку в СРМ
                         </button>
-                        <button class="btn btn-outline-secondary rounded-0 w-100 mb-2" @click="checkout">Получить цену
-                            на
-                            почту
-                        </button>
-                        <button class="btn btn-outline-secondary rounded-0 w-100 mb-2" @click="checkout">Получить цену в
-                            Telegram
+
+                        <button class="btn btn-outline-dark  rounded-0 w-100 mb-2" @click="checkout(3)"><i
+                            class="fa-solid fa-floppy-disk"></i> Сохранить
                         </button>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -83,6 +112,7 @@ export default {
         return {
             tab: 0,
             step: 0,
+            action: [],
             discount: 0,
 
         }
@@ -95,11 +125,22 @@ export default {
             this.step = 0
             this.tab = 0
         },
-        checkout() {
+        checkout(action) {
             this.step = 1
             this.tab = 1
+            this.preCheckAction(action)
         },
+        preCheckAction(action){
+            let index = this.action.findIndex(item=>item === action)
 
+            if (index !== - 1) {
+                this.action.splice(index, 1)
+                return
+            }
+
+
+            this.action.push(action)
+        },
         clearCart() {
             this.$store.dispatch("clearCart").then((response) => {
                 this.$notify({

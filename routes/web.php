@@ -33,6 +33,8 @@ Route::get("/bitrix-field", function () {
     return (object)[
         "lead" => $bitrix->getLeadFields(),
         "deal" => $bitrix->getLeadDealFields(),
+        "leads" => $bitrix->getLeads(),
+        "contacts" => $bitrix->getContacts(),
         "statuses" => $bitrix->getStatusList()
     ];
 });
@@ -40,55 +42,9 @@ Route::get("/bitrix-field", function () {
 Route::get("/2test", function () {
     $bitrix = new \App\Services\BitrixService();
 
-    return $bitrix->getLeadFields();
-
-    $leadData = [
-        'TITLE' => 'ADADASDASD',
-        'NAME' => 'Иван',
-        'SECOND_NAME' => 'Иванов',
-        'LAST_NAME' => 'Тестовый',
-        'COMMENTS' => 'Комментарий к заказу',
-        'SOURCE_ID' => 'OTHER',
-        'SOURCE_DESCRIPTION' => env("SOURCE_DESCRIPTION"),
-        'STATUS_ID' => 'NEW',//NEW, IN_PROCESS, PROCESSED, JUNK, CONVERTED
-        'PHONE' => [['VALUE' => '+79991234561', 'VALUE_TYPE' => 'WORK']],
-        'EMAIL' => [['VALUE' => 'exxxar@gmail.com', 'VALUE_TYPE' => 'WORK']]
-    ];
-
-    $leadId = $bitrix->createLead($leadData)["result"] ?? null;
+    return $bitrix->getContacts();
 
 
-    // $result = $bitrix->getLeads();
-    $productData = [
-        'NAME' => "LINK1522123123",
-        'CURRENCY_ID' => 'RUB',
-        'PRICE' => 100.0,
-        'DESCRIPTION' => "https://do-doors.online/link/15",
-        'MEASURE' => 6,
-        'QUANTITY' => 100 // Единица измерения (шт.)
-    ];
-    $response = $bitrix->addProduct($productData);
-    //dd($response);
-
-
-    $response = $bitrix->addProductToLead($leadId, [
-        [
-            "PRODUCT_ID" => $response["result"] ?? null,
-            "PRICE" => 3000,
-            "QUANTITY" => 1,
-        ],
-    ]);
-
-    //$response = $bitrix->getLeadProducts(2);
-    //$response = $bitrix->addProduct($productData);
-
-
-    $response = $bitrix->addDocumentToLead($leadId, "test.xlsx", base64_encode(file_get_contents(storage_path() . "\\app\\public\\documents\\3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx", "3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx")));
-    $response = $bitrix->getLeads();
-    //$response = $bitrix->getLeadFields();
-    //  $response = $bitrix->getFolders(1);
-    // $response = $bitrix->uploadDocument(1,storage_path()."\\app\\public\\documents\\3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx","3b29367f-1bca-465a-bfa6-b2f7815a4ba4.xlsx");
-    return $response;
 });
 
 Route::get("/test", function () {

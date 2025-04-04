@@ -257,6 +257,12 @@ class BitrixService
         ]);
     }
 
+    // Поиск контакта по номеру телефона
+    public function getContacts()
+    {
+        return $this->request('crm.contact.list', [
+        ]);
+    }
 
     // Поиск контакта по номеру телефона
     public function findContactByPhone($phone)

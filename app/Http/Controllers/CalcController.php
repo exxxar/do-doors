@@ -6,6 +6,7 @@ use App\Classes\DocumentLogic;
 use App\Enums\OrderStatusEnum;
 use App\Exports\Cart\MultiSheetsCartExport;
 use App\Exports\CartExport;
+use App\Mail\KPMail;
 use App\Models\Client;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -55,11 +57,15 @@ class CalcController extends Controller
     {
         ini_set('max_execution_time', 30000);
 
+
         $request->validate([
             "name" => "required",
             "phone" => "required",
             "items" => "required",
         ]);
+
+        $action = explode(",", $request->action ?? '0'); //0 - отправить в crm, 1 - отправить кп на почту клиента, 2 - отправить кп в телеграм, 3 - сохранить
+
 
         $currentPayed = $request->current_payed ?? 0;
         $payedPercent = $request->payed_percent ?? 0;
@@ -67,6 +73,10 @@ class CalcController extends Controller
         $ascentFloor = ($request->ascent_floor ?? false) == "true";
         $deliveryTerms = $request->delivery_terms ?? null;
         $deliveryType = $request->delivery_type ?? 0;
+
+        $designerWorkType = ($request->designer->is_fix ?? false) == "true";
+        $designerMoney = $request->designer->value ?? 0;
+
 
         $workWithNds = $request->work_with_nds ?? 1;
 
@@ -80,7 +90,7 @@ class CalcController extends Controller
         $passport_issued = $request->passport_issued ?? 'не указано';
         $info = $request->info ?? 'не указан';
         $totalPrice = $request->total_price ?? 0;
-        $totalCount = $request->total_count ?? 0;
+        $totalCount = $request->total_count ?? 1;
         $items = json_decode($request->items ?? '[]');
 
         if (is_null($clientId)) {
@@ -126,74 +136,76 @@ class CalcController extends Controller
 
         ]);
 
-        $bitrix = new \App\Services\BitrixService();
-        $contactData = [
-            'NAME' => $client->getFName() ?? $name,
-            'SECOND_NAME' => $client->getSName() ?? '',
-            'LAST_NAME' => $client->getLName() ?? '',
-            'TYPE_ID' => "CLIENT",
-            'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
-            'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
-        ];
+        if (in_array(0, $action) && !in_array(3, $action)) {
+            $bitrix = new \App\Services\BitrixService();
+            $contactData = [
+                'NAME' => $client->getFName() ?? $name,
+                'SECOND_NAME' => $client->getSName() ?? '',
+                'LAST_NAME' => $client->getLName() ?? '',
+                'TYPE_ID' => "CLIENT",
+                'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
+                'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
+            ];
 
-        $contact = $bitrix->upsertContact($contactData);
+            $contact = $bitrix->upsertContact($contactData);
 
-        Log::info("contact=>" . print_r($contact, true));
+            Log::info("contact=>" . print_r($contact, true));
 
-        $leadData = $client->getBitrix24DealData();
-        $leadData["TITLE"] = $name;
-        if (isset($contact["result"]))
-            $leadData["CONTACT_IDS"] = [$contact["result"]];
-        $leadData["COMMENTS"] = $info;
-        $leadData["UF_CRM_1733302797738"] = 'Еще не указан';//$order->id;
-        $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
-        $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
-        $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
-        $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
-        $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-            Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
-        $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
-        $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
-        $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
-        $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
-        $leadData["UF_CRM_1733302493"] = [51, 53, 55, 57][$deliveryType]; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
-        $leadData["UF_CRM_1733302917133"] = $currentPayed;//Аванс, руб
-        $leadData["UF_CRM_1733302937139"] = $totalPrice;//Окончательны платеж, руб.
-        $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
-        $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
-        $leadData["UF_CRM_1733305761683"] = $request->delivery_price ?? 0;
-        $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
+            $leadData = $client->getBitrix24DealData();
+            $leadData["TITLE"] = $name;
+            if (isset($contact["result"]))
+                $leadData["CONTACT_IDS"] = [$contact["result"]];
+            $leadData["COMMENTS"] = $info;
+            $leadData["UF_CRM_1733302797738"] = 'Еще не указан';//$order->id;
+            $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
+            $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
+            $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
+            $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
+            $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+                Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
+            $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
+            $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
+            $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
+            $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
+            $leadData["UF_CRM_1733302493"] = [51, 53, 55, 57][$deliveryType]; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
+            $leadData["UF_CRM_1733302917133"] = $currentPayed;//Аванс, руб
+            $leadData["UF_CRM_1733302937139"] = $totalPrice;//Окончательны платеж, руб.
+            $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
+            $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
+            $leadData["UF_CRM_1733305761683"] = $request->delivery_price ?? 0;
+            $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
+
+            $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
 
 
-        /*   $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
-           $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
-           $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
-           $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
-           $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
-           $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
-           $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
-           $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
-           $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
-           $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
-           $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
-           $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
-           $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
-           $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
-           $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
-           $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
-           $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
-           $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
-           $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
-           $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
+            $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
+            $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
+            $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
+            $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
+            $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
+            $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
+            $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
+            $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
+            $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
+            $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
+            $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
+            $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
+            $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
+            $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
+            $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
+            $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
+            $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
+            $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
+            $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
+            $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";
 
-        $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
+            $deal = $bitrix->createDeal($leadData);
 
-        $deal = $bitrix->createDeal($leadData);
+            $leadId = $deal["result"] ?? null;
 
-        $leadId = $deal["result"] ?? null;
-
-        $order->bitrix24_lead_id = $leadId;
-        $order->save();
+            $order->bitrix24_lead_id = $leadId;
+            $order->save();
+        }
 
         $productsForBitrix = [];
         foreach ($items as $item) {
@@ -246,7 +258,7 @@ class CalcController extends Controller
                 'PRICE' => $item->product->price ?? 0,
                 'DESCRIPTION' => $doorDescription,
                 'MEASURE' => 6,
-                'QUANTITY' => $item->product->count ?? 0 // Единица измерения (шт.)
+                'QUANTITY' => $item->product->count ?? 1 // Единица измерения (шт.)
             ];
 
             $bitrixProductId = $bitrix->addProduct($productData)["result"] ?? null;
@@ -254,7 +266,7 @@ class CalcController extends Controller
             OrderDetail::query()->create([
                 'order_id' => $order->id,
                 'door_type' => $item->product->title ?? null,
-                'count' => $item->product->count ?? 0,
+                'count' => $item->product->count ?? 1,
                 'price' => $item->product->price ?? 0,
                 'comment' => $item->product->comment ?? null,
                 'purpose' => $item->product->purpose ?? null,
@@ -265,7 +277,7 @@ class CalcController extends Controller
             $productsForBitrix[] = [
                 "PRODUCT_ID" => $bitrixProductId,
                 "PRICE" => $item->product->price ?? 0,
-                "QUANTITY" => $item->product->count ?? 0,
+                "QUANTITY" => $item->product->count ?? 1,
             ];
 
         }
@@ -289,7 +301,12 @@ class CalcController extends Controller
             ];
         }
 
-        $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
+        if (in_array(0, $action) && !in_array(3, $action)) {
+            $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
+        }
+
+
+
 
 
         $mpdf = new Mpdf(['format' => 'A4-P']);
@@ -394,9 +411,12 @@ class CalcController extends Controller
             }
 
         }
-        $R = $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
 
-        if (env("SEND_DOCS_TO_TELEGRAM_CHANNEL") ?? false) {
+
+        if (in_array(0, $action) && !in_array(3, $action))
+            $R = $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
+
+        if (in_array(2, $action) && !in_array(3, $action)) {
 
             $tmp = [
                 'chat_id' => env("TELEGRAM_CHANNEL_ID"),
@@ -432,6 +452,16 @@ class CalcController extends Controller
                     "parse_mode" => "HTML",
                 ]);
 
+        }
+
+        if (in_array(1, $action) && !in_array(3, $action)) {
+            $attachments = [
+                $path . $newName,
+                storage_path('app/' . $newName),
+                Storage::get("$excelFileName"),
+            ];
+
+            Mail::to($email)->send(new KPMail($name, $attachments));
         }
 
         Storage::delete($excelFileName);

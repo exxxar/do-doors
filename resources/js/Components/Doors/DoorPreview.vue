@@ -10,8 +10,8 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
             <button
                 type="button"
                 class="btn mr-2 rounded-0 "
-                    v-bind:class="{'btn-dark':side===0,'btn-outline-secondary':side!==0}"
-                    @click="side=0"> Лицевая сторона
+                v-bind:class="{'btn-dark':side===0,'btn-outline-secondary':side!==0}"
+                @click="side=0"> Лицевая сторона
             </button>
 
             <button class="btn rounded-0"
@@ -34,8 +34,6 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                 </div>
 
 
-
-
                 <div style="position: relative;z-index: 5;">
                     <div class="door-header">
                         <div
@@ -53,17 +51,45 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                         <div class="door-color" v-bind:style="{'background-color':sideColor || 'transparent'}"></div>
                         <div class="height"><span>{{ door.height }}</span></div>
                         <div class="width"><span>{{ door.width }}</span></div>
-                        <div class="handle"
-                             style="background-size: cover;"
-                             v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
-                             v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-left.png)':'url(images/handle-right.png)'}"
-                             v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
-                        </div>
-                        <div class="loops"
-                             v-if="door.loops.type"
-                             v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}">
-                            <span v-for="loop in door.loops_count">7</span>
-                        </div>
+                        <template v-if="side===0">
+                            <div class="handle"
+                                 style="background-size: cover;"
+                                 v-bind:class="{
+                                 'to-left':door.loops.type==='left',
+                                 'to-right':door.loops.type==='right',
+                             }"
+                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-left.png)':'url(images/handle-right.png)'}"
+                                 v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
+                            </div>
+                            <div class="loops"
+                                 v-if="door.loops.type"
+                                 v-bind:class="{
+                                 'to-left':door.loops.type==='left',
+                                 'to-right':door.loops.type==='right',
+                             }">
+                                <span v-for="loop in door.loops_count">7</span>
+                            </div>
+                        </template>
+
+                        <template v-if="side===1">
+                            <div class="handle"
+                                 style="background-size: cover;"
+                                 v-bind:class="{
+                                 'to-right':door.loops.type==='left',
+                                 'to-left':door.loops.type==='right',
+                             }"
+                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-right.png)':'url(images/handle-left.png)'}"
+                                 v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
+                            </div>
+                            <div class="loops"
+                                 v-if="door.loops.type"
+                                 v-bind:class="{
+                                 'to-right':door.loops.type==='left',
+                                 'to-left':door.loops.type==='right',
+                             }">
+                                <span v-for="loop in door.loops_count">7</span>
+                            </div>
+                        </template>
                     </div>
 
                     <div class="door-but">
@@ -107,7 +133,6 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                     </div>
 
 
-
                 </div>
             </div>
         </div>
@@ -117,27 +142,33 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                 <li
                     @click="disabled?null:door.need_upper_jumper=!door.need_upper_jumper"
                     v-bind:class="{'bg-dark text-white':door.need_upper_jumper}"
-                    class="list-group-item">Верхняя перемычка</li>
+                    class="list-group-item">Верхняя перемычка
+                </li>
                 <li
                     @click="disabled?null:door.need_automatic_doorstep=!door.need_automatic_doorstep"
                     v-bind:class="{'bg-dark text-white':door.need_automatic_doorstep}"
-                    class="list-group-item">Скрытый порог</li>
+                    class="list-group-item">Скрытый порог
+                </li>
                 <li
                     @click="disabled?null:door.need_hidden_skirting_board=!door.need_hidden_skirting_board"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_skirting_board}"
-                    class="list-group-item">Скрытый плинтус</li>
+                    class="list-group-item">Скрытый плинтус
+                </li>
                 <li
                     @click="disabled?null:door.need_hidden_stopper=!door.need_hidden_stopper"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_stopper}"
-                    class="list-group-item">Скрытый стопор</li>
+                    class="list-group-item">Скрытый стопор
+                </li>
                 <li
                     @click="disabled?null:door.need_hidden_door_closer=!door.need_hidden_door_closer"
                     v-bind:class="{'bg-dark text-white':door.need_hidden_door_closer}"
-                    class="list-group-item">Скрытый доводчик</li>
+                    class="list-group-item">Скрытый доводчик
+                </li>
                 <li
                     @click="disabled?null:door.need_handle_holes=!door.need_handle_holes"
                     v-bind:class="{'bg-dark text-white':door.need_handle_holes&&door.loops.type}"
-                    class="list-group-item">Дверная ручка</li>
+                    class="list-group-item">Дверная ручка
+                </li>
                 <li class="list-group-item bg-dark text-white">Петли</li>
 
             </ul>
@@ -148,29 +179,27 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
     </div>
 
 
-
-
 </template>
 <script>
 export default {
-    props: ["modelValue","disabled"],
+    props: ["modelValue", "disabled"],
     data() {
         return {
             side: 0,
-            door:null,
+            door: null,
 
         }
     },
     watch: {
         'door': {
-            handler(val){
+            handler(val) {
                 this.$emit('update:modelValue', this.door)
             },
             deep: true
         }
     },
     mounted() {
-      this.door = this.modelValue
+        this.door = this.modelValue
 
 
     },
@@ -239,6 +268,7 @@ export default {
                     #ffffff 15px,
                     #ffffff 25px
             );
+
             p {
                 display: inline-block;
                 width: 40px;
@@ -283,9 +313,8 @@ export default {
 
         width: 100%;
         display: flex;
-      //  justify-content: space-around;
+        //  justify-content: space-around;
         z-index: 5;
-
 
 
         .skirting-board {
@@ -313,9 +342,9 @@ export default {
             }
 
 
-           /* &:nth-child(1) {
-                margin-right: 200px;
-            }*/
+            /* &:nth-child(1) {
+                 margin-right: 200px;
+             }*/
         }
 
         .center {
@@ -641,6 +670,9 @@ export default {
     }
 }
 
+.mirrored-x {
+    transform: scaleX(-1);
+}
 
 .preview {
     position: sticky;
