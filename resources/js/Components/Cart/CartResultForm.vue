@@ -172,7 +172,7 @@
                     <label for="installation-count">Дверей к установке</label>
                 </div>
 
-                <p   style="font-size: 10px;">Производить расчет цены</p>
+                <p style="font-size: 10px;">Производить расчет цены</p>
                 <button
                     type="button"
                     @click="clientForm.installation.recount_type = 0"
@@ -201,19 +201,27 @@
             </template>
 
             <h6 class="mb-2 fw-bold">Работа дизайнера</h6>
-            <div class=" my-2">
-                <button
-                    type="button"
-                    @click="clientForm.designer.is_fix = true"
-                    v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix  === true}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Фикс
-                </button>
-                <button
-                    type="button"
-                    @click="clientForm.designer.is_fix = false"
-                    v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix === false}"
-                    class="btn btn-outline-secondary text-black rounded-0 mr-2">Процент
-                </button>
+            <div class=" my-2 d-flex justify-content-between align-items-center">
+                <div>
+                    <button
+                        type="button"
+                        @click="clientForm.designer.is_fix = true"
+                        v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix  === true}"
+                        class="btn btn-outline-secondary text-black rounded-0 mr-2">Фикс
+                    </button>
+                    <button
+                        type="button"
+                        @click="clientForm.designer.is_fix = false"
+                        v-bind:class="{'btn-dark text-white':clientForm.designer.is_fix === false}"
+                        class="btn btn-outline-secondary text-black rounded-0 mr-2">Процент
+                    </button>
+                </div>
+
+
+                <span v-if="!clientForm.designer.is_fix">{{ (designerPrice) }} руб</span>
+                <span v-if="clientForm.designer.is_fix">{{ (clientForm.designer.value) }} руб</span>
+
+
             </div>
 
             <div class="form-floating mb-2">
@@ -264,11 +272,28 @@ export default {
         ...mapGetters(['getErrors',
             'getDictionary',
             'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
+        designerPrice() {
+            let price = 0
 
+            this.cartProducts.forEach(item => {
+                price += item.product.base_price || 0
+            })
+
+            this.clientForm.designer.price = (price * this.clientForm.designer.value / 100).toFixed(2)
+            return this.clientForm.designer.price
+        }
     },
     watch: {
+
+
         'clientForm': {
             handler(val) {
+
+                if (!this.clientForm.designer.is_fix && this.clientForm.designer.value > 100) {
+                    this.clientForm.designer.value = 30
+
+
+                }
                 this.$emit("update:modelValue", this.clientForm)
             },
             deep: true

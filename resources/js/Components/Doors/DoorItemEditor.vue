@@ -1294,6 +1294,7 @@ export default {
                 return Math.round(parseInt(arg) / 10) * 10;
             }
 
+
             return intRound(sum + price);//this.doorForm.dealer_percent > 0 ? (sum + price) * (1 + (this.doorForm.dealer_percent / 100)) : sum + price;
         },
         filteredHeight() {
@@ -1412,8 +1413,12 @@ export default {
         },
         'summaryPrice': {
             handler(val) {
+
+                let base = this.tmp_prices.find(item=>item.type==='door_type')?.price || 0
+
                 //if (this.doorForm.price_type.id !== 3)
                 this.doorForm.price = this.summaryPrice
+                this.doorForm.base_price = base
 
             },
             deep: true

@@ -78,7 +78,8 @@ class CalcController extends Controller
         $installation = json_decode($request->installation ?? '[]');
 
         $designerWorkType = ($designer->is_fix ?? false) == "true" ? 1 : 0;
-        $designerMoney = $designer->value ?? 0;
+        $designerValue = $designer->value ?? 0;
+        $designerPrice = $designer->price ?? 0;
         $installPrice = $installation->price ?? 0;
         $installCount = $installation->count ?? 0;
         $installRecountType = $installation->recount_type ?? 0;
@@ -186,8 +187,8 @@ class CalcController extends Controller
 
             $leadData["UF_CRM_1733303016351"] = 0;//Прибыль, руб.
             $leadData["UF_CRM_1733306662836"] = 0;//Комиссия менеджеру-партнеру, руб.
-            $leadData["UF_CRM_1733306683779"] = $designerWorkType ? $designerMoney : 0;;//Комиссия дизайнеру, руб.
-            $leadData["UF_CRM_1733306708610"] = $designerWorkType ? 0 : $designerMoney;//Процент дизайнера, %
+            $leadData["UF_CRM_1733306683779"] = $designerWorkType ? $designerValue : $designerPrice;;//Комиссия дизайнеру, руб.
+            $leadData["UF_CRM_1733306708610"] = $designerWorkType ? 0 : $designerValue;//Процент дизайнера, %
             $leadData["UF_CRM_1733310041523"] = 0;//Сумма рекламации, руб.
             /*
                         $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";

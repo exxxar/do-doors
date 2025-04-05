@@ -115,6 +115,7 @@ export default {
                 designer:{
                     is_fix:false,
                     value:0,
+                    price:0,
                 },
                 passport: null,
                 passport_issued: null,
