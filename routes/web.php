@@ -5,8 +5,10 @@ use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Order;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,6 +28,10 @@ use Revolution\Google\Sheets\Sheets;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::any("/webhook", function(Request $request){
+   Log::info("test".print_r($request->all(),true));
+});
 
 Route::get("/bitrix-field", function () {
     $bitrix = new \App\Services\BitrixService();
