@@ -29,14 +29,16 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
-Route::any("/webhook", function(Request $request){
-   Log::info("test".print_r($request->all(),true));
-});
+Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookHandler']);
 
-Route::get("/bitrix-field", function () {
+Route::get("/bitrix-field/{dealId?}", function ($dealId = null) {
     $bitrix = new \App\Services\BitrixService();
 
+    if (!is_null($dealId))
+        $deal = $bitrix->getDeal($dealId);
+
     return (object)[
+        "selected_deal" => $deal ?? null,
         "lead" => $bitrix->getLeadFields(),
         "deal" => $bitrix->getLeadDealFields(),
         "leads" => $bitrix->getLeads(),

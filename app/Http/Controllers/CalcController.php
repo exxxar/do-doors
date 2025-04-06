@@ -36,6 +36,35 @@ use nomelodic\NCL\NCLNameCaseRu;
 class CalcController extends Controller
 {
 
+    public function webhookHandler(Request $request){
+        $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
+
+        $bitrix = new \App\Services\BitrixService();
+
+        if (!is_null($id)){
+            $deal = $bitrix->getDeal($id)["result"] ?? null;
+
+            if (is_null($deal))
+                return;
+
+            //прошла оплата
+            if ($deal["STAGE_ID"] == "UC_P71PWP"){
+                $order = Order::query()
+                    ->where("bitrix24_lead_id", $id)
+                    ->first();
+
+                $workDays = $order->work_days ?? 0;
+                $deliveryTerms = $order->delivery_terms ?? '';
+                $leadData = [];
+                $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+                    Carbon::now()->addDays($workDays ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
+
+                $deal = $bitrix->updateDeal($id, $leadData);
+            }
+        }
+
+    }
+
     public function downloadCartExcel(Request $request)
     {
         $request->validate([
@@ -169,8 +198,8 @@ class CalcController extends Controller
             $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
             $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
             $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
-            $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-                Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
+       /*     $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+                Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления*/
             $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
             $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
             $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155

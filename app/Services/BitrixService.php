@@ -33,6 +33,13 @@ class BitrixService
         ]);
     }
 
+    public function getDeal($dealId)
+    {
+        return $this->request('crm.deal.get', [
+            'id' => $dealId
+        ]);
+    }
+
     public function listFolders()
     {
         return $this->request('disk.storage.getlist', [
