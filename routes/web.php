@@ -80,7 +80,7 @@ Route::any("/webhook", function (Request $request){
                 ]);
         }
 
-        $order = Order::query()->create([
+        /*$order = Order::query()->create([
             'contract_number' => null,
             'contract_date' => Carbon::now(),
             'completion_at' => null,
@@ -103,9 +103,9 @@ Route::any("/webhook", function (Request $request){
             'current_payed' => 0,
             'payed_percent' => 0,
 
-        ]);
+        ]);*/
 
-        $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
+        $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . ($order->id ?? '-');
 
     }
 
