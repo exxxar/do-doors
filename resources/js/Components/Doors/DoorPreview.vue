@@ -58,7 +58,7 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                                  'to-left':door.loops.type==='left',
                                  'to-right':door.loops.type==='right',
                              }"
-                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-left.png)':'url(images/handle-right.png)'}"
+                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(../images/handle-left.png)':'url(../images/handle-right.png)'}"
                                  v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
                             </div>
                             <div class="loops"
@@ -78,7 +78,7 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                                  'to-right':door.loops.type==='left',
                                  'to-left':door.loops.type==='right',
                              }"
-                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(images/handle-right.png)':'url(images/handle-left.png)'}"
+                                 v-bind:style="{'background-color':door.handle_holes_type.color || 'transparent','background-image':door.loops.type==='right'?'url(../images/handle-right.png)':'url(../images/handle-left.png)'}"
                                  v-if="door.handle_holes.id!==3&&door.need_handle_holes&&door.loops.type">6
                             </div>
                             <div class="loops"
