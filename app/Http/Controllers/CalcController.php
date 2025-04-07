@@ -323,7 +323,10 @@ class CalcController extends Controller
                         $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
                         $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
 
-            $deal = $bitrix->createDeal($leadData);
+            if (is_null($order->bitrix24_lead_id ?? null))
+                $deal = $bitrix->createDeal($leadData);
+            else
+                $deal = $bitrix->updateDeal($order->bitrix24_lead_id, $leadData);
 
             $leadId = $deal["result"] ?? null;
 
