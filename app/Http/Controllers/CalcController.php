@@ -45,7 +45,7 @@ class CalcController extends Controller
 
         $bitrix = new \App\Services\BitrixService();
 
-        Log::info("test id=>".print_r($id, true));
+        Log::info("test id=>" . print_r($id, true));
 
         if (is_null($id))
             return;
@@ -67,28 +67,31 @@ class CalcController extends Controller
             $contactId = $deal["CONTACT_ID"] ?? null;
 
             if (!is_null($contactId)) {
-                $contact = $bitrix->getContact($contactId)["result"];
+                $contact = $bitrix->getContact($contactId)["result"] ?? null;
 
-                $phone = $contact["PHONE"][0]["value"] ?? null;
+                if (!is_null($contact)) {
+                    $phone = $contact["PHONE"][0]["value"] ?? null;
 
-                $email = $contact["EMAIL"][0]["value"] ?? null;
+                    $email = $contact["EMAIL"][0]["value"] ?? null;
 
-                $comment = $contact["COMMENTS"] ?? null;
+                    // $comment = $contact["COMMENTS"] ?? null;
 
-                $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
+                    $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
 
-                $client = Client::query()
-                    ->where("phone", $phone)
-                    ->first();
+                    $client = Client::query()
+                        ->where("phone", $phone)
+                        ->first();
 
-                if (is_null($client))
-                    $client = Client::query()->create([
-                        'status' => "new_client",
-                        'phone' => $phone,
-                        'email' => $email ?? null,
-                        'user_id' => null,
-                        'title' => $name,
-                    ]);
+                    if (is_null($client))
+                        $client = Client::query()->create([
+                            'status' => "new_client",
+                            'phone' => $phone,
+                            'email' => $email ?? null,
+                            'user_id' => null,
+                            'title' => $name,
+                        ]);
+                }
+
             }
 
             if (is_null($order))
@@ -109,7 +112,7 @@ class CalcController extends Controller
                     'profit' => 0,
                     'bitrix24_lead_id' => $id,
                     'delivery_terms' => null,
-                    'info' =>'',
+                    'info' => '',
                     'total_price' => 0,
                     'total_count' => 0,
                     'current_payed' => 0,
