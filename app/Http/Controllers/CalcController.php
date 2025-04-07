@@ -41,7 +41,7 @@ class CalcController extends Controller
     {
         Log::info("test");
         Log::info("request=>" . print_r($request->all(), true));
-        $id = $request->all()["DATA"]["FIELDS"]["ID"] ?? null;
+        $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
 
         $bitrix = new \App\Services\BitrixService();
 
