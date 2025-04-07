@@ -36,28 +36,16 @@ use nomelodic\NCL\NCLNameCaseRu;
 class CalcController extends Controller
 {
 
-    public function webhookDealCreateHandler(Request $request)
-    {
-        $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
 
-        $bitrix = new \App\Services\BitrixService();
-
-        if (!is_null($id)) {
-            $deal = $bitrix->getDeal($id)["result"] ?? null;
-
-            if (is_null($deal))
-                return;
-
-        }
-    }
-
-    public function webhookDealUpdateHandler(Request $request)
+    public function webhookDealHandler(Request $request)
     {
         Log::info("test");
         Log::info("request=>" . print_r($request->all(), true));
-        $id = $request->data["FIELDS"]["ID"] ?? null;
+        $id = $request->all()["FIELDS"]["ID"] ?? null;
 
         $bitrix = new \App\Services\BitrixService();
+
+        Log::info("test id=>".print_r($id, true));
 
         if (is_null($id))
             return;
