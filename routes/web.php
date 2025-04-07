@@ -1,11 +1,9 @@
 <?php
 
-use App\Enums\OrderStatusEnum;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Order;
-use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,111 +29,9 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
-Route::any("/webhook", function (Request $request){
-    Log::info("test");
-    Log::info("request=>".print_r($request->all(), true));
-    $id = $request->data["FIELDS"]["ID"] ?? null;
-
-    $bitrix = new \App\Services\BitrixService();
-
-    if (is_null($id))
-        return;
-
-    $deal = $bitrix->getDeal($id)["result"] ?? null;
-
-    if (is_null($deal))
-        return;
-
-    $leadData = [];
-
-
-    if ($deal["STAGE_ID"] == env("BITRIX24_NEW_STAGE_ID")) {
-        $order = Order::query()
-            ->where("bitrix24_lead_id", $id)
-            ->first();
-
-
-        $contactId = $deal["CONTACT_ID"] ?? null;
-
-        if (!is_null($contactId)) {
-            $contact = $bitrix->getContact($contactId)["result"];
-
-            $phone = $contact["PHONE"][0]["value"] ?? null;
-
-            $comment = $contact["COMMENTS"] ?? null;
-
-            $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
-
-            $client = \App\Models\Client::query()
-                ->where("phone", $phone)
-                ->first();
-
-            if (is_null($client))
-                $client = Client::query()->create([
-                    'status' => "new_client",
-                    'phone' => $phone,
-                    'email' => $email ?? null,
-                    'user_id' => null,
-                    'title' => $name,
-                ]);
-        }
-
-        /*$order = Order::query()->create([
-            'contract_number' => null,
-            'contract_date' => Carbon::now(),
-            'completion_at' => null,
-            'client_id' => $client->id ?? null,
-            'status' => OrderStatusEnum::NewOrder,
-            'source' => "crm",
-            'contact_person' => $name ?? '-',
-            'phone' => $phone ?? '-',
-            'organizational_form' => $client->status ?? 'new_client',
-            'contract_amount' => 0,
-            'work_days' => 0,
-            'paid' => 0,
-            'debt' => 0,
-            'profit' => 0,
-
-            'delivery_terms' => '',
-            'info' => $comment ?? '',
-            'total_price' => 0,
-            'total_count' => 0,
-            'current_payed' => 0,
-            'payed_percent' => 0,
-
-        ]);*/
-
-        $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . ($order->id ?? '-');
-
-    }
-
-    //прошла оплата
-    if ($deal["STAGE_ID"] == env("BITRIX24_PAYMENT_STAGE_ID")) {
-        $order = Order::query()
-            ->where("bitrix24_lead_id", $id)
-            ->first();
-
-        $workDays = $order->work_days ?? 0;
-        $deliveryTerms = $order->delivery_terms ?? '';
-
-        $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-            Carbon::now()->addDays($workDays ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
-
-    }
-
-    if ($deal["STAGE_ID"] == env("BITRIX24_CONTRACT_SPECIFICATION_STAGE_ID")) {
-        $order = Order::query()
-            ->where("bitrix24_lead_id", $id)
-            ->first();
-
-        $leadData["UF_CRM_1733302797738"] = $order->id ?? '';
-    }
-
-    $deal = $bitrix->updateDeal($id, $leadData);
-
-});
-//Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
-//Route::any("/webhook-deal-create", [\App\Http\Controllers\CalcController::class, 'webhookDealCreateHandler']);
+Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
+Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
+Route::any("/webhook-deal-create", [\App\Http\Controllers\CalcController::class, 'webhookDealCreateHandler']);
 
 Route::get("/bitrix-contact/{contactId?}", function ($contactId) {
     $bitrix = new \App\Services\BitrixService();

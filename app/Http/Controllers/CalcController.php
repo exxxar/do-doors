@@ -54,7 +54,7 @@ class CalcController extends Controller
     public function webhookDealUpdateHandler(Request $request)
     {
         Log::info("test");
-        Log::info("request=>".print_r($request->all(), true));
+        Log::info("request=>" . print_r($request->all(), true));
         $id = $request->data["FIELDS"]["ID"] ?? null;
 
         $bitrix = new \App\Services\BitrixService();
@@ -83,6 +83,8 @@ class CalcController extends Controller
 
                 $phone = $contact["PHONE"][0]["value"] ?? null;
 
+                $email = $contact["EMAIL"][0]["value"] ?? null;
+
                 $comment = $contact["COMMENTS"] ?? null;
 
                 $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
@@ -101,30 +103,31 @@ class CalcController extends Controller
                     ]);
             }
 
-            $order = Order::query()->create([
-                'contract_number' => null,
-                'contract_date' => Carbon::now(),
-                'completion_at' => null,
-                'client_id' => $client->id ?? null,
-                'status' => OrderStatusEnum::NewOrder,
-                'source' => "crm",
-                'contact_person' => $name ?? '-',
-                'phone' => $phone ?? '-',
-                'organizational_form' => $client->status ?? 'new_client',
-                'contract_amount' => 0,
-                'work_days' => 0,
-                'paid' => 0,
-                'debt' => 0,
-                'profit' => 0,
+            if (is_null($order))
+                $order = Order::query()->create([
+                    'contract_number' => null,
+                    'contract_date' => Carbon::now(),
+                    'completion_at' => null,
+                    'client_id' => $client->id ?? null,
+                    'status' => OrderStatusEnum::NewOrder,
+                    'source' => "crm",
+                    'contact_person' => $name ?? '-',
+                    'phone' => $phone ?? '-',
+                    'organizational_form' => $client->status ?? 'new_client',
+                    'contract_amount' => 0,
+                    'work_days' => 0,
+                    'paid' => 0,
+                    'debt' => 0,
+                    'profit' => 0,
+                    'bitrix24_lead_id' => $id,
+                    'delivery_terms' => null,
+                    'info' => $comment ?? '',
+                    'total_price' => 0,
+                    'total_count' => 0,
+                    'current_payed' => 0,
+                    'payed_percent' => 0,
 
-                'delivery_terms' => '',
-                'info' => $comment ?? '',
-                'total_price' => 0,
-                'total_count' => 0,
-                'current_payed' => 0,
-                'payed_percent' => 0,
-
-            ]);
+                ]);
 
             $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
 
