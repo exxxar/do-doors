@@ -109,7 +109,7 @@ class CalcController extends Controller
                     'profit' => 0,
                     'bitrix24_lead_id' => $id,
                     'delivery_terms' => null,
-                    'info' => $comment ?? '',
+                    'info' =>'',
                     'total_price' => 0,
                     'total_count' => 0,
                     'current_payed' => 0,
