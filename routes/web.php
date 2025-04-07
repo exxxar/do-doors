@@ -29,7 +29,7 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
-Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
+Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
 Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
 
 
