@@ -53,7 +53,8 @@ class CalcController extends Controller
 
     public function webhookDealUpdateHandler(Request $request)
     {
-        $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
+        Log::info("request=>".print_r($request->all(), true));
+        $id = $request->data["FIELDS"]["ID"] ?? null;
 
         $bitrix = new \App\Services\BitrixService();
 
