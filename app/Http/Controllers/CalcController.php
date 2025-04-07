@@ -36,32 +36,122 @@ use nomelodic\NCL\NCLNameCaseRu;
 class CalcController extends Controller
 {
 
-    public function webhookHandler(Request $request){
+    public function webhookDealCreateHandler(Request $request)
+    {
         $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
 
         $bitrix = new \App\Services\BitrixService();
 
-        if (!is_null($id)){
+        if (!is_null($id)) {
             $deal = $bitrix->getDeal($id)["result"] ?? null;
 
             if (is_null($deal))
                 return;
 
-            //прошла оплата
-            if ($deal["STAGE_ID"] == "UC_P71PWP"){
-                $order = Order::query()
-                    ->where("bitrix24_lead_id", $id)
+        }
+    }
+
+    public function webhookDealUpdateHandler(Request $request)
+    {
+        $id = $request->all()["data"]["FIELDS"]["ID"] ?? null;
+
+        $bitrix = new \App\Services\BitrixService();
+
+        if (is_null($id))
+            return;
+
+        $deal = $bitrix->getDeal($id)["result"] ?? null;
+
+        if (is_null($deal))
+            return;
+
+        $leadData = [];
+
+
+        if ($deal["STAGE_ID"] == env("BITRIX24_NEW_STAGE_ID")) {
+            $order = Order::query()
+                ->where("bitrix24_lead_id", $id)
+                ->first();
+
+
+            $contactId = $deal["CONTACT_ID"] ?? null;
+
+            if (!is_null($contactId)) {
+                $contact = $bitrix->getContact($contactId)["result"];
+
+                $phone = $contact["PHONE"][0]["value"] ?? null;
+
+                $comment = $contact["COMMENTS"] ?? null;
+
+                $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
+
+                $client = Client::query()
+                    ->where("phone", $phone)
                     ->first();
 
-                $workDays = $order->work_days ?? 0;
-                $deliveryTerms = $order->delivery_terms ?? '';
-                $leadData = [];
-                $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-                    Carbon::now()->addDays($workDays ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
-
-                $deal = $bitrix->updateDeal($id, $leadData);
+                if (is_null($client))
+                    $client = Client::query()->create([
+                        'status' => "new_client",
+                        'phone' => $phone,
+                        'email' => $email ?? null,
+                        'user_id' => null,
+                        'title' => $name,
+                    ]);
             }
+
+            $order = Order::query()->create([
+                'contract_number' => null,
+                'contract_date' => Carbon::now(),
+                'completion_at' => null,
+                'client_id' => $client->id ?? null,
+                'status' => OrderStatusEnum::NewOrder,
+                'source' => "crm",
+                'contact_person' => $name ?? '-',
+                'phone' => $phone ?? '-',
+                'organizational_form' => $client->status ?? 'new_client',
+                'contract_amount' => 0,
+                'work_days' => 0,
+                'paid' => 0,
+                'debt' => 0,
+                'profit' => 0,
+
+                'delivery_terms' => '',
+                'info' => $comment ?? '',
+                'total_price' => 0,
+                'total_count' => 0,
+                'current_payed' => 0,
+                'payed_percent' => 0,
+
+            ]);
+
+            $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
+
         }
+
+        //прошла оплата
+        if ($deal["STAGE_ID"] == env("BITRIX24_PAYMENT_STAGE_ID")) {
+            $order = Order::query()
+                ->where("bitrix24_lead_id", $id)
+                ->first();
+
+            $workDays = $order->work_days ?? 0;
+            $deliveryTerms = $order->delivery_terms ?? '';
+
+            $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+                Carbon::now()->addDays($workDays ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления
+
+        }
+
+        if ($deal["STAGE_ID"] == env("BITRIX24_CONTRACT_SPECIFICATION_STAGE_ID")) {
+            $order = Order::query()
+                ->where("bitrix24_lead_id", $id)
+                ->first();
+
+            $leadData["UF_CRM_1733302797738"] = $order->id ?? '';
+        }
+
+        $deal = $bitrix->updateDeal($id, $leadData);
+
 
     }
 
@@ -198,8 +288,8 @@ class CalcController extends Controller
             $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
             $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
             $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
-       /*     $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-                Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления*/
+            /*     $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
+                     Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления*/
             $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
             $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
             $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
@@ -326,7 +416,7 @@ class CalcController extends Controller
 
         if ($needInstall) {
             $installDoorsData = [
-                'NAME' => "Установка комплекта дверей: ".($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
+                'NAME' => "Установка комплекта дверей: " . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
                 'CURRENCY_ID' => 'RUB',
                 'PRICE' => $installPrice,
                 'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
@@ -339,7 +429,7 @@ class CalcController extends Controller
             $productsForBitrix[] = [
                 "PRODUCT_ID" => $bitrixProductId,
                 "PRICE" => $installPrice,
-                "QUANTITY" =>  $installRecountType == 0 ? 1 : $installCount,
+                "QUANTITY" => $installRecountType == 0 ? 1 : $installCount,
             ];
         }
 

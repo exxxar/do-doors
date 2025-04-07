@@ -29,7 +29,24 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
-Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookHandler']);
+Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
+//Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealUpdateHandler']);
+//Route::any("/webhook-deal-create", [\App\Http\Controllers\CalcController::class, 'webhookDealCreateHandler']);
+
+Route::get("/bitrix-contact/{contactId?}", function ($contactId) {
+    $bitrix = new \App\Services\BitrixService();
+
+
+    $contact = $bitrix->getContact($contactId)["result"];
+
+    $phone = $contact["PHONE"][0]["value"] ?? null;
+
+    $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
+
+
+
+    return $contact;
+});
 
 Route::get("/bitrix-field/{dealId?}", function ($dealId = null) {
     $bitrix = new \App\Services\BitrixService();

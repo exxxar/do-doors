@@ -265,6 +265,14 @@ class BitrixService
     }
 
     // Поиск контакта по номеру телефона
+    public function getContact($id)
+    {
+        return $this->request('crm.contact.get', [
+            'id' => $id,
+        ]);
+    }
+
+    // Поиск контакта по номеру телефона
     public function getContacts()
     {
         return $this->request('crm.contact.list', [
