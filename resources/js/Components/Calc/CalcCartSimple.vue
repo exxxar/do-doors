@@ -57,7 +57,8 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
 
                                 <i v-else class="fa-solid fa-check"></i>
 
-                            </button>Отправить КП
+                            </button>
+                            Отправить КП
                             на почту клиента
                         </label>
                         <p
@@ -77,12 +78,14 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
                                     v-bind:class="{'text-success':action.indexOf(2)!==-1}"
                                     class="fa-solid fa-check-double"></i>
                                 <i v-else class="fa-solid fa-check"></i>
-                            </button>Отправить КП
+                            </button>
+                            Отправить КП
                             в телеграм
                         </label>
                         <p
                             v-if="action.indexOf(2)!==-1"
-                            class="alert alert-light rounded-0 mb-2" style="font-size:10px;">Вы отправите КП в телеграм компании при отправке в CRM, после чего сможете переслать его клиенту в телеграм</p>
+                            class="alert alert-light rounded-0 mb-2" style="font-size:10px;">Вы отправите КП в телеграм
+                            компании при отправке в CRM, после чего сможете переслать его клиенту в телеграм</p>
                         <button class="btn btn-success rounded-0 w-100 mb-2" @click="checkout(0)">Отправить сделку в СРМ
                         </button>
 
@@ -101,6 +104,7 @@ import {mapGetters} from "vuex";
 import {mask} from 'vue-the-mask'
 
 export default {
+    props: ["orderId"],
     directives: {mask},
     computed: {
         ...mapGetters(['getErrors',
@@ -130,10 +134,10 @@ export default {
             this.tab = 1
             this.preCheckAction(action)
         },
-        preCheckAction(action){
-            let index = this.action.findIndex(item=>item === action)
+        preCheckAction(action) {
+            let index = this.action.findIndex(item => item === action)
 
-            if (index !== - 1) {
+            if (index !== -1) {
                 this.action.splice(index, 1)
                 return
             }
@@ -218,6 +222,9 @@ export default {
                     else
                         data.append(key, item)
                 });
+
+            if (this.orderId)
+                data.append("order_id", this.orderId)
 
             data.append("total_price", this.cartTotalPrice)
             data.append("total_count", this.cartTotalCount)

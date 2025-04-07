@@ -44,7 +44,6 @@ Route::get("/bitrix-contact/{contactId?}", function ($contactId) {
     $name = ($contact["LAST_NAME"] ?? "") . " " . ($contact["NAME"] ?? "") . " " . ($contact["SECOND_NAME"] ?? "");
 
 
-
     return $contact;
 });
 
@@ -191,16 +190,27 @@ Route::get('/link/{orderId}', function ($orderId) {
     if (is_null($order))
         return response()->redirectToRoute("calc");
 
+    if (is_null($order) && is_null(Auth::user()->id ?? null))
+        return response()->redirectToRoute("calc");
+
     if (is_null(Auth::user()->id ?? null)) {
         return Inertia::render('OrderInfo', [
             "order" => $order->toArray(),
             "doors" => $order->details ?? []
         ]);
     }
-    return Inertia::render('OrderEditor', [
-        "order" => $order->toArray(),
-        "doors" => $order->details ?? []
+
+    if (count($order->details ?? []) > 0)
+        return Inertia::render('OrderEditor', [
+            "order" => $order->toArray(),
+            "doors" => $order->details ?? []
+        ]);
+
+
+    return Inertia::render('CalcPage',[
+        "order_id"=>$order->id
     ]);
+
 })->name('order.info');
 
 Route::middleware('auth')->group(function () {

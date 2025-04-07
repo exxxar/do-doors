@@ -20,6 +20,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
     <div class="row">
         <div class="col-lg-12">
             <DoorItemEditor
+
                 v-on:callback="openConfirmModal('Дверь успешно добавлена в корзину!','Очистить калькулятор?')"
                 v-if="!loading"
                 :door="selectedDoor"></DoorItemEditor>
@@ -117,6 +118,7 @@ import DoorPreview from "@/Components/Doors/DoorPreview.vue";
 import {mapGetters} from "vuex";
 
 export default {
+
     name: 'MyComponent',
     data() {
         return {

@@ -268,7 +268,7 @@ const showingNavigationDropdown = ref(false);
         </a>
     </div>
 
-    <CalcCartSimple></CalcCartSimple>
+    <CalcCartSimple :order-id="orderId"></CalcCartSimple>
 
     <div class="offcanvas offcanvas-start"
          data-bs-scroll="true" data-bs-backdrop="false"
@@ -409,6 +409,7 @@ const showingNavigationDropdown = ref(false);
 import {mapGetters} from "vuex";
 
 export default {
+    props:["orderId"],
     data() {
         return {
             menuTab: 0

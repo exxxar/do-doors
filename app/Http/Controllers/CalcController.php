@@ -178,6 +178,7 @@ class CalcController extends Controller
         $action = explode(",", $request->action ?? '0'); //0 - отправить в crm, 1 - отправить кп на почту клиента, 2 - отправить кп в телеграм, 3 - сохранить
 
 
+        $orderId = $request->order_id ?? null;
         $currentPayed = $request->current_payed ?? 0;
         $payedPercent = $request->payed_percent ?? 0;
         $payedPercentType = $request->payed_percent_type ?? 0;
@@ -230,10 +231,8 @@ class CalcController extends Controller
         $buyerData = $client->getBueryData();
         $fam_initial = $client->getInitials();
 
-        $order = Order::query()->create([
-            'contract_number' => null,
+        $tmpData = [
             'contract_date' => Carbon::now(),
-            'completion_at' => null,
             'client_id' => $client->id,
             'status' => OrderStatusEnum::NewOrder,
             'source' => $request->source ?? "crm",
@@ -242,18 +241,19 @@ class CalcController extends Controller
             'organizational_form' => $client->status ?? 'new_client',
             'contract_amount' => $totalPrice,
             'work_days' => $work_days,
-            'paid' => 0,
-            'debt' => 0,
-            'profit' => 0,
-
             'delivery_terms' => $deliveryTerms,
             'info' => $info,
             'total_price' => $totalPrice,
             'total_count' => $totalCount,
             'current_payed' => $currentPayed,
             'payed_percent' => $payedPercent,
+        ];
 
-        ]);
+        if (!is_null($orderId)) {
+            $order = Order::query()->find($orderId);
+            $order->update($tmpData);
+        } else
+            $order = Order::query()->create($tmpData);
 
         if (in_array(0, $action) && !in_array(3, $action)) {
             $bitrix = new \App\Services\BitrixService();
