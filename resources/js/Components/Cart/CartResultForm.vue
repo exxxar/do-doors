@@ -108,14 +108,35 @@
 
             <template v-if="clientForm.delivery_type === 0">
                 <h6 class="mb-2 fw-bold">Информация по доставке</h6>
-                <div class="form-floating mb-2">
-                    <input type="number"
-                           min="0"
-                           class="form-control"
-                           v-model="clientForm.delivery_price" id="delivery-price"
-                           placeholder="name@example.com" required>
-                    <label for="delivery-price">Сумма за доставку</label>
+
+
+                <div class="input-group  mb-2">
+                    <div class="form-floating ">
+                        <input type="number"
+                               min="0"
+                               class="form-control"
+                               v-model="clientForm.delivery_price" id="delivery-price"
+                               placeholder="name@example.com" required>
+                        <label for="delivery-price">Сумма за доставку</label>
+                    </div>
+                    <span class="input-group-text rounded-0  border-secondary">
+                          <div class="dropdown ">
+                        <button class="btn btn-light"
+                                type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                           <i class="fa-solid fa-map-location-dot"></i>
+                        </button>
+                        <ul class="dropdown-menu"
+                            style="max-height: 200px; overflow-y: scroll;"
+                            aria-labelledby="dropdownMenuButton">
+                            <li @click="selectDeliveryVariant(item)" v-for="item in delivery_services"><a
+                                class="dropdown-item" href="#">{{ item.title || '-' }}</a></li>
+
+                        </ul>
+                    </div>
+                    </span>
+
                 </div>
+
 
                 <div class="form-floating mb-2">
                     <input type="text" class="form-control"
@@ -261,12 +282,15 @@ export default {
             flgDays: true, // числом или датой дни
             discount: 0,
             clientForm: null,
+            delivery_services: [],
         }
     },
     mounted() {
         this.clientForm = this.modelValue
 
         this.selectPayedPercentType(1)
+
+        this.loadServicesByType()
     },
     computed: {
         ...mapGetters(['getErrors',
@@ -301,6 +325,16 @@ export default {
 
     },
     methods: {
+        loadServicesByType() {
+            this.$store.dispatch("loadServicesByType", {
+                type: 'service_delivery'
+            }).then(resp => {
+                this.delivery_services = resp.data || []
+
+            }).catch(() => {
+
+            })
+        },
         selectPayedPercentType(type) {
             this.clientForm.payed_percent_type = type
             switch (type) {
@@ -335,6 +369,10 @@ export default {
         changePayedPercent() {
             this.clientForm.current_payed = Math.round((
                 this.cartTotalPrice * this.clientForm.payed_percent) / 100)
+        },
+        selectDeliveryVariant(item) {
+            this.clientForm.info = item.title
+            this.clientForm.delivery_price = item.price?.retail || 0
         },
         findPromo() {
 

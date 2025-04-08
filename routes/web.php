@@ -29,6 +29,7 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
+
 Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
 Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
 
@@ -207,8 +208,8 @@ Route::get('/link/{orderId}', function ($orderId) {
         ]);
 
 
-    return Inertia::render('CalcPage',[
-        "order_id"=>$order->id
+    return Inertia::render('CalcPage', [
+        "order_id" => $order->id
     ]);
 
 })->name('order.info');
@@ -265,6 +266,8 @@ Route::prefix("/services")
     ->group(function () {
         Route::get("/", "index")->name('services');
         Route::post("/", "getServiceList");
+        Route::post("/by-type", "getServiceListByType");
+        Route::post("/import-from-moysklad", "importFromMoySklad");
         Route::post("/store", "store");
         Route::delete("/{id}", "destroy");
     });
@@ -297,6 +300,7 @@ Route::prefix("/handles")
         Route::get("/", "index")->name('handles');
         Route::post("/", "getHandleList");
         Route::post("/store", "store");
+        Route::post("/import-from-moysklad", "importFromMoySklad");
         Route::post("/fast-store", "fastStore");
         Route::post('/import-from-google', [GoogleLoginController::class, 'getGoogleLink']);
         Route::post('/import-from-excel', "import");
@@ -367,6 +371,7 @@ Route::prefix("/clients")
         Route::get("/", "index")->name('clients');
         Route::post("/", "getClientList");
         Route::get("/self-list", "getSelfClientList");
+        Route::post("/import-from-moysklad", "importFromMoySklad");
         Route::post("/request-by-inn", "getDataByInn");
         Route::post("/request-by-bik", "getDataByBik");
         Route::post("/store", "store");

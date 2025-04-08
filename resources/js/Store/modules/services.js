@@ -17,6 +17,18 @@ const getters = {
 }
 
 const actions = {
+    async importServicesFromMoySklad(context, payload ) {
+        let link = `${BASE_SERVICE_LINK}/import-from-moysklad`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadServices(context, payload = {dataObject: null, page: 0, size: 50}) {
         let page = payload.page || 0
         let size = payload.size || 50
@@ -33,6 +45,21 @@ const actions = {
             delete dataObject.data
             context.commit('setServicesPaginateObject', dataObject)
             return Promise.resolve();
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+
+    async loadServicesByType(context, payload = {type:null}) {
+        let link = `${BASE_SERVICE_LINK}/by-type`
+        let method = 'POST'
+
+        let _axios = util.makeAxiosFactory(link, method, payload)
+
+        return _axios.then((response) => {
+            let dataObject = response.data
+            return Promise.resolve(dataObject);
         }).catch(err => {
             context.commit("setErrors", err.response.data.errors || [])
             return Promise.reject(err);

@@ -29,6 +29,18 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async importHandlesFromMoySklad(context, payload ) {
+        let link = `${BASE_HANDLES_LINK}/import-from-moysklad`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async importHandlesFromExcel(context, payload = {importForm: null}) {
         let link = `${BASE_HANDLES_LINK}/import-from-excel`
 

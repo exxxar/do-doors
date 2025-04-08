@@ -52,7 +52,8 @@ class MoySkladService
     {
         return [
             'Authorization' => 'Bearer ' . $this->token,
-            'Accept' => 'application/json',
+            'Accept' => 'application/json;charset=utf-8',
+            'Accept-Encoding' => 'gzip',
             'Content-Type' => 'application/json',
         ];
     }
@@ -97,6 +98,26 @@ class MoySkladService
     {
         return $this->get('/entity/product', $params);
     }
+
+    public function getServices(array $params = [])
+    {
+        return $this->get('/entity/service', $params);
+    }
+
+    public function getClients(array $params = [])
+    {
+        return $this->get('/entity/counterparty', $params);
+    }
+
+
+
+    public function getProductsByGroupId($id)
+    {
+        return $this->get('/entity/productfolder', [
+            "id"=>$id
+        ]);
+    }
+
 
     // Пример метода: создание товара
     public function createProduct(array $data)

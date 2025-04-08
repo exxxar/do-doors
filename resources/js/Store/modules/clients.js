@@ -17,6 +17,18 @@ const getters = {
 }
 
 const actions = {
+    async importClientsFromMoySklad(context, payload ) {
+        let link = `${BASE_CLIENTS_LINK}/import-from-moysklad`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+            context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async loadClients(context, payload = {dataObject: null, page: 0, size: 50}) {
         let page = payload.page || 0
         let size = payload.size || 50

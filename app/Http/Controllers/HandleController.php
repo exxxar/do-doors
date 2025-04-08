@@ -25,6 +25,108 @@ class HandleController extends Controller
 {
     use Utility;
 
+    public function importFromMoySklad(Request $request)
+    {
+
+        $sklad = new \App\Services\MoySkladService();
+
+        $needPaths = explode(',', env('MOYSKLAD_HANDLES'));
+
+        $offset = 0;
+        $tmpHandles = [];
+
+        do {
+
+            $tmpSklad = $sklad->getProducts(["offset" => $offset])["rows"];
+            $offset += count($tmpSklad ?? []);
+
+            foreach ($needPaths as $path) {
+                $prods = array_values(\Illuminate\Support\Collection::make($tmpSklad)
+                    ->where("pathName", $path)
+                    ->all());
+
+
+                foreach ($prods as $prod) {
+
+                    $prod = (object)$prod;
+
+                    $images = [];
+
+
+                    if (count($prod->images["rows"] ?? []) > 0) {
+                        foreach ($prod->images as $img) {
+                            $img = (object)$img;
+
+                            if (!is_null($img->filename ?? null))
+                                $images[] = (object)[
+                                    "image" => $img->filename,
+                                    "title" => $img->title ?? '-',
+                                    "description" => null
+                                ];
+                        }
+                    }
+
+                    $isImageInDescription = false;
+                    if (preg_match('/\.(jpg|jpeg|gif|png|bmp)$/i', ($prod->description??''))) {
+                        $isImageInDescription = true;
+
+                        $images[] = (object)[
+                            "image" => $prod->description,
+                            "title" => null,
+                            "description" => null
+                        ];
+                    }
+
+                    $prices = [
+                        "wholesale" => $prod->buyPrice["value"] ?? 0,
+                        "dealer" => $prod->buyPrice["value"] ?? 0,
+                        "retail" => $prod->buyPrice["value"] ?? 0,
+                        "cost" => $prod->buyPrice["value"] ?? 0,
+                    ];
+
+
+                    $tmpHandles[] = (object)[
+                        'title' => $prod->name ?? '-',
+                        'price' => $prices,
+                        'variants' => $images,
+                        "sku" => $prod->article ?? '-',
+                        "comment" => $isImageInDescription ? '' : ($prod->description ?? '-'),
+                        "weight" => $prod->weight ?? 0,
+                        "serial" => $prod->code ?? '-',
+                        /*  "material",
+                      "brand",
+                        "material_description",
+                        "coverage",
+                        "model",
+                        "characteristics",
+                        "base_shape",
+                        "socket_diameter",
+                        "square_length",
+                        "guarantee",
+                        "dimensions",*/
+                    ];
+
+                }
+            }
+        } while (count($tmpSklad) > 0);
+
+        foreach ($tmpHandles as $tmpHandle) {
+            $handle = \App\Models\Handle::query()
+                ->where("title", $tmpHandle->title)
+                ->first();
+
+            if (is_null($handle))
+                \App\Models\Handle::query()
+                    ->create((array)$tmpHandle);
+            else
+                $handle->update((array)$tmpHandle);
+
+        }
+
+        return response()->noContent();
+
+    }
+
     public function import(Request $request)
     {
 

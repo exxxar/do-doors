@@ -21,6 +21,16 @@ import HandlesUploadModal from "@/Components/Admin/Handles/HandlesUploadModal.vu
 
                     <div class="p-6 text-gray-900">
                         <HandlesUploadModal></HandlesUploadModal>
+                        <button
+                            class="my-3 p-3 border-gray-100 border btn rounded-0 mx-2"
+                            type="button"
+                            @click="importHandlesFromMoySklad">
+                            <i class="fa-solid fa-file-import" v-if="!moysklad_loading"></i>
+                            <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            Загрузить данные из Мой Склад
+                        </button>
                         <HandleForm
                             v-if="!loading"
                             :item="selectedHandle"
@@ -41,6 +51,7 @@ export default {
     data() {
         return {
             loading: false,
+            moysklad_loading: false,
             selectedHandle: null,
         }
     },
@@ -48,6 +59,38 @@ export default {
         this.$store.dispatch("loadRalColors")
     },
     methods: {
+        importHandlesFromMoySklad(){
+            this.$notify({
+                title: "DoDoors",
+                text: "Началась загрузка данных",
+            });
+
+            this.moysklad_loading = true
+
+            this.$store.dispatch("importHandlesFromMoySklad")
+                .then(()=>{
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Данные успешно загружены",
+                        type: "success",
+                    });
+
+                    this.loading = true
+                    this.$nextTick(()=>{
+                        this.loading = false
+                        this.moysklad_loading = false
+                    })
+                })
+                .catch(()=>{
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Ошибка загрузки данных",
+                        type: "error",
+                    });
+
+                    this.moysklad_loading = false
+                })
+        },
         selectHandle(item) {
             this.selectedHandle = item;
             this.loading = true

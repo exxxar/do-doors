@@ -90,6 +90,7 @@ export default {
             step: 0,
             editor_modal: null,
             self_clients: [],
+
             clientForm: {
                 id: null,
                 name: null,

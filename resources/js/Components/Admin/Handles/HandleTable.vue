@@ -30,6 +30,7 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
     </form>
 
     <div style="overflow-y: auto;">
+        <p class="fw-bold m-0">Всего элементов:   {{paginate_object?.meta?.total || 0}}</p>
         <table class="table" v-if="items.length>0">
             <thead>
             <tr>

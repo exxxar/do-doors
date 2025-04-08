@@ -16,9 +16,89 @@ class ServiceController extends Controller
 {
     use Utility;
 
+    public function importFromMoySklad(Request $request)
+    {
+
+        $sklad = new \App\Services\MoySkladService();
+
+        $needPaths = explode(',', env('MOYSKLAD_SERVICES'));
+
+        // dd($needPaths);
+
+        $offset = 0;
+        $tmpServices = [];
+
+        do {
+
+            $tmpSklad = $sklad->getServices(["offset" => $offset])["rows"];
+            $offset += count($tmpSklad ?? []);
+
+            foreach ($needPaths as $path) {
+                $prods = array_values(\Illuminate\Support\Collection::make($tmpSklad)
+                    ->where("pathName", $path)
+                    ->all());
+
+
+                foreach ($prods as $prod) {
+
+                    $prod = (object)$prod;
+
+                    $prices = [
+                        "wholesale" => $prod->buyPrice["value"] ?? 0,
+                        "dealer" => $prod->buyPrice["value"] ?? 0,
+                        "retail" => $prod->buyPrice["value"] ?? 0,
+                        "cost" => $prod->buyPrice["value"] ?? 0,
+                    ];
+
+
+                    $tmpServices[] = (object)[
+                        'title' => $prod->name ?? '-',
+                        'type' => "service_delivery",
+                        'price' => $prices,
+                        "description" => $prod->description ?? '-',
+                        "is_active" => true,
+                    ];
+
+                }
+            }
+        } while (count($tmpSklad) > 0);
+
+        foreach ($tmpServices as $tmpService) {
+            $service = \App\Models\Service::query()
+                ->where("title", $tmpService->title)
+                ->first();
+
+            if (is_null($service))
+                \App\Models\Service::query()
+                    ->create((array)$tmpService);
+            else
+                $service->update((array)$tmpService);
+
+        }
+
+        return response()->noContent();
+
+    }
+
     public function index(Request $request): \Inertia\Response
     {
         return Inertia::render('Admin/ServicesPage');
+    }
+
+    public function getServiceListByType(Request $request): ServiceCollection
+    {
+
+        $request->validate([
+            "type" => "required"
+        ]);
+
+        $type = $request->type;
+
+        $services = Service::query()
+            ->where("type", $type)
+            ->get();
+
+        return new ServiceCollection($services);
     }
 
     public function getServiceList(Request $request): ServiceCollection
