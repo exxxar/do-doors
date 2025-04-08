@@ -17,7 +17,9 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                     data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end rounded-0">
+            <ul
+                style="overflow-y: scroll; height: 300px; width: 100%;"
+                class="dropdown-menu dropdown-menu-end rounded-0">
                 <li><a class="dropdown-item" @click="selectInfo(null)" href="javascript:void(0)"><i
                     class="fa-solid fa-ban"></i> Не выбрано</a></li>
                 <li>
@@ -29,8 +31,19 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <template v-for="client in self_clients">
-                        <a v-if="client.status != 'individual'" class="dropdown-item" href="javascript:void(0)"
+                    <div class="p-2">
+                        <div class="form-floating mb-3">
+                            <input type="search"
+                                   v-model="search"
+                                   class="form-control" id="floatingInput" placeholder="Имя">
+                            <label for="floatingInput">Поиск</label>
+                        </div>
+                    </div>
+                    <template v-for="(client, index) in filteredClients">
+                        <a
+                            v-bind:class="{'btn-light':index%2===0}"
+                            style="word-wrap: break-word; overflow-wrap: break-word;"
+                            v-if="client.status != 'individual'" class="p-2 d-block btn rounded-0" href="javascript:void(0)"
                            @click="selectInfo(client)">{{ client.title || null }}
                             ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
                     </template>
@@ -81,10 +94,23 @@ export default {
         ...mapGetters(['getErrors',
             'getDictionary',
             'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
+        filteredClients(){
+            if (!this.search)
+                return this.self_clients || []
+
+
+            const search = this.search.toLowerCase();
+
+            return this.self_clients.filter(item =>
+                (item.title || '').toLowerCase().includes(search) ||
+                (item.fio || '').toLowerCase().includes(search)
+            );
+        }
     },
     watch: {},
     data() {
         return {
+            search:null,
             tab: 0,
             timer: null,
             step: 0,
