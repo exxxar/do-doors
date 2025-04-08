@@ -36,8 +36,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             <input type="search"
                                    v-model="search"
                                    class="form-control" id="floatingInput" placeholder="Имя">
-                            <label for="floatingInput">Поиск
-                                <span class="fw-bold">(в выдаче {{filteredClients.length||0}})</span>
+                            <label for="floatingInput">Поиск (найдено {{filteredClients.length||0}} клиентов)
                             </label>
                         </div>
                     </div>
