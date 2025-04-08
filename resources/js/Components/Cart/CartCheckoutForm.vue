@@ -43,7 +43,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                         <a
                             v-bind:class="{'btn-light':index%2===0}"
                             style="word-wrap: break-word; overflow-wrap: break-word;"
-                            v-if="client.status != 'individual'" class="p-2 d-block btn rounded-0" href="javascript:void(0)"
+                            class="p-2 d-block btn rounded-0" href="javascript:void(0)"
                            @click="selectInfo(client)">{{ client.title || client.phone }}
                             <br><span class="badge rounded-0 btn-dark" style="font-size:10px;">{{ preparedLawStatus(client.status) || 'Не указан' }}</span></a>
                     </template>
