@@ -18,7 +18,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </button>
             <ul
-                style="overflow-y: scroll; height: 300px; width: 100%;"
+                style="overflow-y: scroll; height: 400px; width: 100%;"
                 class="dropdown-menu dropdown-menu-end rounded-0">
                 <li><a class="dropdown-item" @click="selectInfo(null)" href="javascript:void(0)"><i
                     class="fa-solid fa-ban"></i> Не выбрано</a></li>
@@ -45,7 +45,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             style="word-wrap: break-word; overflow-wrap: break-word;"
                             v-if="client.status != 'individual'" class="p-2 d-block btn rounded-0" href="javascript:void(0)"
                            @click="selectInfo(client)">{{ client.title || null }}
-                            ({{ preparedLawStatus(client.status) || 'Не указан' }})</a>
+                            <span class="badge bg-primary" style="font-size:10px;">{{ preparedLawStatus(client.status) || 'Не указан' }}</span></a>
                     </template>
                 </li>
             </ul>
