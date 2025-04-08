@@ -36,7 +36,9 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             <input type="search"
                                    v-model="search"
                                    class="form-control" id="floatingInput" placeholder="Имя">
-                            <label for="floatingInput">Поиск</label>
+                            <label for="floatingInput">Поиск
+                                <span class="fw-bold">(в выдаче {{filteredClients.length||0}})</span>
+                            </label>
                         </div>
                     </div>
                     <template v-for="(client, index) in filteredClients">
@@ -45,7 +47,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             style="word-wrap: break-word; overflow-wrap: break-word;"
                             class="p-2 d-block btn rounded-0" href="javascript:void(0)"
                            @click="selectInfo(client)">{{ client.title || client.phone }}
-                            <br><span class="badge rounded-0 btn-dark" style="font-size:10px;">{{ preparedLawStatus(client.status) || 'Не указан' }}</span></a>
+                            <br><span class="badge rounded-0 btn-dark" style="font-size:8px;">{{ preparedLawStatus(client.status) || 'Не указан' }}</span></a>
                     </template>
                 </li>
             </ul>
@@ -97,7 +99,6 @@ export default {
         filteredClients(){
             if (!this.search)
                 return this.self_clients || []
-
 
             const search = this.search.toLowerCase();
 
