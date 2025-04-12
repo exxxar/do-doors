@@ -229,7 +229,7 @@ class CalcController extends Controller
             $client = Client::query()->find($clientId);
 
         $buyerData = $client->getBueryData();
-        $fam_initial = $client->getInitials();
+        $fam_initial = $client->status == 'individual' ? ($client->fio ?? "Клиент №" . $client->id) : ($client->title ?? "Клиент №" . $client->id);
 
         $tmpData = [
             'contract_date' => Carbon::now(),
