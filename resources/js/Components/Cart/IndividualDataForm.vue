@@ -4,7 +4,7 @@
         <div class="form-floating mb-3">
             <input type="text" class="form-control" v-mask="'+7(###)###-##-##'" v-model="clientForm.phone"
                    id="checkout-phone" placeholder="name@example.com" required>
-            <label for="checkout-phone">Ваш номер телефона</label>
+            <label for="checkout-phone">Номер телефона</label>
         </div>
 
         <div class="form-floating mb-3">

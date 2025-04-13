@@ -7,7 +7,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
 
 <template>
     <form v-if="cartTotalCount>0" v-on:submit.prevent="submit">
-        <div class="input-group mb-0">
+        <div class="input-group mb-3">
             <div class="form-floating">
                 <input type="text" class="form-control" v-model="clientForm.name" id="checkout-name"
                        placeholder="name@example.com" required>
@@ -54,7 +54,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
         </div>
 
 
-        <a class="btn btn-link my-2 p-0"
+        <a class="btn btn-link mb-3 p-0"
            :href="'/client/'+clientForm.id"
            target="_blank"
            v-if="clientForm.id">Редактировать клиента</a>
