@@ -6,6 +6,7 @@ use App\Classes\DocumentLogic;
 use App\Enums\OrderStatusEnum;
 use App\Exports\Cart\MultiSheetsCartExport;
 use App\Exports\CartExport;
+use App\Exports\CommercialProposal\MultiSheetsCart2Export;
 use App\Mail\KPMail;
 use App\Models\Client;
 use App\Models\Order;
@@ -471,16 +472,21 @@ class CalcController extends Controller
 
         $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
 
-        $excelFileName = Str::uuid() . ".xls";
+        $excelFileName1 = "spec-".Str::uuid() . ".xls";
+        $excelFileName2 = "cp-".Str::uuid() . ".xls";
 
         $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
 
 
-        Excel::store(new MultiSheetsCartExport($items, $buyerData, true), $excelFileName);
+        Excel::store(new MultiSheetsCartExport($items, $buyerData, true), $excelFileName1);
+        Excel::store(new MultiSheetsCart2Export($items, $buyerData, true), $excelFileName2);
 
         $bitrixFiles = [
             [
-                "name" => "спецификация от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName"))),
+                "name" => "спецификация от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName1"))),
+            ],
+            [
+                "name" => "коммерческое предложение от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName2"))),
             ],
             [
                 "name" => "информация о заказе от " . $timeFragment . ".pdf", "path" => base64_encode($file),
@@ -578,7 +584,12 @@ class CalcController extends Controller
             sleep(1);
             $telegram->sendDocument([
                 'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                "document" => InputFile::createFromContents(Storage::get("$excelFileName"), "order-" . $timeFragment . ".xls"),
+                "document" => InputFile::createFromContents(Storage::get("$excelFileName1"), "spec-" . $timeFragment . ".xls"),
+                "parse_mode" => "HTML",
+            ]);
+            $telegram->sendDocument([
+                'chat_id' => env("TELEGRAM_CHANNEL_ID"),
+                "document" => InputFile::createFromContents(Storage::get("$excelFileName2"), "cp-" . $timeFragment . ".xls"),
                 "parse_mode" => "HTML",
             ]);
             sleep(1);
@@ -601,13 +612,15 @@ class CalcController extends Controller
             $attachments = [
                 $path . $newName,
                 storage_path('app/' . $newName),
-                Storage::get("$excelFileName"),
+                Storage::get("$excelFileName1"),
+                Storage::get("$excelFileName2"),
             ];
 
             Mail::to($email)->send(new KPMail($name, $attachments));
         }
 
-        Storage::delete($excelFileName);
+        Storage::delete($excelFileName1);
+        Storage::delete($excelFileName2);
         // Storage::delete($path . $newName);
 
         return response()->download(storage_path('app/' . $newName));

@@ -45,43 +45,57 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
                 <div class="card-body">
                     <div v-if="step===0">
 
-                        <label for="send-to-mail" class="mb-2">
-                            <button
-                                id="send-to-mail"
-                                v-bind:class="{'btn-outline-secondary':action.indexOf(1)!==-1}"
-                                class="btn btn-outline-light text-gray-400 rounded-0 mr-2" @click="preCheckAction(1)">
-                                <i
-                                    v-if="action.indexOf(1)!==-1"
-                                    v-bind:class="{'text-success':action.indexOf(1)!==-1}"
-                                    class="fa-solid fa-check-double"></i>
+                        <div class="d-flex justify-content-between mb-2">
+                            <label for="send-to-mail">
+                                <button
+                                    id="send-to-mail"
+                                    v-bind:class="{'btn-outline-secondary':action.indexOf(1)!==-1}"
+                                    class="btn btn-outline-light text-gray-400 rounded-0 mr-2"
+                                    @click="preCheckAction(1)">
+                                    <i
+                                        v-if="action.indexOf(1)!==-1"
+                                        v-bind:class="{'text-success':action.indexOf(1)!==-1}"
+                                        class="fa-solid fa-check-double"></i>
 
-                                <i v-else class="fa-solid fa-check"></i>
+                                    <i v-else class="fa-solid fa-check"></i>
 
-                            </button>
-                            Отправить КП
-                            на почту клиента
-                        </label>
+                                </button>
+                                Отправить КП
+                                на почту клиента
+
+
+                            </label>
+
+                            <button class="btn btn-dark rounded-0 ml-2"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
                         <p
                             v-if="action.indexOf(1)!==-1"
                             class="alert alert-light rounded-0 mb-2"
                             style="font-size:10px;">Вы отправите КП на почту клиента при отправке в CRM</p>
 
 
-                        <label for="send-to-telegram" class="mb-2">
-                            <button
-                                id="send-to-telegram"
-                                v-bind:class="{'btn-outline-secondary':action.indexOf(2)!==-1}"
-                                class="btn btn-outline-light text-gray-400 rounded-0 mr-2"
-                                @click="preCheckAction(2)">
-                                <i
-                                    v-if="action.indexOf(2)!==-1"
-                                    v-bind:class="{'text-success':action.indexOf(2)!==-1}"
-                                    class="fa-solid fa-check-double"></i>
-                                <i v-else class="fa-solid fa-check"></i>
-                            </button>
-                            Отправить КП
-                            в телеграм
-                        </label>
+                        <div class="d-flex justify-content-between mb-2">
+                            <label for="send-to-telegram">
+                                <button
+                                    id="send-to-telegram"
+                                    v-bind:class="{'btn-outline-secondary':action.indexOf(2)!==-1}"
+                                    class="btn btn-outline-light text-gray-400 rounded-0 mr-2"
+                                    @click="preCheckAction(2)">
+                                    <i
+                                        v-if="action.indexOf(2)!==-1"
+                                        v-bind:class="{'text-success':action.indexOf(2)!==-1}"
+                                        class="fa-solid fa-check-double"></i>
+                                    <i v-else class="fa-solid fa-check"></i>
+                                </button>
+                                Отправить КП
+                                в телеграм
+                            </label>
+
+
+                            <button class="btn btn-dark rounded-0 ml-2"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+
+
                         <p
                             v-if="action.indexOf(2)!==-1"
                             class="alert alert-light rounded-0 mb-2" style="font-size:10px;">Вы отправите КП в телеграм

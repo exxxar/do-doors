@@ -67,7 +67,7 @@ class HandleController extends Controller
                     }
 
                     $isImageInDescription = false;
-                    if (preg_match('/\.(jpg|jpeg|gif|png|bmp)$/i', ($prod->description??''))) {
+                    if (preg_match('/\.(jpg|jpeg|gif|png|bmp)$/i', ($prod->description ?? ''))) {
                         $isImageInDescription = true;
 
                         $images[] = (object)[
@@ -209,6 +209,35 @@ class HandleController extends Controller
         }
 
         return response()->noContent();
+
+    }
+
+    public function fastEdit(Request $request)
+    {
+        $request->validate([
+            "title" => "required"
+        ]);
+
+        $priceData = (object)$request->price;
+
+        $id = $request->id ?? null;
+
+        $handle = Handle::query()->find($id);
+
+        if (is_null($handle))
+            return response()->noContent(404);
+
+        $handle->price = (object)[
+            "wholesale" => $priceData->wholesale ?? 0,
+            "dealer" => $priceData->dealer ?? 0,
+            "retail" => $priceData->retail ?? 0,
+            "cost" => $priceData->cost ?? 0,
+        ];
+        $handle->title = $request->title ?? null;
+
+        $handle->save();
+
+        return new HandleResource($handle);
 
     }
 

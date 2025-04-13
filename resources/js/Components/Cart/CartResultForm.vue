@@ -1,14 +1,45 @@
 <template>
     <template v-if="clientForm">
-        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
-            v-if="discount>0">(скидка {{ discount }}%)</span></h6>
 
-        <div class="form-floating mb-2">
-            <input type="text"
-                   class="form-control" @keyup="findPromo" v-model="clientForm.promo" id="checkout-promo"
-                   placeholder="name@example.com">
-            <label for="checkout-promo">Промокод</label>
+
+        <h6 class="font-bold">Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
+            v-if="discount>0">(скидка {{ discount }}%)</span>
+
+        </h6>
+
+        <div class="form-check form-switch my-2">
+            <label class="form-check-label"
+
+                   for="need_promo_switcher">
+
+                <span v-bind:class="{'fw-bold':!need_promo}">скида</span> \
+                <span v-bind:class="{'fw-bold':need_promo}">промокод</span>
+            </label>
+            <input
+                v-model="need_promo"
+                class="form-check-input" type="checkbox" role="switch" id="need_promo_switcher">
+
         </div>
+
+
+        <template v-if="!need_promo">
+            <div class="form-floating mb-2">
+                <input type="text"
+                       class="form-control" v-model="discount" id="checkout-promo"
+                       placeholder="name@example.com">
+                <label for="checkout-promo">Скидка, %</label>
+            </div>
+        </template>
+
+        <template v-if="need_promo">
+            <div class="form-floating mb-2">
+                <input type="text"
+                       class="form-control" @keyup="findPromo" v-model="clientForm.promo" id="checkout-promo"
+                       placeholder="name@example.com">
+                <label for="checkout-promo">Промокод</label>
+            </div>
+        </template>
+
 
         <div v-if="hasRoles(['manager','administrator'])">
 
@@ -110,15 +141,24 @@
                 <h6 class="mb-2 fw-bold">Информация по доставке</h6>
 
 
+                <div class="form-floating mb-2">
+                    <input type="number"
+                           min="0"
+                           class="form-control"
+                           v-model="clientForm.delivery_price" id="delivery-price"
+                           placeholder="name@example.com" required>
+                    <label for="delivery-price">Сумма за доставку</label>
+                </div>
+
+
                 <div class="input-group  mb-2">
-                    <div class="form-floating ">
-                        <input type="number"
-                               min="0"
-                               class="form-control"
-                               v-model="clientForm.delivery_price" id="delivery-price"
+                    <div class="form-floating">
+                        <input type="text" class="form-control"
+                               v-model="clientForm.delivery_city" id="delivery-city"
                                placeholder="name@example.com" required>
-                        <label for="delivery-price">Сумма за доставку</label>
+                        <label for="delivery-city">Город доставки</label>
                     </div>
+
                     <span class="input-group-text rounded-0  border-secondary">
                           <div class="dropdown ">
                         <button class="btn btn-light"
@@ -134,23 +174,21 @@
                         </ul>
                     </div>
                     </span>
-
                 </div>
-
-
-                <div class="form-floating mb-2">
-                    <input type="text" class="form-control"
-                           v-model="clientForm.delivery_city" id="delivery-city"
-                           placeholder="name@example.com" required>
-                    <label for="delivery-city">Город доставки</label>
-                </div>
-
                 <div class="form-floating mb-2">
                     <input type="text" class="form-control"
                            v-model="clientForm.delivery_address" id="delivery-address"
-                           placeholder="name@example.com" required>
+                           placeholder="name@example.com">
                     <label for="delivery-address">Адрес доставки</label>
                 </div>
+
+                <p class="alert alert-light rounded-0 border-black" v-if="clientForm.delivery_service">
+                    <span>   {{clientForm.delivery_service}}</span>
+                    <a href="javascript:void(0)"
+                       class="d-block p-0 m-0 text-danger"
+                       style="font-size:10px;"
+                       @click="clientForm.delivery_service = null"><i class="fa-solid fa-xmark"></i> убрать сервис</a>
+                </p>
 
                 <p class="mb-2">Подъем на этаж</p>
                 <div class=" my-2">
@@ -279,6 +317,7 @@ export default {
     props: ['modelValue', 'disabled'],
     data() {
         return {
+            need_promo: false,
             flgDays: true, // числом или датой дни
             discount: 0,
             clientForm: null,
@@ -372,8 +411,10 @@ export default {
         },
         selectDeliveryVariant(item) {
             this.clientForm.info = item.title
+            this.clientForm.delivery_service = item.title
             this.clientForm.delivery_price = item.price?.retail || 0
         },
+
         findPromo() {
 
             this.discount = 0

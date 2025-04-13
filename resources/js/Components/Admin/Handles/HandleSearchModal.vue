@@ -1,6 +1,6 @@
 <template>
     <div
-        data-bs-toggle="modal" data-bs-target="#handlers-filter-modal"
+        @click="showFilterModal"
         class="card rounded-0 border-black cursor-pointer">
         <div class="card-body px-2 py-1">
 
@@ -75,15 +75,107 @@
 
 
                     <div class="list-group">
-                        <div v-for="item in filteredItems" :key="item.title"
+                        <div v-for="(item, index) in filteredItems" :key="item.title"
                              class="list-group-item cursor-pointer"
                              :class="{'list-group-item-primary': door.handle_holes_type === item,
                              'list-group-item-success':success_added.indexOf(item.title)!=-1&&item.id!=null,
                              'list-group-item-warning':success_added.indexOf(item.title)!=-1&&item.id==null,
 
                              }"
-                             @click="selectHandle(item)">
-                            {{ item.title }}
+                        >
+                            <a href="javascript:void(0)"
+                               @click="editHandle(item)"
+                               class="mr-2">
+                                <i class="fa-solid fa-pen-to-square text-success" v-if="edited_handle?.id!==item.id"></i>
+                                <i class="fa-solid fa-xmark text-danger" v-else></i>
+                            </a>
+
+                            <span @click="selectHandle(item)">
+                                 {{ item.title }}
+                            </span>
+
+                            <template v-if="edited_handle?.id === item.id">
+                                <form v-on:submit.prevent="saveEditedHandle">
+                                    <div class="form-floating mb-2">
+                                        <input type="text" class="form-control"
+                                               :id="'edit-fast-new-handle-title-'+item.id"
+                                               v-model="edited_handle.title" required>
+                                        <label :for="'edit-fast-new-handle-title-'+item.id">Название</label>
+                                    </div>
+
+                                    <div class="input-group mb-2">
+
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control"
+                                                   :id="'edit-fast-new-handle-price-wholesale-'+item.id"
+                                                   v-model="edited_handle.price.wholesale" required>
+                                            <label :for="'edit-fast-new-handle-price-wholesale-'+item.id">Оптовая цена,
+                                                руб</label>
+                                        </div>
+
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control"
+                                                   :id="'edit-fast-new-handle-price-dealer-'+item.id"
+                                                   v-model="edited_handle.price.dealer" required>
+                                            <label :for="'edit-fast-new-handle-price-dealer-'+item.id">Цена дилера,
+                                                руб</label>
+                                        </div>
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control"
+                                                   :id="'edit-fast-new-handle-price-retail-'+item.id"
+                                                   v-model="edited_handle.price.retail" required>
+                                            <label :for="'edit-fast-new-handle-price-retail-'+item.id">Розничная цена,
+                                                руб</label>
+                                        </div>
+
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control"
+                                                   :id="'edit-fast-new-handle-price-cost-'+item.id"
+                                                   v-model="edited_handle.price.cost" required>
+                                            <label :for="'edit-fast-new-handle-price-cost-'+item.id">Себестоимость,
+                                                руб</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="d-flex justify-content-between">
+                                        <button
+                                            :disabled="edit_loading"
+                                            class="btn btn-dark rounded-0" type="submit">
+                                            <i
+                                                v-if="!edit_loading"
+                                                class="fa-solid fa-floppy-disk mr-2"></i>
+                                            <div id="preloader"
+                                                 v-if="edit_loading"
+                                                 class="d-inline-flex justify-content-center align-items-center mr-2">
+                                                <div class="spinner-border spinner-border-sm text-white" role="status">
+                                                    <span class="visually-hidden">Загрузка...</span>
+                                                </div>
+                                            </div>
+                                            Сохранить
+
+                                        </button>
+                                        <button
+                                            :disabled="edit_loading"
+                                            @click="removeSelectedHandle"
+                                            class="btn bg-danger text-white rounded-0" type="button">
+                                            <i v-if="!edit_loading" class="fa-solid fa-trash-can mr-2"></i>
+                                            <div
+                                                v-if="edit_loading"
+                                                id="preloader"
+                                                class="d-inline-flex justify-content-center align-items-center mr-2">
+                                                <div class="spinner-border spinner-border-sm text-white" role="status">
+                                                    <span class="visually-hidden">Загрузка...</span>
+                                                </div>
+                                            </div>
+                                            Удалить ручку
+
+                                        </button>
+                                    </div>
+
+                                </form>
+
+                            </template>
                         </div>
                     </div>
 
@@ -102,7 +194,10 @@ export default {
     data() {
         return {
             door: null,
+            edit_loading: false,
+            edited_handle: null,
             success_added: [],
+            filter_modal: null,
             new_handles: [],
             searchQuery: ''
         }
@@ -124,9 +219,65 @@ export default {
         }
     },
     mounted() {
+        this.filter_modal = new bootstrap.Modal(document.getElementById('handlers-filter-modal'));
         this.door = this.modelValue
     },
     methods: {
+        reloadHandles() {
+            this.$store.dispatch("updatedFormattedSizes").then(resp => {
+                window.dispatchEvent(new CustomEvent("load-sizes", {
+                    detail: null
+                }));
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы успешно обновили данные",
+                });
+            })
+        },
+        saveEditedHandle() {
+            if (!this.edited_handle)
+                return;
+
+            this.edit_loading = true
+            this.$store.dispatch("fastEditHandle", {
+                handle: this.edited_handle
+            }).then((response) => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Вы сохранили данные по ручке",
+                });
+
+                this.edit_loading = false
+                this.edited_handle = null
+                this.reloadHandles()
+            }).catch(error => {
+                this.edit_loading = false
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка сохранения ручки",
+                    type: 'error'
+                });
+            })
+        },
+        removeSelectedHandle() {
+            if (!this.edited_handle)
+                return;
+
+            this.edit_loading = true
+            this.$store.dispatch("removeHandle", {
+                handleId: this.edited_handle.id
+            }).then(() => {
+                this.edit_loading = false
+                this.reloadHandles()
+            }).catch(() => {
+                this.edit_loading = false
+            })
+
+        },
+        showFilterModal() {
+            this.edited_handle = null
+            this.filter_modal.show()
+        },
         selectHandle(handle) {
             let index = this.success_added.findIndex(item => item === handle.title)
 
@@ -134,6 +285,21 @@ export default {
                 this.success_added.splice(index, 1)
 
             this.door.handle_holes_type = handle.id == null ? {title: null} : handle
+
+            this.edited_handle = null;
+            this.filter_modal.hide()
+        },
+        editHandle(handle) {
+
+            if (this.edited_handle && this.edited_handle?.id === handle.id) {
+                this.edited_handle = null
+                return;
+            }
+
+            this.edited_handle = null
+            this.$nextTick(() => {
+                this.edited_handle = handle
+            })
         },
         saveHandles() {
 
@@ -182,6 +348,8 @@ export default {
             })
         },
         reset() {
+            this.edited_handle = null
+            this.filter_modal.hide()
             this.door.handle_holes_type = {title: null}
             this.searchQuery = ''
         }

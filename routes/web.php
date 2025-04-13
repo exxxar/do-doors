@@ -299,6 +299,7 @@ Route::prefix("/handles")
     ->group(function () {
         Route::get("/", "index")->name('handles');
         Route::post("/", "getHandleList");
+        Route::post("/fast-edit", "fastEdit");
         Route::post("/store", "store");
         Route::post("/import-from-moysklad", "importFromMoySklad");
         Route::post("/fast-store", "fastStore");

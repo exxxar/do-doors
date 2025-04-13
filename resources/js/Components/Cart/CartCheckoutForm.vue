@@ -13,6 +13,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                        placeholder="name@example.com" required>
                 <label for="checkout-name">Название компании\Ф.И.О. ИП</label>
             </div>
+
             <button v-if="self_clients.length>0" class="btn btn-outline-secondary" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
@@ -52,6 +53,13 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
             </ul>
         </div>
 
+<!--        <a class="btn btn-link m-0 p-0"
+           @click="edit_requisites=!edit_requisites"
+           v-if="clientForm.id">Редактировать реквизиты</a>
+
+        <template v-if="edit_requisites">
+            {{clientForm}}
+        </template>-->
         <LawDataForm v-if="(type||0)===0"
                      v-model="clientForm"/>
 
@@ -110,6 +118,7 @@ export default {
     watch: {},
     data() {
         return {
+            edit_requisites:false,
             search:null,
             tab: 0,
             timer: null,
@@ -151,6 +160,8 @@ export default {
                 delivery_address: null,
                 delivery_price: null,
                 delivery_city: null,
+
+                delivery_service:null,
 
             }
         }

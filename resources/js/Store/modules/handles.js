@@ -91,6 +91,21 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async fastEditHandle(context, payload = {handle: null}) {
+        let link = `${BASE_HANDLES_LINK}/fast-edit`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.handle)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async storeHandle(context, payload = {handleForm: null}) {
         let link = `${BASE_HANDLES_LINK}/store`
 

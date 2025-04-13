@@ -9,8 +9,8 @@
 
         <div class="form-floating mb-3">
             <input type="email" class="form-control" v-model="clientForm.email" id="checkout-email"
-                   placeholder="name@example.com" required>
-            <label for="checkout-email">Ваш email</label>
+                   placeholder="name@example.com">
+            <label for="checkout-email">Электронная почта</label>
         </div>
         <div class="form-floating mb-3">
             <input type="text" class="form-control" v-mask="'## ##  ######'" v-model="clientForm.passport"
