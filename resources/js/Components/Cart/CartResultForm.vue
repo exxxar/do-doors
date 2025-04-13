@@ -183,7 +183,7 @@
                 </div>
 
                 <p class="alert alert-light rounded-0 border-black" v-if="clientForm.delivery_service">
-                    <span>   {{clientForm.delivery_service}}</span>
+                    <span>   {{ clientForm.delivery_service }}</span>
                     <a href="javascript:void(0)"
                        class="d-block p-0 m-0 text-danger"
                        style="font-size:10px;"
@@ -347,8 +347,13 @@ export default {
         }
     },
     watch: {
-
-
+        'need_promo': {
+            handler(val) {
+                if (this.need_promo)
+                    this.discount = 0
+            },
+            deep: true
+        },
         'clientForm': {
             handler(val) {
 
