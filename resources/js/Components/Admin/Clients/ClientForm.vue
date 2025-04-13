@@ -3,7 +3,7 @@
 </script>
 <template>
 
-    <div class="row mb-3">
+    <div class="row mb-3" v-if="!editing">
         <div class="col-md-6 col-12">
             <button type="button" class="btn btn-dark rounded-0" @click="resetForm">Очистить форму
             </button>
@@ -226,7 +226,7 @@
                     <span class="spinner-border spinner-border-sm  text-success" role="status" v-else></span>
                     Сохранить клиента
                 </button>
-                <button v-if="!loading" type="button" @click="resetForm"
+                <button v-if="!loading&&!editing" type="button" @click="resetForm"
                     class="btn btn-outline-secondary rounded-0 ml-2">
                     <i class="fa-solid fa-xmark mr-1"></i>
                     Очистить клиента
@@ -265,7 +265,7 @@
         components: {},
 
         directives: { mask },
-        props: ["item"],
+        props: ["item", "editing"],
         data() {
             return {
                 messages: [],

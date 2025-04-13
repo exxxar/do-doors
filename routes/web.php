@@ -182,6 +182,18 @@ Route::get('/basket', function () {
     return Inertia::render('CartPage');
 })->middleware(['auth', 'verified'])->name('basket');
 
+Route::get('/client/{clientId}', function ($clientId) {
+    $client = \App\Models\Client::query()
+        ->find($clientId);
+
+    if (is_null($client))
+        return response()->redirectTo("/clients");
+
+    return Inertia::render('Admin/ClientPage',[
+        "client"=>$client
+    ]);
+})->middleware(['auth', 'verified']);
+
 Route::get('/link/{orderId}', function ($orderId) {
     $order = Order::query()
         ->with(["details"])

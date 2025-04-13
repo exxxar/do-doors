@@ -484,7 +484,7 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                 <div class="col-12"
                      v-if="(doorForm.handle_holes_type.variants||[]).length===0&&doorForm.need_handle_holes">
 
-                    <div class="alert alert-warning rounded-0" role="alert">
+                    <div class="alert alert-warning rounded-0 mb-2" role="alert">
                         <p>Вариантов изображений ручки нет</p>
                     </div>
                 </div>
