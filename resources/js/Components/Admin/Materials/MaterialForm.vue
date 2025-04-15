@@ -42,6 +42,15 @@
             </label>
         </div>
 
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input"
+                   v-model="form.config.is_custom_color"
+                   type="checkbox" role="switch" id="is-custom-color">
+            <label class="form-check-label" for="is-custom-color">
+                Ручной ввод цвета
+            </label>
+        </div>
+
         <div class="form-floating mb-3 border-gray-100 border">
             <input type="file" class="form-control"
                    accept="image/*"
@@ -274,7 +283,10 @@ export default {
                 order_position: 0,
                 need_generate_sizes: false,
                 wrapper_variants: [],
-                door_variants: []
+                door_variants: [],
+                config:{
+                    is_custom_color:false
+                }
             }
         }
     },
@@ -296,6 +308,10 @@ export default {
                   title: this.item.title || null,
                   is_base: this.item.is_base || false,
                   order_position: this.item.order_position || 0,
+                  config: this.item.config || {
+                      is_custom_color: false
+                  },
+
                   wrapper_variants: this.item.wrapper_variants || [],
                   door_variants: this.item.door_variants || [],
               }
@@ -315,6 +331,7 @@ export default {
             this.form.is_base = false
             this.form.wrapper_variants = []
             this.form.door_variants = []
+            this.form.config.is_custom_color = false
 
             this.$refs.doorImageRef.value = null
             this.$refs.wrapperImageRef.value = null

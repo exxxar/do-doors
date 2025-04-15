@@ -259,9 +259,7 @@ class CalcController extends Controller
         if (in_array(0, $action) && !in_array(3, $action)) {
             $bitrix = new \App\Services\BitrixService();
             $contactData = [
-                'NAME' => $client->getFName() ?? $name,
-                'SECOND_NAME' => $client->getSName() ?? '',
-                'LAST_NAME' => $client->getLName() ?? '',
+                'NAME' => $client->title ?? $name,
                 'TYPE_ID' => "CLIENT",
                 'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
                 'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
@@ -384,7 +382,7 @@ class CalcController extends Controller
                 'NAME' => $doorDescription,
                 'CURRENCY_ID' => 'RUB',
                 'PRICE' => $item->product->price ?? 0,
-                'DESCRIPTION' => $doorDescription,
+                'DESCRIPTION' => $doorDescription . ". Комментарий к двери:" . ($item->product->comment ?? '-'),
                 'MEASURE' => 6,
                 'QUANTITY' => $item->product->count ?? 1 // Единица измерения (шт.)
             ];
@@ -472,8 +470,8 @@ class CalcController extends Controller
 
         $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
 
-        $excelFileName1 = "spec-".Str::uuid() . ".xls";
-        $excelFileName2 = "cp-".Str::uuid() . ".xls";
+        $excelFileName1 = "spec-" . Str::uuid() . ".xls";
+        $excelFileName2 = "cp-" . Str::uuid() . ".xls";
 
         $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
 

@@ -23,6 +23,7 @@ class Material extends Model
         'wrapper_variants',
         'door_variants',
         'deleted_at',
+        'config',
     ];
 
     /**
@@ -36,6 +37,7 @@ class Material extends Model
         'is_base' => 'boolean',
         'wrapper_variants' => 'array',
         'door_variants' => 'array',
+        'config' => 'array',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 

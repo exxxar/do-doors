@@ -4,6 +4,7 @@ import MaterialSelectForm from "@/Components/Doors/MaterialSelectForm.vue";
 import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
 import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue";
+import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vue";
 </script>
 
 <template>
@@ -260,8 +261,9 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                 </div>
 
 
-                <div class="col-md-6 col-12 mb-2">
+                <div class="col-md-6 col-12">
                     <ColorSelector
+                        :material="doorForm.front_side_finish"
                         :filter="'front_side_finish_color'"
                         v-if="doorForm.front_side_finish.title!=='Под покраску'"
                         @invalid="alert('Вы не выбрали цвет отделки первой стороны')"
@@ -308,7 +310,9 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                 </div>
 
                 <div class="col-md-6 col-12 mb-2">
+                    {{}}
                     <ColorSelector
+                        :material="doorForm.back_side_finish"
                         :filter="'back_side_finish_color'"
                         v-if="doorForm.back_side_finish.title!=='Под покраску'"
                         @invalid="alert('Вы не выбрали цвет отделки второй стороны')"
@@ -431,6 +435,11 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                     <HandleSearchModal v-model="doorForm"/>
                 </div>
 
+                <div class="col-md-6 offset-md-6 mb-2 col-12"
+                     v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id===2">
+                    <WrapperSearchModal v-model="doorForm"/>
+                </div>
+
                 <div
                     v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
                     class="col-12 d-flex align-items-center">
@@ -506,7 +515,7 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox"
-
+                               @change="swapDoorstepStopper(0)"
                                v-model="doorForm.need_automatic_doorstep"
                                role="switch" id="need-automatic-doorstep" checked>
                         <label class="form-check-label" for="need-automatic-doorstep">
@@ -538,6 +547,7 @@ import HandleSearchModal from "@/Components/Admin/Handles/HandleSearchModal.vue"
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox" role="switch"
+                               @change="swapDoorstepStopper(1)"
                                v-model="doorForm.need_hidden_stopper"
                                id="need-hidden-stopper" checked>
                         <label class="form-check-label" for="need-hidden-stopper">
@@ -922,6 +932,7 @@ export default {
             type_dictionary: {
                 size: 'Петли',
                 handle_holes_type: 'Ручка',
+                handle_wrapper_type: 'Завертка',
                 opening_type: 'Тип открытия двери и толщина',
                 box_and_frame_color: 'Цвет короба и каркаса',
                 door_type: 'Тип двери',
@@ -983,6 +994,7 @@ export default {
                 hinge_manufacturer: {title: null}, //Производитель петель
                 handle_holes: {title: null}, //отверстие для ручек
                 handle_holes_type: {title: null}, //тип ручки
+                handle_wrapper_type: {title: null}, //тип завертки
                 need_handle_holes: true, //нужна дверная ручка
                 need_upper_jumper: true, //Верхняя перемычка
                 need_automatic_doorstep: false, //Автоматический порог
@@ -1387,6 +1399,7 @@ export default {
                 if (!this.doorForm.need_handle_holes) {
                     this.doorForm.handle_holes = this.getDictionary.handle_holes_variants[0]
                     this.doorForm.handle_holes_type = {title: null}
+                    this.doorForm.handle_wrapper_type = {title: null}
                 }
 
             },
@@ -1414,7 +1427,7 @@ export default {
         'summaryPrice': {
             handler(val) {
 
-                let base = this.tmp_prices.find(item=>item.type==='door_type')?.price || 0
+                let base = this.tmp_prices.find(item => item.type === 'door_type')?.price || 0
 
                 //if (this.doorForm.price_type.id !== 3)
                 this.doorForm.price = this.summaryPrice
@@ -1467,6 +1480,7 @@ export default {
                     this.doorForm.purpose = door.purpose || "Входная"
                     this.doorForm.handle_holes = door.handle_holes || {title: null}
                     this.doorForm.handle_holes_type = door.handle_holes_type || {title: null}
+                    this.doorForm.handle_wrapper_type = door.handle_wrapper_type || {title: null}
                     this.doorForm.opening_type = door.opening_type || {title: null}
                     this.doorForm.box_and_frame_color = door.box_and_frame_color || {title: null}
                     this.doorForm.door_type = door.door_type || {title: null}
@@ -1593,6 +1607,7 @@ export default {
                     loops_count: this.getDictionary.size_variants[0].loops.count,
                     handle_holes: this.getDictionary.handle_holes_variants[0],
                     handle_holes_type: {title: null},
+                    handle_wrapper_type: {title: null},
                     opening_type: this.getDictionary.opening_variants[0],
                     box_and_frame_color: {title: null},
                     door_type: this.getDictionary.door_variants[0],
@@ -1603,7 +1618,7 @@ export default {
                     seal_color: {title: null},
                     fittings_color: {title: null},
                     loops: this.getDictionary.loops_variants[0],
-                    price_type: this.getDictionary.price_type_variants[1],
+                    price_type: this.getDictionary.price_type_variants[0],
                     hinge_manufacturer: this.getDictionary.hinge_manufacturer_variants[0],
                     need_handle_holes: true,
                     need_upper_jumper: true,
@@ -1622,6 +1637,14 @@ export default {
 
 
                 this.doorForm = doorForm
+
+                if (this.cartTotalCount > 0) {
+                    const handle = JSON.parse(localStorage.getItem("dodoors_handle_holes_type_selected"))
+                    console.log("handle for selection", handle)
+                    if (handle)
+                        this.doorForm.handle_holes_type = handle
+                }
+
 
                 this.loaded = true
             })
@@ -1668,6 +1691,10 @@ export default {
             this.finishBackVariantModal.show()
 
 
+        },
+        swapDoorstepStopper(index) {
+            this.doorForm.need_automatic_doorstep = index === 0
+            this.doorForm.need_hidden_stopper = index !== 0
         },
         getServiceByType(type) {
             if ((this.getDictionary.services || []).length === 0)

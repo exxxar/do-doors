@@ -1394,9 +1394,12 @@ const mutations = {
                 id: item.id,
                 title: item.title,
                 is_base: item.is_base || false,
+                config: item.config||null,
                 wrapper_variants: item.wrapper_variants,
                 door_variants: item.door_variants,
             })
+
+            console.log(item.title, item.config)
 
         })
 

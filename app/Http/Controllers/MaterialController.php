@@ -56,6 +56,7 @@ class MaterialController extends Controller
 
         $wrapperImageInfo = json_decode($request->wrapper_images_info ?? '[]');
         $doorImageInfo = json_decode($request->door_images_info ?? '[]');
+        $config= json_decode($request->config ?? '[]');
 
 
         $tmp = $this->uploadPhotos(
@@ -107,6 +108,7 @@ class MaterialController extends Controller
                     "title" => $request->title ?? null,
                     'wrapper_variants' => $wrapper,
                     'door_variants' => $door,
+                    'config' => $config,
                     'is_base' => ($request->is_base  ?? false)  == "true",
                     'order_position' => $request->order_position ?? 0,
                 ]);
@@ -134,6 +136,7 @@ class MaterialController extends Controller
                 "title" => $request->title ?? null,
                 'wrapper_variants' => $wrapper,
                 'door_variants' => $door,
+                'config' => $config,
                 'is_base' => ($request->is_base  ?? false)  == "true",
                 'order_position' => $request->order_position ?? 0,
             ]);

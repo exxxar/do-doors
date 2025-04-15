@@ -86,7 +86,8 @@
                             <a href="javascript:void(0)"
                                @click="editHandle(item)"
                                class="mr-2">
-                                <i class="fa-solid fa-pen-to-square text-success" v-if="edited_handle?.id!==item.id"></i>
+                                <i class="fa-solid fa-pen-to-square text-success"
+                                   v-if="edited_handle?.id!==item.id"></i>
                                 <i class="fa-solid fa-xmark text-danger" v-else></i>
                             </a>
 
@@ -211,7 +212,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getDictionary',]),
+        ...mapGetters(['getDictionary', 'cartTotalCount']),
         filteredItems() {
             return this.getDictionary.handle_holes_type_variants.filter(item =>
                 (item.title) ? item.title.toLowerCase().includes(this.searchQuery.toLowerCase()) : ''
@@ -221,6 +222,8 @@ export default {
     mounted() {
         this.filter_modal = new bootstrap.Modal(document.getElementById('handlers-filter-modal'));
         this.door = this.modelValue
+
+
     },
     methods: {
         reloadHandles() {
@@ -286,6 +289,8 @@ export default {
 
             this.door.handle_holes_type = handle.id == null ? {title: null} : handle
 
+            localStorage.setItem("dodoors_handle_holes_type_selected", JSON.stringify(this.door.handle_holes_type))
+            console.log("Save to ls", this.door.handle_holes_type)
             this.edited_handle = null;
             this.filter_modal.hide()
         },

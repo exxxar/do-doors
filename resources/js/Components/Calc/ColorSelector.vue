@@ -4,47 +4,56 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
 
 <template>
 
+
     <div v-if="color" class="mb-2">
-        <div
-            class="dropdown-center"
-            v-if="(color.code||null)!=='RAL'">
-            <button
-                v-bind:style="{'background-color':color.code,'color':invertHex(color.code)}"
-                class="btn btn-outline-secondary w-100 rounded-0 custom-dropdown-btn text-left"
-                type="button"
-                data-bs-toggle="dropdown"
-                data-bs-auto-close="true"
-                aria-expanded="false">
+
+
+        <template v-if="!material?.config?.is_custom_color">
+            <div
+                class="dropdown-center"
+                v-if="(color.code||null)!=='RAL'">
+                <button
+                    v-bind:style="{'background-color':color.code,'color':invertHex(color.code)}"
+                    class="btn btn-outline-secondary w-100 rounded-0 custom-dropdown-btn text-left"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="true"
+                    aria-expanded="false">
                 <span
-                      v-bind:class="{'font-size-10':color.title}"
-                      class="mr-2"><i class="fa-solid fa-palette"></i> <slot name="name"></slot></span>
-                <p class="mb-0" v-if="color.title"> {{ color.title }}</p>
-            </button>
-            <ul class="dropdown-menu rounded-0">
-                <li><a class="dropdown-item" href="javascript:void(0)"
-                       @click="selectColor(null)">Не выбрано</a>
-                </li>
+                    v-bind:class="{'font-size-10':color.title}"
+                    class="mr-2"><i class="fa-solid fa-palette"></i> <slot name="name"></slot></span>
+                    <p class="mb-0" v-if="color.title"> {{ color.title }}</p>
+                </button>
+                <ul class="dropdown-menu rounded-0">
+                    <li><a class="dropdown-item" href="javascript:void(0)"
+                           @click="selectColor(null)">Не выбрано</a>
+                    </li>
 
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item"
-                       v-bind:class="{'bg-primary text-white':color.title===item.title }"
-                       @click="selectColor(item)"
-                       href="javascript:void(0)" v-for="item in filteredColors">{{ item.title }}</a>
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="javascript:void(0)"
-                       @click="openRalModal">Справочник цветов</a>
-                </li>
-            </ul>
-        </div>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li v-for="item in filteredColors">
+
+
+                        <a class="dropdown-item"
+                           v-bind:class="{'bg-primary text-white':color.title===item.title }"
+                           @click="selectColor(item)"
+                           href="javascript:void(0)">{{ item.title }}</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="javascript:void(0)"
+                           @click="openRalModal">Справочник цветов</a>
+                    </li>
+                </ul>
+            </div>
+        </template>
 
         <div
-            v-if="(color.code||'').toLowerCase()==='ral'"
-            class="input-group mb-3">
+            v-if="(color.code||'').toLowerCase()==='ral'||material?.config?.is_custom_color"
+            class="input-group mb-0">
                       <span class="input-group-text border-secondary"
                             v-if="isHex(color.title)"
                             v-bind:style="{'background-color':color.title}"
@@ -59,7 +68,9 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                     <slot name="name"></slot>
                 </label>
             </div>
-            <button class="btn btn-outline-secondary" type="button"
+            <button
+                v-if="!material.config?.is_custom_color"
+                class="btn btn-outline-secondary" type="button"
                     data-bs-auto-close="true"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">
@@ -113,7 +124,7 @@ import {mapGetters} from "vuex";
 import {uuid} from "vue-uuid";
 
 export default {
-    props: ["modelValue","filter"],
+    props: ["modelValue", "filter", "material"],
     data() {
         return {
             id: null,
@@ -131,11 +142,11 @@ export default {
         },
         'color': {
             handler(val) {
-                let search = (this.color.title||'').toLowerCase()
+                let search = (this.color.title || '').toLowerCase()
 
 
-                if (search.indexOf("ral")!==-1)
-                    search = search.substring(search.indexOf("ral")+3).trim()
+                if (search.indexOf("ral") !== -1)
+                    search = search.substring(search.indexOf("ral") + 3).trim()
 
                 if (search.length === 4) {
                     Object.keys(this.colors).forEach(key => {
@@ -152,7 +163,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['getDictionary','getRalColors']),
+        ...mapGetters(['getDictionary', 'getRalColors']),
 
         filteredColors() {
             let colors = this.getDictionary.color_variants
@@ -176,7 +187,7 @@ export default {
             var green = parseInt(hex.substr(2, 2), 16);
             var blue = parseInt(hex.substr(4, 2), 16);
 
-            var luminance = (0.2126*  red + 0.7152*  green + 0.0722 * blue) / 255;
+            var luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
             return luminance > 0.5 ? '#000000' : '#ffffff';
         },
         isHex(num) {
@@ -195,7 +206,7 @@ export default {
         loadRalColors() {
             this.$store.dispatch("loadRalColors")
         },
-        openRalModal(){
+        openRalModal() {
             this.loadRalColors()
 
             this.colorModal = new bootstrap.Modal(document.getElementById('select-ral-color-' + this.id), {})
@@ -248,11 +259,12 @@ export default {
 <style>
 
 .font-size-10 {
-    font-size:10px;
+    font-size: 10px;
 }
+
 .custom-dropdown-btn {
     height: 58px;
-    min-height:  58px;
+    min-height: 58px;
 
 }
 

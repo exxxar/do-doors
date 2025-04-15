@@ -155,7 +155,7 @@
                     <div class="form-floating">
                         <input type="text" class="form-control"
                                v-model="clientForm.delivery_city" id="delivery-city"
-                               placeholder="name@example.com" required>
+                               placeholder="name@example.com">
                         <label for="delivery-city">Город доставки</label>
                     </div>
 
@@ -418,6 +418,14 @@ export default {
             this.clientForm.info = item.title
             this.clientForm.delivery_service = item.title
             this.clientForm.delivery_price = item.price?.retail || 0
+
+            const text = item.title;
+            const regex = /г\.\s*([А-Яа-яЁё\- ]+)/;
+
+            const match = text.match(regex);
+            if (match)
+                this.clientForm.delivery_city = match[1].trim();
+
         },
 
         findPromo() {
