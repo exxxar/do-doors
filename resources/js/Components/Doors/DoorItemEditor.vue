@@ -516,7 +516,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                         <input class="form-check-input"
                                type="checkbox"
                                @change="swapDoorstepStopper(0)"
-                               v-model="doorForm.need_automatic_doorstep"
+
                                role="switch" id="need-automatic-doorstep" checked>
                         <label class="form-check-label" for="need-automatic-doorstep">
                             Нужен автоматический порог \ не нужен
@@ -548,7 +548,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                         <input class="form-check-input"
                                type="checkbox" role="switch"
                                @change="swapDoorstepStopper(1)"
-                               v-model="doorForm.need_hidden_stopper"
+
                                id="need-hidden-stopper" checked>
                         <label class="form-check-label" for="need-hidden-stopper">
                             Нужен скрытый стопор \ не нужен
@@ -1693,7 +1693,7 @@ export default {
 
         },
         swapDoorstepStopper(index) {
-            this.doorForm.need_automatic_doorstep = index === 0 && ! this.doorForm.need_automatic_doorstep
+            this.doorForm.need_automatic_doorstep = index === 0 && !this.doorForm.need_automatic_doorstep
             this.doorForm.need_hidden_stopper =  index !== 0 && !this.doorForm.need_hidden_stopper
         },
         getServiceByType(type) {
