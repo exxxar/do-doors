@@ -1695,10 +1695,17 @@ export default {
         swapDoorstepStopper(index) {
 
             if ( this.doorForm.need_automatic_doorstep && index === 0)
+            {
+                this.doorForm.need_automatic_doorstep = false
                 return;
+            }
 
-            if ( this.doorForm.need_hidden_stopper && index === 1)
+
+            if ( this.doorForm.need_hidden_stopper && index === 1) {
+                this.doorForm.need_hidden_stopper = false
                 return;
+            }
+
 
             this.doorForm.need_automatic_doorstep = index === 0
             this.doorForm.need_hidden_stopper =  index !== 0
