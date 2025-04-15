@@ -1693,8 +1693,15 @@ export default {
 
         },
         swapDoorstepStopper(index) {
-            this.doorForm.need_automatic_doorstep = !this.doorForm.need_automatic_doorstep && index === 0
-            this.doorForm.need_hidden_stopper = !this.doorForm.need_hidden_stopper && index !== 0
+
+            if ( this.doorForm.need_automatic_doorstep && index === 0)
+                return;
+
+            if ( this.doorForm.need_hidden_stopper && index === 1)
+                return;
+
+            this.doorForm.need_automatic_doorstep = index === 0
+            this.doorForm.need_hidden_stopper =  index !== 0
         },
         getServiceByType(type) {
             if ((this.getDictionary.services || []).length === 0)
