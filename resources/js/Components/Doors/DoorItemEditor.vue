@@ -515,6 +515,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox"
+                               @change="swapDoorstepStopper(0)"
                                v-model="doorForm.need_automatic_doorstep"
                                role="switch" id="need-automatic-doorstep" checked>
                         <label class="form-check-label" for="need-automatic-doorstep">
@@ -546,7 +547,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox" role="switch"
-
+                               @change="swapDoorstepStopper(1)"
                                v-model="doorForm.need_hidden_stopper"
                                id="need-hidden-stopper" checked>
                         <label class="form-check-label" for="need-hidden-stopper">
@@ -1361,7 +1362,6 @@ export default {
                 if (!this.doorForm.need_hidden_stopper) {
                     this.doorForm.service_stopper = {title: null}
                 } else {
-                    this.swapDoorstepStopper(1)
                     let services = this.getServiceByType("service_stopper")
                     this.doorForm.service_stopper = services.length > 0 ? services[0] : {title: null}
                 }
@@ -1388,8 +1388,6 @@ export default {
                 } else {
                     let services = this.getServiceByType("service_doorstep")
                     this.doorForm.service_doorstep = services.length > 0 ? services[0] : {title: null}
-
-                    this.swapDoorstepStopper(0)
                 }
 
             },
@@ -1695,20 +1693,6 @@ export default {
 
         },
         swapDoorstepStopper(index) {
-
-            if ( this.doorForm.need_automatic_doorstep && index === 0)
-            {
-                this.doorForm.need_automatic_doorstep = false
-                return;
-            }
-
-
-            if ( this.doorForm.need_hidden_stopper && index === 1) {
-                this.doorForm.need_hidden_stopper = false
-                return;
-            }
-
-
             this.doorForm.need_automatic_doorstep = index === 0
             this.doorForm.need_hidden_stopper =  index !== 0
         },
