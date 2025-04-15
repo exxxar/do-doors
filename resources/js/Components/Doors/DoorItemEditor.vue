@@ -1693,8 +1693,8 @@ export default {
 
         },
         swapDoorstepStopper(index) {
-            this.doorForm.need_automatic_doorstep = index === 0
-            this.doorForm.need_hidden_stopper =  index !== 0
+            this.doorForm.need_automatic_doorstep = index === 0 && ! this.doorForm.need_automatic_doorstep
+            this.doorForm.need_hidden_stopper =  index !== 0 && !this.doorForm.need_hidden_stopper
         },
         getServiceByType(type) {
             if ((this.getDictionary.services || []).length === 0)
