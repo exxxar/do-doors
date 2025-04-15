@@ -1394,6 +1394,18 @@ export default {
             deep: true
         },
 
+        'doorForm.handle_holes':{
+            handler(val) {
+                if (this.doorForm.handle_holes.id === 3) {
+                    this.doorForm.handle_holes_type = {title: null}
+                    this.doorForm.handle_wrapper_type = {title: null}
+                }
+
+                if (this.doorForm.handle_holes.id === 1)
+                    this.doorForm.handle_wrapper_type = {title: null}
+            },
+            deep: true
+        },
         'doorForm.need_handle_holes': {
             handler(val) {
                 if (!this.doorForm.need_handle_holes) {
