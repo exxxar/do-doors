@@ -515,7 +515,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox"
-                               @change="swapDoorstepStopper(0)"
+                               @click="swapDoorstepStopper(0)"
                                v-model="doorForm.need_automatic_doorstep"
                                role="switch" id="need-automatic-doorstep" checked>
                         <label class="form-check-label" for="need-automatic-doorstep">
@@ -547,7 +547,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <div class="form-check form-switch">
                         <input class="form-check-input"
                                type="checkbox" role="switch"
-                               @change="swapDoorstepStopper(1)"
+                               @click="swapDoorstepStopper(1)"
                                v-model="doorForm.need_hidden_stopper"
                                id="need-hidden-stopper" checked>
                         <label class="form-check-label" for="need-hidden-stopper">
