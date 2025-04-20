@@ -15,6 +15,7 @@
     <table>
         <tr>
             <td>#</td>
+            <td style="width: 50px;">Номер договора</td>
             <td style="width: 50px;">Ширина</td>
             <td style="width: 50px;">Высота</td>
             <td style="width: 50px;">Глубина</td>
@@ -51,6 +52,7 @@
         @foreach($items as $index=>$item)
             <tr>
                 <td style="width: 50px;">{{$index+1}}</td>
+                <td style="width: 50px;">{{$item->order->contract_number ?? $item->order->id }}</td>
                 <td style="width: 50px;">{{$item->width ?? 0}}</td>
                 <td style="width: 50px;">{{$item->height ?? 0}}</td>
                 <td style="width: 50px;">{{$item->depth ?? 0}}</td>

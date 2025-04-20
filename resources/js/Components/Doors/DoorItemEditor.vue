@@ -431,7 +431,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     </div>
                 </div>
 
-                <div class="col-md-6 col-12" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
+                <div class="col-md-6 col-12 mb-2" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
                     <HandleSearchModal v-model="doorForm"/>
                 </div>
 
@@ -727,10 +727,8 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
 
         <div class="col-12 mt-2">
             <div class="row bg-white ">
-                <div
+<!--                <div
                     v-bind:class="{'col-md-2':doorForm.price_type.id===3,'col-md-4':doorForm.price_type.id!==3}">
-
-
                     <div class="form-floating">
                         <select class="form-select"
                                 v-model="doorForm.price_type"
@@ -745,8 +743,8 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                         </select>
                         <label for="door-type">Тип цены</label>
                     </div>
-                </div>
-                <div class="col-md-2"
+                </div>-->
+<!--                <div class="col-md-2"
                      v-if="doorForm.price_type.id===3">
                     <div class="form-floating">
                         <input type="number"
@@ -756,7 +754,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                                class="form-control text-center" id="floatingInput" required>
                         <label for="floatingInput">Процент дилера</label>
                     </div>
-                </div>
+                </div>-->
                 <div class="col-md-4 d-flex justify-between">
                     <button type="button"
                             @click="changeDoorCount('sub')"
@@ -777,11 +775,11 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     </button>
 
                 </div>
-                <div class="col-md-2 d-flex justify-center align-items-center">
+                <div class="col-md-4 d-flex justify-center align-items-center">
                     <p class="text-center text-primary font-bold text-black" style="font-size: 16px;">
                         {{ resultPrice }}х{{ doorForm.count }}={{ resultPrice * doorForm.count }}₽</p>
                 </div>
-                <div class="col-md-2 d-flex">
+                <div class="col-md-4 d-flex">
                     <button
                         :disabled="!doorForm.price_type.key"
                         class="btn btn-dark rounded-0 w-100"><i class="fa-solid fa-floppy-disk"></i> Сохранить
@@ -1837,10 +1835,20 @@ export default {
                 this.$store.dispatch("editDoorInOrder", {
                     doorForm: data
                 }).then((response) => {
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Дверь успешно обновлена",
+                        type: "success"
+                    });
+
                     this.$emit("callback")
                     this.resetForm()
-                }).catch(error => {
-
+                }).catch(() => {
+                    this.$notify({
+                        title: "DoDoors",
+                        text: "Ошибка редактирования данных",
+                        type: "error"
+                    });
                 })
                 return;
             }

@@ -72,6 +72,12 @@ class OrderController extends Controller
         $order = $request->order ?? "id";
         $direction = $request->direction ?? "asc";
 
+        $type = $request->type ?? null;
+        $ids = $request->ids ?? null;
+
+        if (!is_null($ids))
+            $ids = explode(',', $ids);
+
         $df = $request->df ?? null;
         $dt = $request->dt ?? null;
 
@@ -83,6 +89,11 @@ class OrderController extends Controller
                 ->orWhere("phone", 'like', "%$search%")
                 ->orWhere("contract_amount", 'like', "%$search%")
                 ->orWhere("id", 'like', "%$search%");
+
+        if ($type == "multiply") {
+            $orders = $orders
+                ->whereIn("id", $ids);
+        }
 
         if (!is_null($df) && !is_null($dt))
             $orders = $orders
@@ -102,8 +113,10 @@ class OrderController extends Controller
         $ids = array_values($orders->pluck("id")->toArray());
 
         $details = OrderDetail::query()
+            ->with(["order"])
             ->whereIn("order_id", $ids)
             ->get();
+
 
         return Excel::download(new OrderExport(
             $orders,
@@ -207,19 +220,18 @@ class OrderController extends Controller
         $request->validate([
             "o" => "required",
             "c" => "required",
-            "nds" => "required"
+
         ]);
 
         $path = storage_path() . "/app";
 
         $orderId = $request->o ?? null;
         $clientId = $request->c ?? null;
-        $nds = $request->nds ?? 0;
 
-        $nds = $nds <= 1 && $nds >= 0 ? $nds : 0;
 
         $client = Client::query()->find($clientId);
         $order = Order::query()->find($orderId);
+
 
         if (is_null($client))
             return view("error", [
@@ -230,6 +242,8 @@ class OrderController extends Controller
             return view("error", [
                 "message" => "Такой заказ не найден в системе!"
             ]);
+
+        $nds = ($order->organizational_form ?? 'legal_entity') == 'legal_entity' ? 1 : 0;
 
         $name = $nds == 0 ? "договор с ИП.docx" : "договор с ООО.docx";
 
@@ -297,7 +311,7 @@ class OrderController extends Controller
         $templateProcessor->setValue('total_count', $order->total_count ?? 0);
         $templateProcessor->setValue('current_payed', $order->current_payed ?? 0);
         $templateProcessor->setValue('payed_percent', $order->payed_percent ?? 0);
-        $templateProcessor->setValue('last_payment', floatval($order->total_price) - floatval($order->current_payed ));
+        $templateProcessor->setValue('last_payment', floatval($order->total_price) - floatval($order->current_payed));
         $templateProcessor->setValue('delivery_terms', $order->delivery_terms ?? '-');
         $templateProcessor->setValue('work_days', $work_days_string);
 
@@ -306,8 +320,8 @@ class OrderController extends Controller
         $templateProcessor->setValue('ksch', $buyerData["buyer_correspondent_account"]);
         $templateProcessor->setValue('rsch', $buyerData["buyer_checking_account"]);
         $templateProcessor->setValue('bank_name', $buyerData["buyer_bank_name"]);
-    /*    $templateProcessor->setValue('passport', $passport);
-        $templateProcessor->setValue('passport_issued', $passport_issued);*/
+        /*    $templateProcessor->setValue('passport', $passport);
+            $templateProcessor->setValue('passport_issued', $passport_issued);*/
         if (!is_null($preparedRequisites))
             $templateProcessor->setValue('requisites', $preparedRequisites);
 

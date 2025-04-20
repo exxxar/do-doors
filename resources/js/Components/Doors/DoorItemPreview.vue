@@ -13,6 +13,14 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
 
 
                 <div class="row">
+                    <div class="col-md-6 col-12 mb-2">
+                        <button
+                            :disabled="!canEdit"
+                            @click="editVariant"
+                            type="button"
+                            class="btn btn-dark rounded-0 w-100 p-3"><i class="fa-solid fa-floppy-disk"></i> Редактировать
+                        </button>
+                    </div>
 
                     <div class="col-md-6 col-12 mb-2">
                         <div class="card rounded-0 border-black">

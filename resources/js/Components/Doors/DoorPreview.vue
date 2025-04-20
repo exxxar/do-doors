@@ -36,13 +36,24 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
 
                 <div style="position: relative;z-index: 5;">
                     <div class="door-header">
-                        <div
-                            class="door-closer d-flex justify-content-center align-items-center"
-                            style="font-size: 12px;"
-                            v-bind:class="{'to-right':door.loops.type==='left','to-left':door.loops.type==='right'}"
-                            v-if="door.need_hidden_door_closer">
-                            5
-                        </div>
+                        <template v-if="side===0">
+                            <div
+                                class="door-closer d-flex justify-content-center align-items-center"
+                                style="font-size: 12px;"
+                                v-bind:class="{'to-right':door.loops.type==='left','to-left':door.loops.type==='right'}"
+                                v-if="door.need_hidden_door_closer">
+                                5
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div
+                                class="door-closer d-flex justify-content-center align-items-center"
+                                style="font-size: 12px;"
+                                v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
+                                v-if="door.need_hidden_door_closer">
+                                5
+                            </div>
+                        </template>
                     </div>
                     <div class="door">
                         <img :src="doorImage?doorImage:'/images/door-1.jpg'"
@@ -125,13 +136,22 @@ import HandleDetail from "@/Components/Admin/Handles/HandleDetail.vue";
                     </div>
 
 
-                    <div class="stopper d-flex justify-content-center align-items-center"
-                         style="font-size: 12px;"
-                         v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
-                         v-if="door.need_hidden_stopper">
-                        4
-                    </div>
-
+                    <template v-if="side===0">
+                        <div class="stopper d-flex justify-content-center align-items-center"
+                             style="font-size: 12px;"
+                             v-bind:class="{'to-left':door.loops.type==='left','to-right':door.loops.type==='right'}"
+                             v-if="door.need_hidden_stopper">
+                            4
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="stopper d-flex justify-content-center align-items-center"
+                             style="font-size: 12px;"
+                             v-bind:class="{'to-right':door.loops.type==='left','to-left':door.loops.type==='right'}"
+                             v-if="door.need_hidden_stopper">
+                            4
+                        </div>
+                    </template>
 
                 </div>
             </div>

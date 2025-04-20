@@ -21,7 +21,8 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
                 </div>
 
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary rounded-0 h-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-outline-secondary rounded-0 h-100" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
                         <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
                     </button>
                     <ul class="dropdown-menu">
@@ -74,6 +75,24 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
                 class="badge  mr-1 bg-secondary rounded-0 cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
         </div>
     </div>
+
+    <template v-if="selected_orders.length>0">
+        <p  class="my-3">Выбрано <span>({{selected_orders.length}})</span> элементов:
+            <span
+                @click="selectOrder(item)"
+                class="badge mr-1 bg-dark rounded-0 cursor-pointer" v-for="item in selected_orders">{{item}}</span>
+            <span
+                @click="selected_orders = []"
+                class="badge mr-1 bg-secondary rounded-0 cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+        </p>
+        <div class="d-flex flex-wrap">
+            <button
+                @click="downloadSelectedOrders"
+                type="button" class="btn btn-dark rounded-0 mr-2">Скачать эксель</button>
+
+        </div>
+    </template>
+
     <p class="my-2 small italic" v-if="paginate_object">Найдено результатов
         <strong>{{ paginate_object.meta.total }}</strong></p>
     <div class="d-flex scrollable-area">
@@ -221,21 +240,31 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
 
                 </th>
 
-<!--
-                <th
-                    scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
-                    Дата изменения
-                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
-                        class="fa-solid fa-caret-down"></i></span>
-                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
-                        class="fa-solid fa-caret-up"></i></span>
-                </th>-->
+                <!--
+                                <th
+                                    scope="col" class="text-center cursor-pointer" @click="sortAndLoad('updated_at')">
+                                    Дата изменения
+                                    <span v-if="sort.direction === 'desc'&&sort.column === 'updated_at'"><i
+                                        class="fa-solid fa-caret-down"></i></span>
+                                    <span v-if="sort.direction === 'asc'&&sort.column === 'updated_at'"><i
+                                        class="fa-solid fa-caret-up"></i></span>
+                                </th>-->
 
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
-                <th scope="row">{{ item.id || index }}</th>
+                <th scope="row">
+                    <div class="form-check">
+                        <input
+                            :value="item.id"
+                            v-model="selected_orders"
+                            class="form-check-input" type="checkbox" value="" :id="'order-check-'+index">
+                        <label class="form-check-label" :for="'order-check-'+index">
+                            {{ item.id || index }}
+                        </label>
+                    </div>
+                </th>
                 <td class="text-center">
                     <div class="dropdown">
                         <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -250,19 +279,20 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
 
 
                             <li><a class="dropdown-item"
-                                   @click="openConfirmModal('Подготовка договора','Вам необходимо выбрать как вам предпочтительнее работать', item)"
+                                   @click="downloadDocument(item)"
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-file-signature mr-2"></i>Скачать
                                 договор</a></li>
                             <li><a class="dropdown-item"
                                    @click="selectItemForEdit(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a></li>
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a>
+                            </li>
 
-<!--
-                            <li><a class="dropdown-item"
-                                   @click="selectItem(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Детали заказа</a></li>
--->
+                            <!--
+                                                        <li><a class="dropdown-item"
+                                                               @click="selectItem(item)"
+                                                               href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Детали заказа</a></li>
+                            -->
 
                             <li><a class="dropdown-item text-danger"
                                    @click="removeItem(item.id)"
@@ -349,9 +379,9 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
                 </td>
 
 
-<!--                <td class="text-center">
-                    {{ item.updated_at || '-' }}
-                </td>-->
+                <!--                <td class="text-center">
+                                    {{ item.updated_at || '-' }}
+                                </td>-->
 
             </tr>
 
@@ -453,7 +483,8 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="order-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="order-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content rounded-0">
 
@@ -485,6 +516,7 @@ export default {
     data() {
         return {
             editor_modal: null,
+            selected_orders: [],
             selected_item: null,
             table: {
                 contract_number: {
@@ -590,7 +622,15 @@ export default {
         this.editor_modal = new bootstrap.Modal(document.getElementById('order-editor-modal'), {})
     },
     methods: {
-        resetColumns(){
+        selectOrder(id) {
+            let index = this.selected_orders.findIndex(index => index === id)
+
+            if (index === -1)
+                this.selected_orders.push(id)
+            else
+                this.selected_orders.splice(index, 1)
+        },
+        resetColumns() {
             Object.keys(this.table).forEach(key => {
                 this.table[key].value = true
             })
@@ -616,25 +656,42 @@ export default {
             this.sort.direction = this.sort.direction === "desc" ? "asc" : "desc"
             this.loadOrders(this.current_page)
         },
-        filteredDownload(){
+        downloadSelectedOrders(){
             let order = this.sort
-            let from = (order.date||[]).length>0 ? (new Date(order.date[0] )).getTime(): null;
-            let to = (order.date||[]).length>1 ? (new Date(order.date[1] )).getTime() : null;
+            let from = (order.date || []).length > 0 ? (new Date(order.date[0])).getTime() : null;
+            let to = (order.date || []).length > 1 ? (new Date(order.date[1])).getTime() : null;
+
+            let tmp = `/orders/download-filtered-orders?order=id&ids=${this.selected_orders.join(',')}&type=multiply`
+
+
+
+            if (from && to)
+                tmp += `&df=${from}&dt=${to}`
+
+            if (this.search)
+                tmp += `&search=${this.search || null}`
+
+            window.open(tmp, '_blank').focus();
+        },
+        filteredDownload() {
+            let order = this.sort
+            let from = (order.date || []).length > 0 ? (new Date(order.date[0])).getTime() : null;
+            let to = (order.date || []).length > 1 ? (new Date(order.date[1])).getTime() : null;
 
             let tmp = `/orders/download-filtered-orders?order=id`
 
 
-            if (from&&to)
-                tmp +=`&df=${from}&dt=${to}`
+            if (from && to)
+                tmp += `&df=${from}&dt=${to}`
 
             if (this.search)
-                tmp +=`&search=${this.search||null}`
+                tmp += `&search=${this.search || null}`
 
             window.open(tmp, '_blank').focus();
         },
-        downloadDocument() {
-            let order = this.confirm.item
-            window.open(`/orders/download-contract?c=${order.client_id}&o=${order.id}&nds=${this.confirm.work_with_nds}`, '_blank').focus();
+        downloadDocument(order) {
+
+            window.open(`/orders/download-contract?c=${order.client_id}&o=${order.id}`, '_blank').focus();
             this.confirm_modal.hide()
         },
         loadOrders(page = 0) {
@@ -642,8 +699,8 @@ export default {
 
             let order = this.sort
 
-            let from = (order.date||[]).length>0 ? order.date[0] : null;
-            let to = (order.date||[]).length>1 ? order.date[1] : null;
+            let from = (order.date || []).length > 0 ? order.date[0] : null;
+            let to = (order.date || []).length > 1 ? order.date[1] : null;
 
 
             this.$store.dispatch("loadOrders", {

@@ -95,7 +95,9 @@ import Pagination from "@/Components/Pagination.vue";
             </thead>
             <tbody>
             <tr v-for="(item, index) in items">
-                <th scope="row">{{ item.id || index }}</th>
+                <th scope="row">{{ item.id || index }}
+
+                </th>
                 <td class="text-center" @click="selectItem(item)">
                     {{ item.door_type || '-' }}
                 </td>

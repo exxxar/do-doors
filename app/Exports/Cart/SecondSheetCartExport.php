@@ -22,13 +22,17 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Worksheet;
 class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDrawings
 {
     public $items;
+
+    public $otherProducts;
+
     private $sheetTitle;
 
     public $buyer;
 
-    public function __construct($data, $sheetTitle = "Спецификация", $buyer = null)
+    public function __construct($data, $otherProducts = null, $sheetTitle = "Спецификация", $buyer = null)
     {
         $this->items = $data ?? [];
+        $this->otherProducts = $otherProducts ?? null;
         $this->sheetTitle = $sheetTitle;
         $this->buyer = $buyer;
 
@@ -40,6 +44,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
         return view('export.cart-part2', [
             'items' => $this->items,
+            'other_products' => $this->otherProducts,
             'sheet_title' => $this->sheetTitle,
             'seller' => $doc->getAllSellerParameters(),
             'buyer' => $this->buyer
@@ -48,7 +53,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
     public function drawings()
     {
-        $signStartPos = count($this->items) + 3 + 2 + 13;
+        $signStartPos = count($this->items) +count($this->otherProducts ?? []) + 3 + 2 + 13;
 
         $stampStartPos = $signStartPos+7;
 
@@ -76,7 +81,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
         return [
             AfterSheet::class => function (AfterSheet $event) {
 
-                $count = count($this->items) + 3;
+                $count = count($this->items) + count($this->otherProducts ?? []) + 3;
                 $startPosTable2 = $count + 2;
                 $endPosTable2 = $startPosTable2 + 11;
 
@@ -123,7 +128,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
     public function styles(Worksheet|\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
     {
-        $count = count($this->items) + 3;
+        $count = count($this->items) + count($this->otherProducts ?? []) + 3;
         $startPosTable2 = $count + 2;
         $endPosTable2 = $startPosTable2 + 11;
         return [

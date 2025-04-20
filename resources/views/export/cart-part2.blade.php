@@ -27,18 +27,19 @@
 
         @php
         $summary = 0;
+        $index = 1;
         @endphp
 
-        @foreach($items as $index=>$item)
+        @foreach($items as $key=>$item)
             <tr>
-                <td style="width: 50px;">{{$index+1}}</td>
+                <td style="width: 50px;">{{$index}}</td>
 
                 <td style="width: 100px;" colspan="2">
                     DoDoors: {{$item->product->door_type->title ?? 'не указано'}},
                     открывание {{$item->product->opening_type->title ?? 'не указано'}},
                     петли {{$item->product->loops->title ?? 'не указано'}}.
-                    Отделка с передней стороны: {{$item->product->front_side_finish->title ?? 'не указано'}}.
-                    Отделка с задней стороны: {{$item->product->back_side_finish->title ?? 'не указано'}}.
+                    Отделка с передней стороны: {{$item->product->front_side_finish->title ?? 'не указано'}} ({{$item->product->front_side_finish_color->title ?? '-'}}).
+                    Отделка с задней стороны: {{$item->product->back_side_finish->title ?? 'не указано'}} ({{$item->product->back_side_finish_color->title ?? '-'}}).
                     Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}}.
                     Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
                 </td>
@@ -56,9 +57,40 @@
 
                 @php
                     $summary += (($item->product->price ?? 0) *($item->quantity ?? 0));
+                    $index++;
                 @endphp
             </tr>
+
         @endforeach
+
+        @if(!is_null($other_products))
+            @foreach($other_products as $index=>$item)
+                <tr>
+                    <td style="width: 50px;">{{$index}}</td>
+
+                    <td style="width: 100px;" colspan="2">
+                      {{$item->title ?? '-'}}
+                    </td>
+
+
+                    <td style="width: 150px;" >
+                        {{$item->description ?? '-'}}
+                    </td>
+
+                    <td style="width: 150px;">-</td>
+                    <td style="width: 150px;">-</td>
+                    <td style="width: 50px;">1</td>
+                    <td style="width: 150px;">{{$item->price ?? 0}}</td>
+                    <td style="width: 150px;">{{$item->price ?? 0}}</td>
+
+                    @php
+                        $summary += $item->price ?? 0;
+                         $index++;
+                    @endphp
+                </tr>
+
+            @endforeach
+        @endif
 
         <tr>
             <td></td>

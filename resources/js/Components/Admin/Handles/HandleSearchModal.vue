@@ -2,7 +2,7 @@
     <div
         @click="showFilterModal"
         class="card rounded-0 border-black cursor-pointer">
-        <div class="card-body px-2 py-1">
+        <div class="card-body px-2 py-1 ">
 
             <label class="font-size-10"><i class="fa-solid fa-ruler-vertical"></i> Выбор ручки</label>
             <p v-if="door">{{ door.handle_holes_type?.title || 'не выбрано' }}</p>

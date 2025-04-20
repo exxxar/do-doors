@@ -60,6 +60,9 @@ const actions = {
     removeProduct({state, commit}, id) {
         commit('removeItem', id);
     },
+    updateCartItems({state, commit}, items) {
+        commit('setCartItems', items);
+    },
     clearCart({state, commit}) {
         commit('clearAllItems');
     },

@@ -161,6 +161,7 @@ class CalcController extends Controller
         return Excel::download(new CartExport($items), "cart.xls");
     }
 
+
     /**
      * @throws TelegramSDKException
      * @throws MpdfException
@@ -175,6 +176,7 @@ class CalcController extends Controller
             "phone" => "required",
             "items" => "required",
         ]);
+
 
         $action = explode(",", $request->action ?? '0'); //0 - отправить в crm, 1 - отправить кп на почту клиента, 2 - отправить кп в телеграм, 3 - сохранить
 
@@ -333,32 +335,14 @@ class CalcController extends Controller
             $order->save();
         }
 
+
+        $otherProducts = [];
+
         $productsForBitrix = [];
         foreach ($items as $item) {
 
-            /*    $bitrixProductTitle = sprintf(
-                    "DoDoors: %s, %s, петли %s.
-        Отделка с передней стороны: %s.
-        Отделка с задней стороны: %s.
-        Цвет короба и полотна: %s.
-        Цвет фурнитуры: %s.
-        Размер: %sx%s мм.
-        Количество: %s шт.
-        Стоимость за комплект: %s руб.
-        Итоговая стоимость: %s руб.",
-                    $item->product->door_type->title ?? 'не указано',
-                    $item->product->opening_type->title ?? 'не указано',
-                    $item->product->loops->title ?? 'не указано',
-                    $item->product->front_side_finish->title ?? 'не указано',
-                    $item->product->back_side_finish->title ?? 'не указано',
-                    $item->product->box_and_frame_color->title ?? 'не указано',
-                    $item->product->fittings_color->title ?? 'не указано',
-                    $item->product->height ?? 0,
-                    $item->product->width ?? 0,
-                    $item->quantity ?? 0,
-                    $item->product->price ?? 0,
-                    ($item->product->price ?? 0) * ($item->quantity ?? 0)
-                );*/
+            $priceType = $item->product->price_type->key ?? 'retail';
+
 
             $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
             $doorDescription = "DoDoors: " . (in_array($item->product->door_type->title, $shorts) ? $shorts[$item->product->door_type->title] : ($item->product->door_type->title ?? 'КДС')) . " " .
@@ -408,6 +392,61 @@ class CalcController extends Controller
 
         }
 
+        if (!is_null($item->handle_holes_type ?? null)) {
+            $handle = $item->handle_holes_type;
+            $price = (array)$handle->price;
+            $installDoorsData = [
+                'NAME' => "Ручка: " . ($handle->title ?? '-'),
+                'CURRENCY_ID' => 'RUB',
+                'PRICE' => $price[$priceType] ?? 0,
+                'DESCRIPTION' => "Цена комплекта ручек у поставщика",
+                'MEASURE' => 0,
+                'QUANTITY' => 1
+            ];
+
+            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+
+            $productsForBitrix[] = [
+                "PRODUCT_ID" => $bitrixProductId,
+                "PRICE" => $price[$priceType] ?? 0,
+                "QUANTITY" => 1,
+            ];
+
+            $otherProducts[] = (object)[
+                "title" => "Ручка: " . ($handle->title ?? '-'),
+                'description' => "Цена комплекта ручек у поставщика",
+                "price" => $price[$priceType] ?? 0,
+            ];
+
+        }
+
+        if (!is_null($item->handle_wrapper_type ?? null)) {
+            $wrapper = $item->handle_wrapper_type;
+            $price = (array)$wrapper->price;
+            $installDoorsData = [
+                'NAME' => "Завертка: " . ($wrapper->title ?? '-'),
+                'CURRENCY_ID' => 'RUB',
+                'PRICE' => $price[$priceType] ?? 0,
+                'DESCRIPTION' => "Цена завертки поставщика",
+                'MEASURE' => 0,
+                'QUANTITY' => 1
+            ];
+
+            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+
+            $productsForBitrix[] = [
+                "PRODUCT_ID" => $bitrixProductId,
+                "PRICE" => $price[$priceType] ?? 0,
+                "QUANTITY" => 1,
+            ];
+
+            $otherProducts[] = (object)[
+                "title" => "Завертка: " . ($wrapper->title ?? '-'),
+                'description' => "Цена завертки поставщика",
+                "price" => $price[$priceType] ?? 0,
+            ];
+        }
+
         if ($needInstall) {
             $installDoorsData = [
                 'NAME' => "Установка комплекта дверей: " . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
@@ -424,6 +463,12 @@ class CalcController extends Controller
                 "PRODUCT_ID" => $bitrixProductId,
                 "PRICE" => $installPrice,
                 "QUANTITY" => $installRecountType == 0 ? 1 : $installCount,
+            ];
+
+            $otherProducts[] = (object)[
+                "title" => "Установка комплекта дверей: " . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
+                'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
+                "price" => $installPrice
             ];
         }
 
@@ -476,8 +521,8 @@ class CalcController extends Controller
         $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
 
 
-        Excel::store(new MultiSheetsCartExport($items, $buyerData, true), $excelFileName1);
-        Excel::store(new MultiSheetsCart2Export($items, $buyerData, true), $excelFileName2);
+        Excel::store(new MultiSheetsCartExport($items, $buyerData, $otherProducts, true), $excelFileName1);
+        Excel::store(new MultiSheetsCart2Export($items, $buyerData, $otherProducts, true), $excelFileName2);
 
         $bitrixFiles = [
             [
@@ -494,7 +539,7 @@ class CalcController extends Controller
 
         $path = storage_path() . "/app";
 
-        $fileName = $client->status == 'individual' ? "договор с ФЛ.docx" : ($workWithNds == 1 ? "договор с ООО.docx" : "договор с ИП.docx");
+        $fileName = $client->status == 'individual' ? "договор с ИП.docx" : "договор с ООО.docx";
         $statusClient = $client->getShortClientStatus();
 
 

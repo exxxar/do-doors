@@ -22,15 +22,19 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Worksheet;
 class SecondSheetCartExport implements FromView, WithStyles, WithEvents
 {
     public $items;
+
+    public $otherProducts;
+
     private $sheetTitle;
 
     public $buyer;
 
-    public function __construct($data, $sheetTitle = "Коммерческое предложение", $buyer = null)
+    public function __construct($data,$otherProducts = null, $sheetTitle = "Коммерческое предложение", $buyer = null)
     {
         $this->items = $data ?? [];
         $this->sheetTitle = $sheetTitle;
         $this->buyer = $buyer;
+        $this->otherProducts = $otherProducts ?? null;
 
     }
 
@@ -42,7 +46,8 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
             'items' => $this->items,
             'sheet_title' => $this->sheetTitle,
             'seller' => $doc->getAllSellerParameters(),
-            'buyer' => $this->buyer
+            'buyer' => $this->buyer,
+            'other_products' => $this->otherProducts,
         ]);
     }
 
@@ -55,7 +60,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
         return [
             AfterSheet::class => function (AfterSheet $event) {
 
-                $count = count($this->items) + 3;
+                $count = count($this->items) + count($this->otherProducts ?? []) + 3;
                 $startPosTable2 = $count + 2;
                 $endPosTable2 = $startPosTable2 + 11;
 
@@ -82,7 +87,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
 
     public function styles(Worksheet|\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
     {
-        $count = count($this->items) + 3;
+        $count = count($this->items) + count($this->otherProducts ?? []) + 3;
         $startPosTable2 = $count + 2;
         $endPosTable2 = $startPosTable2 + 11;
         return [

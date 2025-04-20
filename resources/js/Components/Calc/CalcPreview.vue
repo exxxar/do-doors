@@ -2,6 +2,7 @@
 import DoorItemPreview from "@/Components/Doors/DoorItemPreview.vue";
 
 import DoorItemEditor from "@/Components/Doors/DoorItemEditor.vue";
+import CheckoutFormEditor from "@/Components/Cart/CheckoutFormEditor.vue";
 </script>
 <template>
 
@@ -45,10 +46,11 @@ import DoorItemEditor from "@/Components/Doors/DoorItemEditor.vue";
     <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
          aria-labelledby="offcanvasWithBothOptionsLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title fw-bold" id="offcanvasWithBothOptionsLabel">Двери в заказе</h5>
+            <h5 v-if="cart_tab===0" class="offcanvas-title fw-bold" id="offcanvasWithBothOptionsLabel">Двери в заказе</h5>
+            <h5 v-if="cart_tab===1" class="offcanvas-title fw-bold" id="offcanvasWithBothOptionsLabel">Параметры заказа</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
+        <div class="offcanvas-body" v-if="cart_tab===0">
             <template v-for="(item, index) in doors">
                 <div
                     @click="selectDoor(index)"
@@ -97,51 +99,25 @@ import DoorItemEditor from "@/Components/Doors/DoorItemEditor.vue";
             </template>
 
         </div>
-        <form
-            v-if="canEdit"
-            v-on:submit.prevent="submit"
+
+        <template v-if="cart_tab===1">
+            <div class="offcanvas-body p-3">
+                <CheckoutFormEditor
+                    v-on:back="cart_tab=0"
+                    :order="order"
+                    :doors="doors"></CheckoutFormEditor>
+            </div>
+
+        </template>
+
+        <div
+            v-if="cart_tab===0"
             class="offcanvas-footer p-3">
-            <div class="form-floating mb-2">
-                <input type="text"
-                       v-model="formData.contract_number"
-                       class="form-control" id="contractNumber" required placeholder="Введите номер договора">
-                <label for="contractNumber">Номер договора</label>
-            </div>
+            <button type="button"
+                    @click="cart_tab=1"
+                    class="btn btn-outline-dark p-3 w-100 rounded-0">Редактировать параметры заказа</button>
+        </div>
 
-            <div class="row  my-3">
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" value="1" v-model="formData.work_with_nds"
-                               name="flexRadioDefault" id="work-with-nds">
-                        <label class="form-check-label" for="work-with-nds">
-                            С НДС
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" value="0" name="flexRadioDefault"
-                               v-model="formData.work_with_nds" id="work-without-nds">
-                        <label class="form-check-label" for="work-without-nds">
-                            Без НДС
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                v-if="timer"
-                class="d-flex justify-content-center my-3">
-                <div class="spinner-border text-primary mx-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                Отправляем...
-            </div>
-            <!-- Кнопка сформировать договор -->
-            <button type="submit"
-                    :disabled="timer"
-                    class="btn btn-dark p-3 w-100 rounded-0 ">Сформировать договор</button>
-        </form>
     </div>
 </template>
 <script>
@@ -155,6 +131,7 @@ export default {
         return {
             loading: false,
             tab: 0,
+            cart_tab:0,
             timer:null,
             selected_index: 0,
             formData:{
