@@ -72,44 +72,6 @@ Route::get("/2test", function () {
 
 });
 
-Route::get("/test", function () {
-    $path = storage_path() . "\\app";
-
-    //  $fileName = $workWithNds == 1?"договор с ООО.docx":"договор с ИП.docx";
-
-    /* dd([
-         "file_exist"=>file_exists($path . "/$fileName"),
-         "filename"=>$fileName,
-         "path"=>$path
-     ]);*/
-
-
-    try {
-        $templateProcessor = new TemplateProcessor($path . "\\demo.docx");
-        $templateProcessor->setValue('name', "1231231");
-        $templateProcessor->setValue('email', "dasdasd");
-        $templateProcessor->setValue('phone', "!23123");
-        $templateProcessor->setValue('order_id', "1");
-        $templateProcessor->setValue('info', "3123");
-        $templateProcessor->setValue('total_price', 1313);
-        $templateProcessor->setValue('total_count', 44);
-        $templateProcessor->setValue('current_payed', 44);
-        $templateProcessor->setValue('payed_percent', 5);
-        $templateProcessor->setValue('delivery_terms', "test");
-
-
-        $templateProcessor->saveAs($path . "/test.docx");
-
-
-    } catch (CopyFileException $e) {
-        dd($e);
-    } catch (CreateTemporaryFileException $e) {
-        dd($e);
-    }
-
-
-});
-
 
 Route::get('/login/google/callback', [GoogleLoginController::class, 'callback'])->name('login.google-callback');
 Route::get('/login/google/service-callback', [GoogleLoginController::class, 'serviceCallback'])->name('login.google-callback.test');

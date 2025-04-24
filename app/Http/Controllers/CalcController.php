@@ -258,6 +258,8 @@ class CalcController extends Controller
         } else
             $order = Order::query()->create($tmpData);
 
+        $leadId = $order->bitrix24_lead_id ?? null;
+
         if (in_array(0, $action) && !in_array(3, $action)) {
 
             $contactData = [
@@ -491,7 +493,7 @@ class CalcController extends Controller
             ];
         }
 
-        if (in_array(0, $action) && !in_array(3, $action)) {
+        if (in_array(0, $action) && !in_array(3, $action) && !is_null($leadId)) {
             $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
         }
 
@@ -593,7 +595,8 @@ class CalcController extends Controller
 
                 $templateProcessor->saveAs($path . $newName);
 
-                $bitrix->addDocumentToDeal($leadId, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
+                if (!is_null($leadId))
+                    $bitrix->addDocumentToDeal($leadId, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
                 // $bitrixFiles[] = ["name" => $newName, "path" => base64_encode(file_get_contents($path . $newName))];
 
             } catch (CopyFileException $e) {
@@ -605,7 +608,7 @@ class CalcController extends Controller
         }
 
 
-        if (in_array(0, $action) && !in_array(3, $action))
+        if (in_array(0, $action) && !in_array(3, $action) && !is_null($leadId))
             $R = $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
 
         if (in_array(2, $action) && !in_array(3, $action)) {
