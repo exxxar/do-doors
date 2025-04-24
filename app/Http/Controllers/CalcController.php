@@ -200,7 +200,7 @@ class CalcController extends Controller
         $installRecountType = $installation->recount_type ?? 0;
         $needInstall = ($installation->need_door_install ?? false) == true;
 
-
+        $bitrix = new \App\Services\BitrixService();
         $workWithNds = $request->work_with_nds ?? 1;
 
         $clientId = $request->id ?? null;
@@ -259,7 +259,7 @@ class CalcController extends Controller
             $order = Order::query()->create($tmpData);
 
         if (in_array(0, $action) && !in_array(3, $action)) {
-            $bitrix = new \App\Services\BitrixService();
+
             $contactData = [
                 'NAME' => $client->title ?? $name,
                 'TYPE_ID' => "CLIENT",

@@ -23,7 +23,7 @@
 
                        for="need_promo_switcher">
 
-                    <span v-bind:class="{'fw-bold':!need_promo}">скида</span> \
+                    <span v-bind:class="{'fw-bold':!need_promo}">скидка</span> \
                     <span v-bind:class="{'fw-bold':need_promo}">промокод</span>
                 </label>
                 <input
@@ -354,7 +354,7 @@
             </template>
 
             <p class="alert alert-light rounded-0 mb-2" v-if="blocks.price_type_attention">
-                <strong class="fw-bold">Внимание!</strong> При смене типа цены будет проведен перерасчет всех цены на
+                <strong class="fw-bold">Внимание!</strong> При смене типа цены будет проведен перерасчет всех цен на
                 двери и изменены значения начальной внесенной суммы для покупателя
                 <a
                     @click="blocks.price_type_attention = false"

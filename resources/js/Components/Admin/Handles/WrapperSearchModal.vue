@@ -67,6 +67,23 @@
                         </button>
 
                     </div>
+                    <ul class="list-group">
+                    <div v-for="(item, index) in filteredItems" :key="item.title"
+                         class="list-group-item cursor-pointer"
+                         :class="{'list-group-item-primary': door.handle_holes_type === item,
+                             'list-group-item-success':success_added.indexOf(item.title)!=-1&&item.id!=null,
+                             'list-group-item-warning':success_added.indexOf(item.title)!=-1&&item.id==null,
+
+                             }"
+                    >
+
+                        <span @click="selectWrapper(item)">
+                                 {{ item.title }}
+                            </span>
+
+                    </div>
+                    </ul>
+
 
 
                 </div>
@@ -88,7 +105,8 @@ export default {
             success_added: [],
             filter_modal: null,
             new_wrappers: [],
-            searchQuery: ''
+            searchQuery: '',
+            new_handles: [],
         }
     },
     watch: {
@@ -101,6 +119,11 @@ export default {
     },
     computed: {
         ...mapGetters(['getDictionary', 'cartTotalCount']),
+        filteredItems() {
+            return this.getDictionary.handle_holes_type_variants.filter(item =>
+                (item.title) ? item.title.toLowerCase().includes(this.searchQuery.toLowerCase()) : ''
+            ).reverse();
+        }
 
     },
     mounted() {
