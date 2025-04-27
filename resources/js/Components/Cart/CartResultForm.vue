@@ -806,7 +806,7 @@ export default {
 
             this.clientForm.summary_price_type = item
             this.recountPrices()
-
+            this.changePayedPercent()
         },
         loadServicesByType() {
             this.$store.dispatch("loadServicesByType", {

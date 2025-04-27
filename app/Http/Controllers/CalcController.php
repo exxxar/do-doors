@@ -222,7 +222,7 @@ class CalcController extends Controller
                 ->first();
             if (is_null($client))
                 $client = Client::query()->create([
-                    'status' => "new_client",
+                    'status' => ["individual","legal_entity","phys"][$workWithNds],
                     'phone' => $phone,
                     'email' => $email ?? null,
                     'user_id' => Auth::user()->id,
@@ -275,7 +275,7 @@ class CalcController extends Controller
 
             $leadData = $client->getBitrix24DealData();
             $leadData["TITLE"] = $name;
-            if (isset($contact["result"]))
+            if (!empty($contact["result"]))
                 $leadData["CONTACT_IDS"] = [$contact["result"]];
             $leadData["COMMENTS"] = $info;
             $leadData["UF_CRM_1733302797738"] = 'Еще не указан';//$order->id;
@@ -351,8 +351,8 @@ class CalcController extends Controller
                 (($item->product->need_upper_jumper ?? false) == "true" ? '' : 'без верх. перемычки ') .
                 ($item->product->height ?? 0) . "х" . ($item->product->width ?? 0) . ", " .
                 "открывание " . ($item->product->opening_type->title ?? 'не указано') . ", " .
-                "петли " . ($item->product->loops->title ?? 'не указано') . ". " .
-                ($item->product->front_side_finish_color->title ?? 'Грунт') . "/" .
+                "петли " . ($item->product->loops->title ?? 'не указано') . ". " . ($item->product->front_side_finish->title??'материал')." ".
+                ($item->product->front_side_finish_color->title ?? 'Грунт') . "/" . ($item->product->back_side_finish->title??'материал')." ".
                 ($item->product->back_side_finish_color->title ?? 'Грунт') . ". " .
                 "Цвет короба и полотна: " . ($item->product->box_and_frame_color->title ?? 'не указано') . ". " .
                 "Цвет фурнитуры: " . ($item->product->fittings_color->title ?? 'не указано') . ". " .
@@ -361,8 +361,7 @@ class CalcController extends Controller
                 (($item->product->need_hidden_stopper ?? false) == "true" ? 'Скрытый стопор ' : '') .
                 (($item->product->need_hidden_door_closer ?? false) == "true" ? 'Скрытый доводчик ' : '') .
                 (($item->product->need_hidden_skirting_board ?? false) == "true" ? 'Скрытый плинтус ' : '') .
-                (($item->product->need_door_install ?? false) == "true" ? 'Установка двери ' : '') .
-                (($item->product->need_handle_holes ?? false) == "true" ? 'Ручка в комплекте ' : '');
+                (($item->product->need_door_install ?? false) == "true" ? 'Установка двери ' : '');
 
             $productData = [
                 'NAME' => $doorDescription,
@@ -392,62 +391,63 @@ class CalcController extends Controller
                 "QUANTITY" => $item->product->count ?? 1,
             ];
 
+            if (!is_null($item->handle_holes_type ?? null)) {
+                $handle = $item->handle_holes_type;
+                $price = (array)$handle->price;
+                $installDoorsData = [
+                    'NAME' => "Ручка: " . ($handle->title ?? '-'),
+                    'CURRENCY_ID' => 'RUB',
+                    'PRICE' => $price[$priceType] ?? 0,
+                    'DESCRIPTION' => "Цена комплекта ручек у поставщика",
+                    'MEASURE' => 0,
+                    'QUANTITY' => 1
+                ];
+
+                $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+
+                $productsForBitrix[] = [
+                    "PRODUCT_ID" => $bitrixProductId,
+                    "PRICE" => $price[$priceType] ?? 0,
+                    "QUANTITY" => 1,
+                ];
+
+                $otherProducts[] = (object)[
+                    "title" => "Ручка: " . ($handle->title ?? '-'),
+                    'description' => "Цена комплекта ручек у поставщика",
+                    "price" => $price[$priceType] ?? 0,
+                ];
+
+            }
+
+            if (!is_null($item->handle_wrapper_type ?? null)) {
+                $wrapper = $item->handle_wrapper_type;
+                $price = (array)$wrapper->price;
+                $installDoorsData = [
+                    'NAME' => "Завертка: " . ($wrapper->title ?? '-'),
+                    'CURRENCY_ID' => 'RUB',
+                    'PRICE' => $price[$priceType] ?? 0,
+                    'DESCRIPTION' => "Цена завертки поставщика",
+                    'MEASURE' => 0,
+                    'QUANTITY' => 1
+                ];
+
+                $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+
+                $productsForBitrix[] = [
+                    "PRODUCT_ID" => $bitrixProductId,
+                    "PRICE" => $price[$priceType] ?? 0,
+                    "QUANTITY" => 1,
+                ];
+
+                $otherProducts[] = (object)[
+                    "title" => "Завертка: " . ($wrapper->title ?? '-'),
+                    'description' => "Цена завертки поставщика",
+                    "price" => $price[$priceType] ?? 0,
+                ];
+            }
         }
 
-        if (!is_null($item->handle_holes_type ?? null)) {
-            $handle = $item->handle_holes_type;
-            $price = (array)$handle->price;
-            $installDoorsData = [
-                'NAME' => "Ручка: " . ($handle->title ?? '-'),
-                'CURRENCY_ID' => 'RUB',
-                'PRICE' => $price[$priceType] ?? 0,
-                'DESCRIPTION' => "Цена комплекта ручек у поставщика",
-                'MEASURE' => 0,
-                'QUANTITY' => 1
-            ];
 
-            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
-
-            $productsForBitrix[] = [
-                "PRODUCT_ID" => $bitrixProductId,
-                "PRICE" => $price[$priceType] ?? 0,
-                "QUANTITY" => 1,
-            ];
-
-            $otherProducts[] = (object)[
-                "title" => "Ручка: " . ($handle->title ?? '-'),
-                'description' => "Цена комплекта ручек у поставщика",
-                "price" => $price[$priceType] ?? 0,
-            ];
-
-        }
-
-        if (!is_null($item->handle_wrapper_type ?? null)) {
-            $wrapper = $item->handle_wrapper_type;
-            $price = (array)$wrapper->price;
-            $installDoorsData = [
-                'NAME' => "Завертка: " . ($wrapper->title ?? '-'),
-                'CURRENCY_ID' => 'RUB',
-                'PRICE' => $price[$priceType] ?? 0,
-                'DESCRIPTION' => "Цена завертки поставщика",
-                'MEASURE' => 0,
-                'QUANTITY' => 1
-            ];
-
-            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
-
-            $productsForBitrix[] = [
-                "PRODUCT_ID" => $bitrixProductId,
-                "PRICE" => $price[$priceType] ?? 0,
-                "QUANTITY" => 1,
-            ];
-
-            $otherProducts[] = (object)[
-                "title" => "Завертка: " . ($wrapper->title ?? '-'),
-                'description' => "Цена завертки поставщика",
-                "price" => $price[$priceType] ?? 0,
-            ];
-        }
 
         if ($needInstall) {
             $installDoorsData = [
@@ -541,7 +541,10 @@ class CalcController extends Controller
 
         $path = storage_path() . "/app";
 
-        $fileName = $client->status == 'individual' ? "договор с ИП.docx" : "договор с ООО.docx";
+
+        $fileName = ["договор с ИП.docx" , "договор с ООО.docx", "договор с ФЛ.docx"][$workWithNds];
+
+
         $statusClient = $client->getShortClientStatus();
 
 

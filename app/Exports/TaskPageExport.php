@@ -14,10 +14,13 @@ class TaskPageExport implements FromView
     {
         $this->tasks= $tasks ?? [];
         $this->sheetTitle = $sheetTitle;
+
     }
 
     public function view(): \Illuminate\Contracts\View\View
     {
+
+
         return view('export.tasks', [
             'items' => $this->tasks,
             'sheet_title' => $this->sheetTitle,

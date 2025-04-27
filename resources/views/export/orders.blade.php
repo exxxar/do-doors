@@ -39,7 +39,7 @@
     @foreach($orders as $index=>$item)
         <tr>
             <td>{{$item->id}}</td>
-            <td>{{$item->contract_number}}</td>
+            <td>{{$item->contract_number ?? '-'}}</td>
             <td>{{$item->contract_date}}</td>
             <td>{{$item->completion_at}}</td>
             <td>{{$item->client->title ?? $item->client_id ?? '-'}}</td>
