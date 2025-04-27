@@ -51,11 +51,8 @@
 
         @foreach($items as $index=>$item)
             <tr>
-                @php
-                $order = (object)($item->order);
-                @endphp
                 <td style="width: 50px;">{{$index+1}}</td>
-                <td style="width: 50px;">{{$order->contract_number ?? $order->id ?? '-' }}</td>
+                <td style="width: 50px;">{{$item->order->contract_number ?? $item->order->id ?? '-' }}</td>
                 <td style="width: 50px;">{{$item->width ?? 0}}</td>
                 <td style="width: 50px;">{{$item->height ?? 0}}</td>
                 <td style="width: 50px;">{{$item->depth ?? 0}}</td>
