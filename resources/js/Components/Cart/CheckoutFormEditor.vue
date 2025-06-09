@@ -81,6 +81,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
 
         <CartResultForm
             :disabled="timer||true"
+
             v-model="clientForm">
             <template #loader>
                 <div
@@ -319,6 +320,8 @@ export default {
                 });
 
                 this.loadSelfClients()
+
+                this.back()
 
             }).catch(error => {
                 clearInterval(tmpTimer)
