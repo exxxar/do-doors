@@ -113,6 +113,9 @@ export default {
         }
     },
     mounted() {
+
+        this.step = 0
+        this.tab = 0
        // useCalcUtilities().summaryPrice(this.d)
     },
     methods: {

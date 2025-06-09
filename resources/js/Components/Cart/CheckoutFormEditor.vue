@@ -202,6 +202,7 @@ export default {
 
         },
         back() {
+            console.log("click back")
             this.$emit("callback")
         },
 
@@ -299,8 +300,6 @@ export default {
 
                 this.step = 0
                 this.tab = 0
-
-                this.back()
 
                 this.$store.dispatch("clearCart");
 

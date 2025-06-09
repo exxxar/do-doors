@@ -189,7 +189,7 @@ export default {
 
         },
         back() {
-            this.$emit("back")
+            this.$emit("callback")
         },
 
         preparedLawStatus(item) {
@@ -283,6 +283,8 @@ export default {
 
                 clearInterval(tmpTimer)
                 this.timer = null
+
+                this.back()
 
                 this.step = 0
 
