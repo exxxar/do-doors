@@ -81,10 +81,9 @@ class BitrixService
     public function getLeadDealFields()
     {
         return $this->request("crm.deal.userfield.list", [
-            "select"=>  ["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL", "LIST_COLUMN_LABEL","LIST_FILTER_LABEL"]
+            "select" => ["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL", "LIST_COLUMN_LABEL", "LIST_FILTER_LABEL"]
         ]);
     }
-
 
 
     public function getStatusList()
@@ -97,7 +96,7 @@ class BitrixService
     public function getLeadFields()
     {
         return $this->request("crm.lead.fields", [
-            "select"=>["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL"]
+            "select" => ["ID", "FIELD_NAME", "USER_TYPE_ID", "EDIT_FORM_LABEL"]
         ]);
     }
 
@@ -160,7 +159,7 @@ class BitrixService
     public function addDocumentsToLead($leadId, array $files, $param = null)
     {
 
-     //   $param = is_null($param) ? env('DOCUMENT_FILED_CODE_SPECIFICATION') : null;
+        //   $param = is_null($param) ? env('DOCUMENT_FILED_CODE_SPECIFICATION') : null;
 
         $documents = [];
 
@@ -318,7 +317,8 @@ class BitrixService
 
         if (!empty($existingContact['result'])) {
             $contactId = $existingContact['result'][0]['ID'];
-            return $this->updateContact($contactId, $contactData);
+            $this->updateContact($contactId, $contactData);
+            return ["result" => $contactId];
         }
 
         return $this->createContact($contactData);
