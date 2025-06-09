@@ -297,6 +297,7 @@ export default {
                 this.timer = null
 
                 this.step = 0
+                this.tab = 0
 
                 this.$store.dispatch("clearCart");
 
@@ -316,6 +317,8 @@ export default {
                     text: "Заказ передан менеджеру!",
                     type: 'success'
                 });
+
+                this.loadSelfClients()
 
             }).catch(error => {
                 clearInterval(tmpTimer)

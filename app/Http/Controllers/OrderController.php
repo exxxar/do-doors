@@ -117,8 +117,6 @@ class OrderController extends Controller
             ->whereIn("order_id", $ids)
             ->get();
 
-
-
         return Excel::download(new OrderExport(
             $orders,
             $details,

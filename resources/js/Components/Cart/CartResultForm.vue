@@ -36,6 +36,7 @@
             <template v-if="!need_promo">
                 <div class="form-floating mb-2">
                     <input type="text"
+                           @change="changeDiscount"
                            class="form-control" v-model="discount" id="checkout-promo"
                            placeholder="name@example.com">
                     <label for="checkout-promo">Скидка, %</label>
@@ -498,6 +499,12 @@ export default {
 
     },
     methods: {
+        changeDiscount(){
+
+            const discount = Math.round( (this.cartTotalPrice*this.discount) / 100)
+          this.clientForm.current_payed =   Math.round((
+              this.cartTotalPrice * this.clientForm.payed_percent) / 100) - discount
+        },
         recountPrices() {
 
             const dealerPercent = this.clientForm.dealer_percent || 0
@@ -846,8 +853,11 @@ export default {
             return tmpRole
         },
         changeCurrentPayed() {
+
             this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
                 this.cartTotalPrice) * 100)
+
+
         },
         changePayedPercent() {
             this.clientForm.current_payed = Math.round((

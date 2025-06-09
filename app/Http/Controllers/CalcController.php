@@ -271,6 +271,7 @@ class CalcController extends Controller
 
             $contact = $bitrix->upsertContact($contactData);
 
+            Log::info("contact data=>" . print_r($contactData, true));
             Log::info("contact=>" . print_r($contact, true));
 
             $leadData = $client->getBitrix24DealData();
@@ -344,7 +345,6 @@ class CalcController extends Controller
         foreach ($items as $item) {
 
             $priceType = $item->product->price_type->key ?? 'retail';
-
 
             $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
             $doorDescription = "DoDoors: " . (in_array($item->product->door_type->title, $shorts) ? $shorts[$item->product->door_type->title] : ($item->product->door_type->title ?? 'КДС')) . " " .
@@ -446,8 +446,6 @@ class CalcController extends Controller
                 ];
             }
         }
-
-
 
         if ($needInstall) {
             $installDoorsData = [
