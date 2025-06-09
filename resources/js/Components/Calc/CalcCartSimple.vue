@@ -36,7 +36,7 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
         </div>
         <div class="offcanvas-body" v-if="tab===1">
             <CartCheckoutForm
-                v-on:back="back"
+                v-on:callback="back"
                 :action="action"
                 v-if="step===1"></CartCheckoutForm>
         </div>

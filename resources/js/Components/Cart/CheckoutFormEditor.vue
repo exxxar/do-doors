@@ -202,7 +202,7 @@ export default {
 
         },
         back() {
-            this.$emit("back")
+            this.$emit("callback")
         },
 
         preparedLawStatus(item) {
@@ -300,6 +300,8 @@ export default {
                 this.step = 0
                 this.tab = 0
 
+                this.back()
+
                 this.$store.dispatch("clearCart");
 
                 this.clientForm = {
@@ -321,7 +323,7 @@ export default {
 
                 this.loadSelfClients()
 
-                this.back()
+
 
             }).catch(error => {
                 clearInterval(tmpTimer)
