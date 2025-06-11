@@ -23,7 +23,7 @@ import CartCheckoutForm from "@/Components/Cart/CartCheckoutForm.vue";
 
                     <div class="pt-5">
                         <h6 class="mb-0"><a
-                            @click="back"
+                            @click="backToCalc"
                             href="javascript:void(0)" class="text-body"><i
                             class="fas fa-long-arrow-alt-left me-2"></i>К калькулятору</a></h6>
                     </div>
@@ -141,7 +141,7 @@ export default {
     methods: {
         checkout(action) {
             this.step = 1
-            this.tab = 1
+            this.tab = 0
             this.preCheckAction(action)
         },
         preCheckAction(action) {
@@ -156,10 +156,13 @@ export default {
         goToCheckout() {
             this.$emit("callback")
         },
+        backToCalc(){
+            window.location = "/dashboard"
+        },
         back() {
             this.step = 0
             this.tab = 0
-            //window.location = "/dashboard"
+
         }
     }
 }
