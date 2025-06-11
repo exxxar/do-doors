@@ -868,6 +868,8 @@ export default {
         changePayedPercent() {
             this.clientForm.current_payed = Math.round((
                 this.cartTotalPrice * this.clientForm.payed_percent) / 100)
+
+            this.changeDiscount()
         },
         selectDeliveryVariant(item) {
             this.clientForm.info = item.title
