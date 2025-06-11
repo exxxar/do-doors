@@ -36,7 +36,7 @@
             <template v-if="!need_promo">
                 <div class="form-floating mb-2">
                     <input type="text"
-                           @change="changeDiscount"
+
                            class="form-control" v-model="discount" id="checkout-promo"
                            placeholder="name@example.com">
                     <label for="checkout-promo">Скидка, %</label>
@@ -465,7 +465,12 @@ export default {
         }
     },
     watch: {
-
+        'discount': {
+            handler(val) {
+                this.changeDiscount()
+            },
+            deep: true
+        },
         'blocks': {
             handler(val) {
                 localStorage.setItem("dodoors_cart_checkout_blocks", JSON.stringify(this.blocks))
@@ -499,11 +504,12 @@ export default {
 
     },
     methods: {
-        changeDiscount(){
+        changeDiscount() {
 
-            const discount = Math.round( (this.cartTotalPrice*this.discount) / 100)
-          this.clientForm.current_payed =   Math.round((
-              this.cartTotalPrice * this.clientForm.payed_percent) / 100) - discount
+            const discount = Math.round((this.cartTotalPrice * this.discount) / 100)
+
+            this.clientForm.current_payed = Math.max(0, Math.round((
+                this.cartTotalPrice * this.clientForm.payed_percent) / 100) - discount)
         },
         recountPrices() {
 
