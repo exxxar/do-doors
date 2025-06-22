@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use Carbon\Carbon;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -170,80 +171,93 @@ class CalcController extends Controller
     {
         ini_set('max_execution_time', 30000);
 
+        // Validate request data
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string',
+                'phone' => 'required|string',
+                'items' => 'required|string', // Assuming items is JSON string
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        }
 
-        $request->validate([
-            "name" => "required",
-            "phone" => "required",
-            "items" => "required",
-        ]);
+        // Parse action parameter
+        $action = array_map('intval', explode(',', $request->input('action', '0')));
 
+        // Initialize variables with defaults
+        $orderId = $request->input('order_id');
+        $currentPayed = (float) $request->input('current_payed', 0);
+        $payedPercent = (float) $request->input('payed_percent', 0);
+        $payedPercentType = (int) $request->input('payed_percent_type', 0);
+        $ascentFloor = filter_var($request->input('ascent_floor', false), FILTER_VALIDATE_BOOLEAN);
+        $deliveryTerms = $request->input('delivery_terms');
+        $deliveryType = (int) $request->input('delivery_type', 0);
 
-        $action = explode(",", $request->action ?? '0'); //0 - отправить в crm, 1 - отправить кп на почту клиента, 2 - отправить кп в телеграм, 3 - сохранить
+        // Decode JSON inputs with error handling
+        try {
+            $designer = json_decode($request->input('designer', '[]'), true, 512, JSON_THROW_ON_ERROR);
+            $installation = json_decode($request->input('installation', '[]'), true, 512, JSON_THROW_ON_ERROR);
+            $items = json_decode($request->input('items', '[]'), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            return response()->json(['error' => 'Invalid JSON data'], 400);
+        }
 
-
-        $orderId = $request->order_id ?? null;
-        $currentPayed = $request->current_payed ?? 0;
-        $payedPercent = $request->payed_percent ?? 0;
-        $payedPercentType = $request->payed_percent_type ?? 0;
-        $ascentFloor = ($request->ascent_floor ?? false) == "true";
-        $deliveryTerms = $request->delivery_terms ?? null;
-        $deliveryType = $request->delivery_type ?? 0;
-
-        $designer = json_decode($request->designer ?? '[]');
-        $installation = json_decode($request->installation ?? '[]');
-
-        $designerWorkType = ($designer->is_fix ?? false) == "true" ? 1 : 0;
-        $designerValue = $designer->value ?? 0;
-        $designerPrice = $designer->price ?? 0;
-        $installPrice = $installation->price ?? 0;
-        $installCount = $installation->count ?? 0;
-        $installRecountType = $installation->recount_type ?? 0;
-        $needInstall = ($installation->need_door_install ?? false) == true;
+        // Extract designer and installation data with null checks
+        $designerWorkType = isset($designer['is_fix']) && filter_var($designer['is_fix'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        $designerValue = (float) ($designer['value'] ?? 0);
+        $designerPrice = (float) ($designer['price'] ?? 0);
+        $installPrice = (float) ($installation['price'] ?? 0);
+        $installCount = (int) ($installation['count'] ?? 0);
+        $installRecountType = (int) ($installation['recount_type'] ?? 0);
+        $needInstall = isset($installation['need_door_install']) && filter_var($installation['need_door_install'], FILTER_VALIDATE_BOOLEAN);
 
         $bitrix = new \App\Services\BitrixService();
-        $workWithNds = $request->work_with_nds ?? 1;
+        $workWithNds = (int) $request->input('work_with_nds', 1);
+        $clientId = $request->input('id');
 
-        $clientId = $request->id ?? null;
+        // Gather other request data
+        $name = $request->input('name');
+        $email = $request->input('email', 'не указано');
+        $phone = $request->input('phone');
+        $passport = $request->input('passport', 'не указано');
+        $workDays = (int) $request->input('work_days', 0);
+        $passportIssued = $request->input('passport_issued', 'не указано');
+        $info = $request->input('info', 'не указан');
+        $totalPrice = (float) $request->input('total_price', 0);
+        $totalCount = (int) $request->input('total_count', 1);
 
-        $name = $request->name;
-        $email = $request->email ?? 'не указано';
-        $phone = $request->phone;
-        $passport = $request->passport ?? 'не указано';
-        $work_days = $request->work_days ?? 0;
-        $passport_issued = $request->passport_issued ?? 'не указано';
-        $info = $request->info ?? 'не указан';
-        $totalPrice = $request->total_price ?? 0;
-        $totalCount = $request->total_count ?? 1;
-        $items = json_decode($request->items ?? '[]');
-
-        if (is_null($clientId)) {
-            $client = Client::query()
-                ->where("phone", $phone)
-                ->first();
-            if (is_null($client))
-                $client = Client::query()->create([
-                    'status' => ["individual","legal_entity","phys"][$workWithNds],
-                    'phone' => $phone,
-                    'email' => $email ?? null,
-                    'user_id' => Auth::user()->id,
-                    'title' => $name,
-                ]);
-        } else
-            $client = Client::query()->find($clientId);
+        // Handle client creation/update
+        $client = Client::query()->where('phone', $phone)->first();
+        if (!$client && !$clientId) {
+            $client = Client::create([
+                'status' => ['individual', 'legal_entity', 'phys'][$workWithNds] ?? 'individual',
+                'phone' => $phone,
+                'email' => $email === 'не указано' ? null : $email,
+                'user_id' => Auth::id(),
+                'title' => $name,
+            ]);
+        } elseif ($clientId) {
+            $client = Client::find($clientId);
+            if (!$client) {
+                return response()->json(['error' => 'Client not found'], 404);
+            }
+        }
 
         $buyerData = $client->getBueryData();
-        $fam_initial = $client->status == 'individual' ? ($client->fio ?? "Клиент №" . $client->id) : ($client->title ?? "Клиент №" . $client->id);
+        $famInitial = $client->status === 'individual' ? ($client->fio ?? "Клиент №{$client->id}") : ($client->title ?? "Клиент №{$client->id}");
 
+        // Prepare order data
         $tmpData = [
             'contract_date' => Carbon::now(),
             'client_id' => $client->id,
             'status' => OrderStatusEnum::NewOrder,
-            'source' => $request->source ?? "crm",
+            'source' => $request->input('source', 'crm'),
             'contact_person' => $name,
             'phone' => $phone,
             'organizational_form' => $client->status ?? 'new_client',
             'contract_amount' => $totalPrice,
-            'work_days' => $work_days,
+            'work_days' => $workDays,
             'delivery_terms' => $deliveryTerms,
             'info' => $info,
             'total_price' => $totalPrice,
@@ -252,315 +266,340 @@ class CalcController extends Controller
             'payed_percent' => $payedPercent,
         ];
 
-        if (!is_null($orderId)) {
-            $order = Order::query()->find($orderId);
+        // Create or update order
+        $order = $orderId ? Order::find($orderId) : null;
+        if ($order) {
             $order->update($tmpData);
-        } else
-            $order = Order::query()->create($tmpData);
-
-        $leadId = $order->bitrix24_lead_id ?? null;
-
-        if (in_array(0, $action) && !in_array(3, $action)) {
-
-            $contactData = [
-                'NAME' => $client->title ?? $name,
-                'TYPE_ID' => "CLIENT",
-                'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
-                'EMAIL' => [['VALUE' => $email, 'VALUE_TYPE' => 'WORK']]
-            ];
-
-            $contact = $bitrix->upsertContact($contactData);
-
-            Log::info("contact data=>" . print_r($contactData, true));
-            Log::info("contact=>" . print_r($contact, true));
-
-            $leadData = $client->getBitrix24DealData();
-            $leadData["TITLE"] = $name;
-            if (!empty($contact["result"]))
-                $leadData["CONTACT_IDS"] = [$contact["result"]];
-            $leadData["COMMENTS"] = $info;
-            $leadData["UF_CRM_1733302797738"] = 'Еще не указан';//$order->id;
-            $leadData["TYPE_ID"] = [93, 93, 91][$workWithNds]; //91 - физ, 93 - юр, 95 - дилер, 97 - дистребьютор, 99 - Юр. лицо, дистрибьютор и менеджер
-            $leadData["UF_CRM_1733302313"] = [47, 45, 49][$payedPercentType ?? 1]; //45 - 70\30, 47 - 50 \ 50, 49 - 100% предоплата
-            $leadData["UF_CRM_1733302527"] = $ascentFloor ? 59 : 61; //59 - нужен, 61 - не нужен
-            $leadData["UF_CRM_1733302565"] = ($request->delivery_city ?? '') . ', ' . ($request->delivery_address ?? '');
-            /*     $leadData["UF_CRM_1733302582"] = (strlen($deliveryTerms) > 3 ? Carbon::parse($deliveryTerms) :
-                     Carbon::now()->addDays($request->work_days ?? 7))->format('d.m.Y'); //Предпологаемая дата сдачи, срок изготовления*/
-            $leadData["UF_CRM_1733302597"] = Carbon::now()->addDays(5)->format('d.m.Y');//Срок актуальности КП
-            $leadData["UF_CRM_1733302818544"] = Carbon::now()->format('d.m.Y');//Дата договора
-            $leadData["UF_CRM_1733302846046"] = [65, 63, 155][$workWithNds];//ООО - 63 ИП - 65 ФИЗ - 155
-            $leadData["UF_CRM_1733302866734"] = $request->delivery_city ?? '-';
-            $leadData["UF_CRM_1733302493"] = [51, 53, 55, 57][$deliveryType]; //51 - доставка до адреса, 53 - самовывоз, 55 - тк, 57 - доставка до проходной
-            $leadData["UF_CRM_1733302917133"] = $currentPayed;//Аванс, руб
-            $leadData["UF_CRM_1733302937139"] = $totalPrice;//Окончательны платеж, руб.
-            $leadData["UF_CRM_1733302958322"] = $totalPrice - $currentPayed;//Долг, руб.
-            $leadData["UF_CRM_1733302997393"] = 0.0; //мотивация менеджера
-            $leadData["UF_CRM_1733305761683"] = $request->delivery_price ?? 0;
-            $leadData["UF_CRM_1742035413778"] = env("APP_URL") . "/link/" . $order->id;
-
-            $leadData["UF_CRM_1742976788"] = [2125, 2125, 2123][$workWithNds]; //Организация 2123 - дудорс ооо, 2125 - ИП
-
-            $leadData["UF_CRM_1733303016351"] = 0;//Прибыль, руб.
-            $leadData["UF_CRM_1733306662836"] = 0;//Комиссия менеджеру-партнеру, руб.
-            $leadData["UF_CRM_1733306683779"] = $designerWorkType ? $designerValue : $designerPrice;;//Комиссия дизайнеру, руб.
-            $leadData["UF_CRM_1733306708610"] = $designerWorkType ? 0 : $designerValue;//Процент дизайнера, %
-            $leadData["UF_CRM_1733310041523"] = 0;//Сумма рекламации, руб.
-            /*
-                        $leadData["UF_CRM_674F4188D6C91"] = "UF_CRM_674F4188D6C91";
-                        $leadData["UF_CRM_674F4188DC365"] = "UF_CRM_674F4188DC365";
-                        $leadData["UF_CRM_674F4188E087D"] = "UF_CRM_674F4188E087D";
-                        $leadData["UF_CRM_674F4188E5672"] = "UF_CRM_674F4188E5672";
-                        $leadData["UF_CRM_674F4188EB8BC"] = "UF_CRM_674F4188EB8BC";
-                        $leadData["UF_CRM_1733304526"] = "UF_CRM_1733304526"; //имя и контакт водителя
-                        $leadData["UF_CRM_1733309976"] = "UF_CRM_1733309976"; //ПРИЧИНА рекламаци
-                        $leadData["UF_CRM_67934C319A189"] = "UF_CRM_67934C319A189";
-                        $leadData["UF_CRM_67934C31A75C8"] = "UF_CRM_67934C31A75C8";
-                        $leadData["UF_CRM_67934C31CD377"] = "UF_CRM_67934C31CD377";
-                        $leadData["UF_CRM_67934C31D5CB7"] = "UF_CRM_67934C31D5CB7";
-                        $leadData["UF_CRM_67934C31DC8FA"] = "UF_CRM_67934C31DC8FA";
-                        $leadData["UF_CRM_1738691309292"] = "UF_CRM_1738691309292";//замерщик установщик
-                        $leadData["UF_CRM_67D21B6040E41"] = "UF_CRM_67D21B6040E41";
-                        $leadData["UF_CRM_67DCECB80FA2A"] = "UF_CRM_67DCECB80FA2A";
-                        $leadData["UF_CRM_67DCECB81ECA5"] = "UF_CRM_67DCECB81ECA5";
-                        $leadData["UF_CRM_67DCECB82B021"] = "UF_CRM_67DCECB82B021";
-                        $leadData["UF_CRM_67DCECB837CC6"] = "UF_CRM_67DCECB837CC6";
-                        $leadData["UF_CRM_67DCECB840804"] = "UF_CRM_67DCECB840804";
-                        $leadData["UF_CRM_67DCECB8499AB"] = "UF_CRM_67DCECB8499AB";*/
-
-            if (is_null($order->bitrix24_lead_id ?? null))
-                $deal = $bitrix->createDeal($leadData);
-            else
-                $deal = $bitrix->updateDeal($order->bitrix24_lead_id, $leadData);
-
-            $leadId = $deal["result"] ?? null;
-
-            $order->bitrix24_lead_id = $leadId;
-            $order->save();
+        } else {
+            $order = Order::create($tmpData);
         }
 
+        $leadId = $order->bitrix24_lead_id;
 
+        // Handle Bitrix integration
+        if (in_array(0, $action) && !in_array(3, $action)) {
+            $contactData = [
+                'NAME' => $client->title ?? $name,
+                'TYPE_ID' => 'CLIENT',
+                'PHONE' => [['VALUE' => $phone, 'VALUE_TYPE' => 'WORK']],
+                'EMAIL' => [['VALUE' => $email !== 'не указано' ? $email : '', 'VALUE_TYPE' => 'WORK']],
+            ];
+
+            try {
+                $contact = $bitrix->upsertContact($contactData);
+                Log::info('Contact data: ' . print_r($contactData, true));
+                Log::info('Contact response: ' . print_r($contact, true));
+            } catch (Exception $e) {
+                Log::error('Bitrix contact creation failed: ' . $e->getMessage());
+            }
+
+            $leadData = $client->getBitrix24DealData();
+            $leadData = array_merge($leadData, [
+                'TITLE' => $name,
+                'CONTACT_IDS' => !empty($contact['result']) ? [$contact['result']] : [],
+                'COMMENTS' => $info,
+                'UF_CRM_1733302797738' => $order->id,
+                'TYPE_ID' => [93, 93, 91][$workWithNds] ?? 91,
+                'UF_CRM_1733302313' => [47, 45, 49][$payedPercentType] ?? 49,
+                'UF_CRM_1733302527' => $ascentFloor ? 59 : 61,
+                'UF_CRM_1733302565' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
+                'UF_CRM_1733302597' => Carbon::now()->addDays(5)->format('d.m.Y'),
+                'UF_CRM_1733302818544' => Carbon::now()->format('d.m.Y'),
+                'UF_CRM_1733302846046' => [65, 63, 155][$workWithNds] ?? 155,
+                'UF_CRM_1733302866734' => $request->input('delivery_city', '-'),
+                'UF_CRM_1733302493' => [51, 53, 55, 57][$deliveryType] ?? 51,
+                'UF_CRM_1733302917133' => $currentPayed,
+                'UF_CRM_1733302937139' => $totalPrice,
+                'UF_CRM_1733302958322' => $totalPrice - $currentPayed,
+                'UF_CRM_1733302997393' => 0.0,
+                'UF_CRM_1733305761683' => $request->input('delivery_price', 0),
+                'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id,
+                'UF_CRM_1742976788' => [2125, 2125, 2123][$workWithNds] ?? 2123,
+                'UF_CRM_1733303016351' => 0,
+                'UF_CRM_1733306662836' => 0,
+                'UF_CRM_1733306683779' => $designerWorkType ? $designerValue : $designerPrice,
+                'UF_CRM_1733306708610' => $designerWorkType ? 0 : $designerValue,
+                'UF_CRM_1733310041523' => 0,
+            ]);
+
+            try {
+                $deal = $leadId ? $bitrix->updateDeal($leadId, $leadData) : $bitrix->createDeal($leadData);
+                $leadId = $deal['result'] ?? null;
+                if ($leadId) {
+                    $order->bitrix24_lead_id = $leadId;
+                    $order->save();
+                }
+            } catch (Exception $e) {
+                Log::error('Bitrix deal operation failed: ' . $e->getMessage());
+            }
+        }
+
+        // Process items for Bitrix
+        $productsForBitrix = [];
         $otherProducts = [];
 
-        $productsForBitrix = [];
         foreach ($items as $item) {
+            if (!isset($item['product'])) {
+                continue;
+            }
 
-            $priceType = $item->product->price_type->key ?? 'retail';
+            $product = (object) $item['product'];
+            $priceType = $product->price_type->key ?? 'retail';
 
             $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
-            $doorDescription = "DoDoors: " . (in_array($item->product->door_type->title, $shorts) ? $shorts[$item->product->door_type->title] : ($item->product->door_type->title ?? 'КДС')) . " " .
-                (($item->product->need_upper_jumper ?? false) == "true" ? '' : 'без верх. перемычки ') .
-                ($item->product->height ?? 0) . "х" . ($item->product->width ?? 0) . ", " .
-                "открывание " . ($item->product->opening_type->title ?? 'не указано') . ", " .
-                "петли " . ($item->product->loops->title ?? 'не указано') . ". " . ($item->product->front_side_finish->title??'материал')." ".
-                ($item->product->front_side_finish_color->title ?? 'Грунт') . "/" . ($item->product->back_side_finish->title??'материал')." ".
-                ($item->product->back_side_finish_color->title ?? 'Грунт') . ". " .
-                "Цвет короба и полотна: " . ($item->product->box_and_frame_color->title ?? 'не указано') . ". " .
-                "Цвет фурнитуры: " . ($item->product->fittings_color->title ?? 'не указано') . ". " .
-                "Толщина профиля " . ($item->product->depth ?? 'не указано') . " мм. " .
-                (($item->product->need_automatic_doorstep ?? false) == "true" ? 'Автоматический порог ' : '') .
-                (($item->product->need_hidden_stopper ?? false) == "true" ? 'Скрытый стопор ' : '') .
-                (($item->product->need_hidden_door_closer ?? false) == "true" ? 'Скрытый доводчик ' : '') .
-                (($item->product->need_hidden_skirting_board ?? false) == "true" ? 'Скрытый плинтус ' : '') .
-                (($item->product->need_door_install ?? false) == "true" ? 'Установка двери ' : '');
+            $doorDescription = sprintf(
+                'DoDoors: %s %s%dx%d, открывание %s, петли %s. %s %s/%s %s. Цвет короба и полотна: %s. Цвет фурнитуры: %s. Толщина профиля %s мм. %s%s%s%s',
+                $shorts[$product->door_type->title ?? null] ?? ($product->door_type->title ?? 'КДС'),
+                filter_var($product->need_upper_jumper ?? false, FILTER_VALIDATE_BOOLEAN) ? '' : 'без верх. перемычки ',
+                $product->height ?? 0,
+                $product->width ?? 0,
+                $product->opening_type->title ?? 'не указано',
+                $product->loops->title ?? 'не указано',
+                $product->front_side_finish->title ?? 'материал',
+                $product->front_side_finish_color->title ?? 'Грунт',
+                $product->back_side_finish->title ?? 'материал',
+                $product->back_side_finish_color->title ?? 'Грунт',
+                $product->box_and_frame_color->title ?? 'не указано',
+                $product->fittings_color->title ?? 'не указано',
+                $product->depth ?? 'не указано',
+                filter_var($product->need_automatic_doorstep ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Автоматический порог ' : '',
+                filter_var($product->need_hidden_stopper ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый стопор ' : '',
+                filter_var($product->need_hidden_door_closer ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый доводчик ' : '',
+                filter_var($product->need_hidden_skirting_board ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый плинтус ' : ''
+            );
 
             $productData = [
                 'NAME' => $doorDescription,
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => $item->product->price ?? 0,
-                'DESCRIPTION' => $doorDescription . ". Комментарий к двери:" . ($item->product->comment ?? '-'),
+                'PRICE' => (float) ($product->price ?? 0),
+                'DESCRIPTION' => $doorDescription . '. Комментарий к двери: ' . ($product->comment ?? '-'),
                 'MEASURE' => 6,
-                'QUANTITY' => $item->product->count ?? 1 // Единица измерения (шт.)
+                'QUANTITY' => (int) ($product->count ?? 1),
             ];
 
-            $bitrixProductId = $bitrix->addProduct($productData)["result"] ?? null;
+            try {
+                $bitrixProductId = $bitrix->addProduct($productData)['result'] ?? null;
+                if ($bitrixProductId) {
+                    OrderDetail::create([
+                        'order_id' => $order->id,
+                        'door_type' => $product->title ?? null,
+                        'count' => (int) ($product->count ?? 1),
+                        'price' => (float) ($product->price ?? 0),
+                        'comment' => $product->comment ?? null,
+                        'purpose' => $product->purpose ?? null,
+                        'door' => $item['product'],
+                        'bitrix24_product_id' => $bitrixProductId,
+                    ]);
 
-            OrderDetail::query()->create([
-                'order_id' => $order->id,
-                'door_type' => $item->product->title ?? null,
-                'count' => $item->product->count ?? 1,
-                'price' => $item->product->price ?? 0,
-                'comment' => $item->product->comment ?? null,
-                'purpose' => $item->product->purpose ?? null,
-                'door' => $item->product,
-                'bitrix24_product_id' => $bitrixProductId
-            ]);
-
-            $productsForBitrix[] = [
-                "PRODUCT_ID" => $bitrixProductId,
-                "PRICE" => $item->product->price ?? 0,
-                "QUANTITY" => $item->product->count ?? 1,
-            ];
-
-            if (!is_null($item->handle_holes_type ?? null)) {
-                $handle = $item->handle_holes_type;
-                $price = (array)$handle->price;
-                $installDoorsData = [
-                    'NAME' => "Ручка: " . ($handle->title ?? '-'),
-                    'CURRENCY_ID' => 'RUB',
-                    'PRICE' => $price[$priceType] ?? 0,
-                    'DESCRIPTION' => "Цена комплекта ручек у поставщика",
-                    'MEASURE' => 0,
-                    'QUANTITY' => 1
-                ];
-
-                $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
-
-                $productsForBitrix[] = [
-                    "PRODUCT_ID" => $bitrixProductId,
-                    "PRICE" => $price[$priceType] ?? 0,
-                    "QUANTITY" => 1,
-                ];
-
-                $otherProducts[] = (object)[
-                    "title" => "Ручка: " . ($handle->title ?? '-'),
-                    'description' => "Цена комплекта ручек у поставщика",
-                    "price" => $price[$priceType] ?? 0,
-                ];
-
+                    $productsForBitrix[] = [
+                        'PRODUCT_ID' => $bitrixProductId,
+                        'PRICE' => (float) ($product->price ?? 0),
+                        'QUANTITY' => (int) ($product->count ?? 1),
+                    ];
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to add product to Bitrix: ' . $e->getMessage());
             }
 
-            if (!is_null($item->handle_wrapper_type ?? null)) {
-                $wrapper = $item->handle_wrapper_type;
-                $price = (array)$wrapper->price;
+            // Handle door handles
+            if (isset($item['handle_holes_type'])) {
+                $handle = (object) $item['handle_holes_type'];
+                $price = (array) ($handle->price ?? []);
                 $installDoorsData = [
-                    'NAME' => "Завертка: " . ($wrapper->title ?? '-'),
+                    'NAME' => 'Ручка: ' . ($handle->title ?? '-'),
                     'CURRENCY_ID' => 'RUB',
-                    'PRICE' => $price[$priceType] ?? 0,
-                    'DESCRIPTION' => "Цена завертки поставщика",
+                    'PRICE' => (float) ($price[$priceType] ?? 0),
+                    'DESCRIPTION' => 'Цена комплекта ручек у поставщика',
                     'MEASURE' => 0,
-                    'QUANTITY' => 1
+                    'QUANTITY' => 1,
                 ];
 
-                $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+                try {
+                    $bitrixProductId = $bitrix->addProduct($installDoorsData)['result'] ?? null;
+                    if ($bitrixProductId) {
+                        $productsForBitrix[] = [
+                            'PRODUCT_ID' => $bitrixProductId,
+                            'PRICE' => (float) ($price[$priceType] ?? 0),
+                            'QUANTITY' => 1,
+                        ];
 
-                $productsForBitrix[] = [
-                    "PRODUCT_ID" => $bitrixProductId,
-                    "PRICE" => $price[$priceType] ?? 0,
-                    "QUANTITY" => 1,
+                        $otherProducts[] = (object) [
+                            'title' => 'Ручка: ' . ($handle->title ?? '-'),
+                            'description' => 'Цена комплекта ручек у поставщика',
+                            'price' => (float) ($price[$priceType] ?? 0),
+                        ];
+                    }
+                } catch (Exception $e) {
+                    Log::error('Failed to add handle product to Bitrix: ' . $e->getMessage());
+                }
+            }
+
+            // Handle wrappers
+            if (isset($item['handle_wrapper_type'])) {
+                $wrapper = (object) $item['handle_wrapper_type'];
+                $price = (array) ($wrapper->price ?? []);
+                $installDoorsData = [
+                    'NAME' => 'Завертка: ' . ($wrapper->title ?? '-'),
+                    'CURRENCY_ID' => 'RUB',
+                    'PRICE' => (float) ($price[$priceType] ?? 0),
+                    'DESCRIPTION' => 'Цена завертки поставщика',
+                    'MEASURE' => 0,
+                    'QUANTITY' => 1,
                 ];
 
-                $otherProducts[] = (object)[
-                    "title" => "Завертка: " . ($wrapper->title ?? '-'),
-                    'description' => "Цена завертки поставщика",
-                    "price" => $price[$priceType] ?? 0,
-                ];
+                try {
+                    $bitrixProductId = $bitrix->addProduct($installDoorsData)['result'] ?? null;
+                    if ($bitrixProductId) {
+                        $productsForBitrix[] = [
+                            'PRODUCT_ID' => $bitrixProductId,
+                            'PRICE' => (float) ($price[$priceType] ?? 0),
+                            'QUANTITY' => 1,
+                        ];
+
+                        $otherProducts[] = (object) [
+                            'title' => 'Завертка: ' . ($wrapper->title ?? '-'),
+                            'description' => 'Цена завертки поставщика',
+                            'price' => (float) ($price[$priceType] ?? 0),
+                        ];
+                    }
+                } catch (Exception $e) {
+                    Log::error('Failed to add wrapper product to Bitrix: ' . $e->getMessage());
+                }
             }
         }
 
+        // Handle installation
         if ($needInstall) {
             $installDoorsData = [
-                'NAME' => "Установка комплекта дверей: " . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
+                'NAME' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => $installPrice,
-                'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
+                'PRICE' => (float) $installPrice,
+                'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
                 'MEASURE' => 0,
-                'QUANTITY' => $installRecountType == 0 ? 1 : $installCount
+                'QUANTITY' => $installRecountType == 0 ? 1 : $installCount,
             ];
 
-            $bitrixProductId = $bitrix->addProduct($installDoorsData)["result"] ?? null;
+            try {
+                $bitrixProductId = $bitrix->addProduct($installDoorsData)['result'] ?? null;
+                if ($bitrixProductId) {
+                    $productsForBitrix[] = [
+                        'PRODUCT_ID' => $bitrixProductId,
+                        'PRICE' => (float) $installPrice,
+                        'QUANTITY' => $installRecountType == 0 ? 1 : $installCount,
+                    ];
 
-            $productsForBitrix[] = [
-                "PRODUCT_ID" => $bitrixProductId,
-                "PRICE" => $installPrice,
-                "QUANTITY" => $installRecountType == 0 ? 1 : $installCount,
-            ];
-
-            $otherProducts[] = (object)[
-                "title" => "Установка комплекта дверей: " . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : "цена за установку одной двери"),
-                'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : "Цена за установку одной двери",
-                "price" => $installPrice
-            ];
+                    $otherProducts[] = (object) [
+                        'title' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
+                        'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
+                        'price' => (float) $installPrice,
+                    ];
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to add installation product to Bitrix: ' . $e->getMessage());
+            }
         }
 
-        if (($request->delivery_type ?? 0) == 0) {
+        // Handle delivery
+        if ($deliveryType == 0) {
             $deliveryProductData = [
-                'NAME' => "Доставка комплекта дверей",
+                'NAME' => 'Доставка комплекта дверей',
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => $request->delivery_price ?? 0,
-                'DESCRIPTION' => ($request->delivery_city ?? '') . ", " . ($request->delivery_address ?? ''),
+                'PRICE' => (float) ($request->input('delivery_price', 0)),
+                'DESCRIPTION' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
                 'MEASURE' => 0,
-                'QUANTITY' => 1
+                'QUANTITY' => 1,
             ];
 
-            $bitrixProductId = $bitrix->addProduct($deliveryProductData)["result"] ?? null;
-
-            $productsForBitrix[] = [
-                "PRODUCT_ID" => $bitrixProductId,
-                "PRICE" => $request->delivery_price ?? 0,
-                "QUANTITY" => 1,
-            ];
+            try {
+                $bitrixProductId = $bitrix->addProduct($deliveryProductData)['result'] ?? null;
+                if ($bitrixProductId) {
+                    $productsForBitrix[] = [
+                        'PRODUCT_ID' => $bitrixProductId,
+                        'PRICE' => (float) ($request->input('delivery_price', 0)),
+                        'QUANTITY' => 1,
+                    ];
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to add delivery product to Bitrix: ' . $e->getMessage());
+            }
         }
 
-        if (in_array(0, $action) && !in_array(3, $action) && !is_null($leadId)) {
-            $result = $bitrix->addProductToDeal($leadId, $productsForBitrix);
+        // Add products to deal
+        if (in_array(0, $action) && !in_array(3, $action) && $leadId) {
+            try {
+                $bitrix->addProductToDeal($leadId, $productsForBitrix);
+            } catch (Exception $e) {
+                Log::error('Failed to add products to deal: ' . $e->getMessage());
+            }
         }
 
+        // Generate PDF
+        try {
+            $mpdf = new Mpdf(['format' => 'A4-P']);
+            $currentDate = Carbon::now('+3:00')->format('Y-m-d H:i:s');
+            $number = Str::uuid();
 
-        $mpdf = new Mpdf(['format' => 'A4-P']);
-        $current_date = Carbon::now("+3:00")->format("Y-m-d H:i:s");
+            $mpdf->WriteHTML(view('pdf.order-v2', [
+                'name' => $name,
+                'order_id' => $number,
+                'current_date' => $currentDate,
+                'email' => $email,
+                'phone' => $phone,
+                'info' => $info,
+                'total_price' => $totalPrice,
+                'total_count' => $totalCount,
+                'items' => $items,
+            ]));
 
-        $number = Str::uuid();
+            $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
+        } catch (Exception $e) {
+            Log::error('PDF generation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to generate PDF'], 500);
+        }
 
-        $mpdf->WriteHTML(view("pdf.order-v2", [
-            "name" => $name,
-            "order_id" => $number,
-            "current_date" => $current_date,
-            "email" => $email,
-            "phone" => $phone,
-            "info" => $info,
-            "total_price" => $totalPrice,
-            "total_count" => $totalCount,
-            "items" => $items
-        ]));
+        // Generate Excel files
+        $timeFragment = Carbon::now('+3:00')->format('Y-m-d-H-i-s');
+        $excelFileName1 = "spec-$timeFragment.xls";
+        $excelFileName2 = "cp-$timeFragment.xls";
 
-        $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
+        try {
+            Excel::store(new MultiSheetsCartExport($items, $buyerData, $otherProducts, true), $excelFileName1);
+            Excel::store(new MultiSheetsCart2Export($items, $buyerData, $otherProducts, true), $excelFileName2);
+        } catch (Exception $e) {
+            Log::error('Excel generation failed: ' . $e->getMessage());
+        }
 
-        $excelFileName1 = "spec-" . Str::uuid() . ".xls";
-        $excelFileName2 = "cp-" . Str::uuid() . ".xls";
-
-        $timeFragment = Carbon::now("+3:00")->format("Y-m-d-H-i-s");
-
-
-        Excel::store(new MultiSheetsCartExport($items, $buyerData, $otherProducts, true), $excelFileName1);
-        Excel::store(new MultiSheetsCart2Export($items, $buyerData, $otherProducts, true), $excelFileName2);
-
+        // Prepare Bitrix files
         $bitrixFiles = [
             [
-                "name" => "спецификация от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName1"))),
+                'name' => "спецификация от $timeFragment.xls",
+                'path' => base64_encode(Storage::get($excelFileName1)),
             ],
             [
-                "name" => "коммерческое предложение от " . $timeFragment . ".xls", "path" => base64_encode(file_get_contents(storage_path("app/$excelFileName2"))),
+                'name' => "коммерческое предложение от $timeFragment.xls",
+                'path' => base64_encode(Storage::get($excelFileName2)),
             ],
             [
-                "name" => "информация о заказе от " . $timeFragment . ".pdf", "path" => base64_encode($file),
-            ]
+                'name' => "информация о заказе от $timeFragment.pdf",
+                'path' => base64_encode($file),
+            ],
         ];
 
-
-        $path = storage_path() . "/app";
-
-
-        $fileName = ["договор с ИП.docx" , "договор с ООО.docx", "договор с ФЛ.docx"][$workWithNds];
-
-
+        // Handle contract document
+        $path = storage_path('app');
+        $fileName = ['договор с ИП.docx', 'договор с ООО.docx', 'договор с ФЛ.docx'][$workWithNds] ?? 'договор с ФЛ.docx';
         $statusClient = $client->getShortClientStatus();
+        $newName = "/договор с клиентом №{$client->id} {$statusClient} от" . Carbon::now()->format('Y-m-d h-i-s') . '.docx';
+        $workDaysString = $workDays . ' (' . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $workDays]) . ')';
 
-
-        $newName = "/договор с клиентом №" . $client->id . " " . ($statusClient) . " от" . (Carbon::now()->format('Y-m-d h-i-s')) . ".docx";
-
-        $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) . ")";
-
-        /*       $nc = new NCLNameCaseRu();
-               $member = $nc->q($client->fio, NCLNameCaseRu::$RODITLN);*/
-
-        if (file_exists($path . "/$fileName")) {
+        if (file_exists("$path/$fileName")) {
             try {
-                $templateProcessor = new TemplateProcessor($path . "/$fileName");
+                $templateProcessor = new TemplateProcessor("$path/$fileName");
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
                 $templateProcessor->setValue('numb_doc', $order->id);
                 $templateProcessor->setValue('title', $name);
                 $templateProcessor->setValue('member', $client->fio ?? '-');
-                $templateProcessor->setValue('fio', $fam_initial ?? '-');
+                $templateProcessor->setValue('fio', $famInitial);
                 $templateProcessor->setValue('email', $email);
                 $templateProcessor->setValue('phone', $phone);
                 $templateProcessor->setValue('fact_address', $client->fact_address ?? '-');
@@ -569,109 +608,117 @@ class CalcController extends Controller
                 $templateProcessor->setValue('ogrn', $client->ogrn ?? '-');
                 $templateProcessor->setValue('kpp', $client->kpp ?? '-');
                 $templateProcessor->setValue('okpo', $client->okpo ?? '-');
-
                 $templateProcessor->setValue('order_id', $order->id);
                 $templateProcessor->setValue('info', $info);
                 $templateProcessor->setValue('total_price', $totalPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
                 $templateProcessor->setValue('current_payed', $currentPayed);
                 $templateProcessor->setValue('payed_percent', $payedPercent);
-                $templateProcessor->setValue('last_payment', floatval($totalPrice) - floatval($currentPayed));
-                $templateProcessor->setValue('delivery_terms', $deliveryTerms);
-                $templateProcessor->setValue('work_days', $work_days_string);
-
-                // requisites
-                $templateProcessor->setValue('bik', $buyerData["buyer_bank_bic"]);
-                $templateProcessor->setValue('ksch', $buyerData["buyer_correspondent_account"]);
-                $templateProcessor->setValue('rsch', $buyerData["buyer_checking_account"]);
-                $templateProcessor->setValue('bank_name', $buyerData["buyer_bank_name"]);
+                $templateProcessor->setValue('last_payment', $totalPrice - $currentPayed);
+                $templateProcessor->setValue('delivery_terms', $deliveryTerms ?? '-');
+                $templateProcessor->setValue('work_days', $workDaysString);
+                $templateProcessor->setValue('bik', $buyerData['buyer_bank_bic'] ?? '-');
+                $templateProcessor->setValue('ksch', $buyerData['buyer_correspondent_account'] ?? '-');
+                $templateProcessor->setValue('rsch', $buyerData['buyer_checking_account'] ?? '-');
+                $templateProcessor->setValue('bank_name', $buyerData['buyer_bank_name'] ?? '-');
                 $templateProcessor->setValue('passport', $passport);
-                $templateProcessor->setValue('passport_issued', $passport_issued);
+                $templateProcessor->setValue('passport_issued', $passportIssued);
 
                 $doc = new DocumentLogic();
-                $sellerParams = $doc->getAllSellerParameters($workWithNds);
-
-                foreach ($sellerParams as $key => $value)
+                foreach ($doc->getAllSellerParameters($workWithNds) as $key => $value) {
                     $templateProcessor->setValue($key, $value);
+                }
 
                 $templateProcessor->saveAs($path . $newName);
 
-                if (!is_null($leadId))
+                if ($leadId) {
                     $bitrix->addDocumentToDeal($leadId, $newName, base64_encode(file_get_contents($path . $newName)), env('DOCUMENT_FILED_CODE_CONTRACT'));
-                // $bitrixFiles[] = ["name" => $newName, "path" => base64_encode(file_get_contents($path . $newName))];
-
-            } catch (CopyFileException $e) {
-
-            } catch (CreateTemporaryFileException $e) {
-
+                }
+            } catch (Exception $e) {
+                Log::error('Document processing failed: ' . $e->getMessage());
             }
-
         }
 
+        // Upload documents to Bitrix
+        if (in_array(0, $action) && !in_array(3, $action) && $leadId) {
+            try {
+                $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
+            } catch (Exception $e) {
+                Log::error('Failed to upload documents to Bitrix: ' . $e->getMessage());
+            }
+        }
 
-        if (in_array(0, $action) && !in_array(3, $action) && !is_null($leadId))
-            $R = $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
-
+        // Send to Telegram
         if (in_array(2, $action) && !in_array(3, $action)) {
-
-            $tmp = [
-                'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                "text" => "#заказ\nПоступил новый заказ!\n"
-                    . "Имя клиент: $name\n"
-                    . "E-mail: $email\n"
-                    . "Телефон: $phone\n"
-                    . "Доп.инфо: $info\n"
-                    . "Общее кол-во товара: $totalCount ед.\n"
-                    . "Цена товара: $totalPrice руб.\n",
-                "parse_mode" => "HTML",
-            ];
-
-            $telegram = new Api(env("TELEGRAM_BOT_TOKEN"));
-            $telegram->sendMessage($tmp);
-            sleep(1);
-            $telegram->sendDocument([
-                'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                "document" => InputFile::createFromContents(Storage::get("$excelFileName1"), "spec-" . $timeFragment . ".xls"),
-                "parse_mode" => "HTML",
-            ]);
-            $telegram->sendDocument([
-                'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                "document" => InputFile::createFromContents(Storage::get("$excelFileName2"), "cp-" . $timeFragment . ".xls"),
-                "parse_mode" => "HTML",
-            ]);
-            sleep(1);
-            $telegram->sendDocument([
-                'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                "document" => InputFile::createFromContents($file, "order-" . $timeFragment . ".pdf"),
-                "parse_mode" => "HTML",
-            ]);
-            sleep(1);
-            if (file_exists($path . $newName))
-                $telegram->sendDocument([
-                    'chat_id' => env("TELEGRAM_CHANNEL_ID"),
-                    "document" => InputFile::create($path . $newName),
-                    "parse_mode" => "HTML",
+            try {
+                $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+                $telegram->sendMessage([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'text' => "#заказ\nПоступил новый заказ!\n" .
+                        "Имя клиента: $name\n" .
+                        "E-mail: $email\n" .
+                        "Телефон: $phone\n" .
+                        "Доп.инфо: $info\n" .
+                        "Общее кол-во товара: $totalCount ед.\n" .
+                        "Цена товара: $totalPrice руб.\n",
+                    'parse_mode' => 'HTML',
                 ]);
 
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                if (file_exists($path . $newName)) {
+                    $telegram->sendDocument([
+                        'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                        'document' => InputFile::create($path . $newName),
+                        'parse_mode' => 'HTML',
+                    ]);
+                }
+            } catch (Exception $e) {
+                Log::error('Telegram notification failed: ' . $e->getMessage());
+            }
         }
 
-        if (in_array(1, $action) && !in_array(3, $action)) {
-            $attachments = [
-                $path . $newName,
-                storage_path('app/' . $newName),
-                Storage::get("$excelFileName1"),
-                Storage::get("$excelFileName2"),
-            ];
+        // Send email
+        if (in_array(1, $action) && !in_array(3, $action) && $email !== 'не указано') {
+            try {
+                $attachments = array_filter([
+                    file_exists($path . $newName) ? $path . $newName : null,
+                    Storage::exists($excelFileName1) ? storage_path("app/$excelFileName1") : null,
+                    Storage::exists($excelFileName2) ? storage_path("app/$excelFileName2") : null,
+                ]);
 
-            Mail::to($email)->send(new KPMail($name, $attachments));
+                Mail::to($email)->send(new KPMail($name, $attachments));
+            } catch (Exception $e) {
+                Log::error('Email sending failed: ' . $e->getMessage());
+            }
         }
 
-        Storage::delete($excelFileName1);
-        Storage::delete($excelFileName2);
-        // Storage::delete($path . $newName);
+        // Clean up
+        Storage::delete([$excelFileName1, $excelFileName2]);
 
-        return response()->download(storage_path('app/' . $newName));
+        // Return response
+        if (file_exists($path . $newName)) {
+            return response()->download($path . $newName)->deleteFileAfterSend(true);
+        }
 
+        return response()->json(['message' => 'Order processed successfully'], 200);
     }
 
 
