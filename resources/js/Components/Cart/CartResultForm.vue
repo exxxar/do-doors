@@ -509,7 +509,7 @@ export default {
             const discount = Math.round((this.cartTotalPrice * this.discount) / 100)
 
             this.clientForm.current_payed = Math.max(0, Math.round((
-                this.cartTotalPrice * this.clientForm.payed_percent) / 100) - discount)
+                (this.cartTotalPrice - discount )* this.clientForm.payed_percent) / 100))
         },
         recountPrices() {
 
