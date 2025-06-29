@@ -447,8 +447,9 @@ class CalcController extends Controller
                 }
             }
 
+            Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)".print_r($item['handle_wrapper_type'], true));
             // Handle wrappers
-            if (isset($item['handle_wrapper_type'])) {
+            if (!is_null($item['handle_wrapper_type'] ?? null)) {
                 $wrapper = (object)$item['handle_wrapper_type'];
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
@@ -459,7 +460,7 @@ class CalcController extends Controller
                     'MEASURE' => 0,
                     'QUANTITY' => 1,
                 ];
-
+                Log::info("ДА, ЕСТЬ? (РУЧКА)".print_r($handleDoorsData, true));
                 try {
                     $bitrixProductId = $bitrix->addProduct($handleDoorsData)['result'] ?? null;
                     Log::info("ЗАВЕРТКА: ".print_r($bitrixProductId, true));
