@@ -211,6 +211,7 @@ Route::prefix("/documents")
     ->group(function () {
         Route::get('/config', [DocumentController::class, 'getConfig']); // Получить текущий конфиг
         Route::post('/config', [DocumentController::class, 'updateConfig']); // Обновить конфиг или отдельные поля
+
     });
 
 
@@ -322,6 +323,10 @@ Route::prefix("/orders")
         Route::get("/download-filtered-orders", "downloadFilteredOrdersExcel");
         Route::get("/download-contract", "downloadContract");
         Route::get("/download-template", "downloadTemplate");
+        Route::get("/download-demo", "downloadDemo");
+        Route::get('/download-by-contract',  'downloadContract');
+        Route::post('/send-to-telegram',  'sendToTelegram');
+        Route::post('/send-to-bitrix',  'sendToBitrix');
         Route::post("/", "getOrderList");
         Route::post("/update-contract-templates", "updateContractTemplates");
         Route::post("/store", "store");

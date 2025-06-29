@@ -57,17 +57,35 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
         $stampStartPos = $signStartPos+7;
 
+        switch($this->buyer["status"]){
+            default:
+            case 'individual':
+                    $sign = 'docs/sign_ip.jpg';
+                    $stamp = 'docs/stamp_ip.jpg';
+                break;
+            case 'legal_entity':
+                $sign = 'docs/sign_ooo.jpg';
+                $stamp = 'docs/stamp_ooo.jpg';
+                break;
+            case 'phys':
+                $sign = 'docs/sign_phys_person.jpg';
+                $stamp = 'docs/stamp_phys_person.jpg';
+                break;
+        }
+
+
+
         $drawing1 = new Drawing();
         $drawing1->setName('Подпись');
         $drawing1->setDescription('Первое изображение');
-        $drawing1->setPath(public_path('docs/sign_ooo.jpg'));
+        $drawing1->setPath(public_path($sign));
         $drawing1->setHeight(100);
         $drawing1->setCoordinates("C$signStartPos");
 
         $drawing2 = new Drawing();
         $drawing2->setName('Печать');
         $drawing2->setDescription('Второе изображение');
-        $drawing2->setPath(public_path('docs/stamp_ooo.jpg'));
+        $drawing2->setPath(public_path($stamp));
         $drawing2->setHeight(200);
         $drawing2->setCoordinates("C$stampStartPos");
 
@@ -93,10 +111,10 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
                 $sheet->getStyle("A$startPosTable2:E$endPosTable2")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle("A$startPosTable2:E$endPosTable2")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
 
-                $sheet->getStyle("F$startPosTable2:I$endPosTable2")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle("F$startPosTable2:I$endPosTable2")->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle("F$startPosTable2:I$endPosTable2")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-                $sheet->getStyle("F$startPosTable2:I$endPosTable2")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
 
                // $sheet->getColumnDimension('B')->setWidth(100); // Ширина колонки B
                // $sheet->getColumnDimension('C')->setWidth(50); // Ширина колонки C
@@ -110,7 +128,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
                 $stampEndPos = $endPosTable2 + 25;
                 // Устанавливаем область печати (например, A1:D20)
-                $sheet->getPageSetup()->setPrintArea("A1:I$stampEndPos");
+                $sheet->getPageSetup()->setPrintArea("A1:J$stampEndPos");
 
                 // Устанавливаем ориентацию страницы (книжная или альбомная)
                 $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_PORTRAIT); // Альбомная
@@ -143,7 +161,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
                     'wrapText' => true,
                 ],
             ],
-            "A2:I$count" => [ // Укажите диапазон таблицы
+            "A2:J$count" => [ // Укажите диапазон таблицы
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN, // Жирные границы

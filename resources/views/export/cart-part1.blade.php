@@ -26,18 +26,24 @@
                     {{($item->product->need_upper_jumper ?? false) == "true" ? '' : 'без верх. перемычки'}}
                     {{$item->product->height ?? 0}}х{{$item->product->width ?? 0}},
                     открывание {{$item->product->opening_type->title ?? 'не указано'}},
-                    петли {{$item->product->loops->title ?? 'не указано'}}.  {{$item->product->front_side_finish->title ?? '-'}}
-                    {{$item->product->front_side_finish_color->title ?? 'Грунт'}}/ {{$item->product->back_side_finish->title ?? 'Грунт'}}
+                    петли {{$item->product->loops->title ?? 'не указано'}}
+                    . {{$item->product->front_side_finish->title ?? '-'}}
+                    {{$item->product->front_side_finish_color->title ?? 'Грунт'}}
+                    / {{$item->product->back_side_finish->title ?? 'Грунт'}}
                     {{$item->product->back_side_finish_color->title ?? 'Грунт'}}.
-                    Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}}.
-                    Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
+                    @if (!is_null($item->product->box_and_frame_color->title ?? null))
+                        Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}}.
+                    @endif
+                    @if (!is_null($item->product->fittings_color->title ?? null))
+                        Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
+                    @endif
                     Толщина профиля {{$item->product->depth ?? 'не указано'}} мм.
                     {{($item->product->need_automatic_doorstep ?? false) == "true" ? 'Автоматический порог' : ''}}
                     {{($item->product->need_hidden_stopper ?? false) == "true" ? 'Скрытый стопор' : ''}}
                     {{($item->product->need_hidden_door_closer ?? false) == "true" ? 'Скрытый доводчик' : ''}}
                     {{($item->product->need_hidden_skirting_board ?? false) == "true" ? 'Скрытый плинтус' : ''}}
                     {{($item->product->need_door_install ?? false) == "true" ? 'Установка двери' : ''}}
-                    {{($item->product->need_handle_holes ?? false) == "true" ? 'Ручка в комплекте' : ''}}
+                   {{-- {{($item->product->need_handle_holes ?? false) == "true" ? 'Ручка в комплекте' : ''}--}}}
                 </td>
             </tr>
         @endforeach

@@ -164,6 +164,7 @@ export default {
                 delivery_city: null,
 
                 delivery_service:null,
+                discount_data:null,
 
             }
         }

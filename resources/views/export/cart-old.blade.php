@@ -38,8 +38,12 @@
                     петли {{$item->product->loops->title ?? 'не указано'}}.
                     Отделка с передней стороны: {{$item->product->front_side_finish->title ?? 'не указано'}} {{$item->product->front_side_finish_color->title ?? 'Грунт'}}.
                     Отделка с задней стороны: {{$item->product->back_side_finish->title ?? 'не указано'}} {{$item->product->back_side_finish_color->title ?? 'Грунт'}} .
-                    Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}} .
-                    Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
+                    @if (!is_null($item->product->box_and_frame_color->title ?? null))
+                        Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}}.
+                    @endif
+                    @if (!is_null($item->product->fittings_color->title ?? null))
+                        Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
+                    @endif
                 </td>
 
                 <td>

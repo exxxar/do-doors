@@ -1,3 +1,7 @@
+<script setup>
+import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentForm.vue";
+</script>
+
 <template>
     <div class="row">
         <div class="col-12">
@@ -172,6 +176,8 @@
         <div class="col-12">
             <a class="mb-0 small text-red-600" href="/orders/download-template?type=1" target="_blank">Скачать текущий
                 шаблон для ООО</a>
+            <a class="ml-2 mb-0 small text-blue-600" href="/orders/download-demo?type=1" target="_blank">(Посмотреть
+                демо-версию)</a>
         </div>
         <div class="col-md-10">
             <div class="form-floating border-gray-100 border">
@@ -192,6 +198,8 @@
         <div class="col-12">
             <a class="mb-0 small text-red-600" href="/orders/download-template?type=0" target="_blank">Скачать текущий
                 шаблон ИП</a>
+            <a class="ml-2 mb-0 small text-blue-600" href="/orders/download-demo?type=0" target="_blank">(Посмотреть
+                демо-версию)</a>
         </div>
         <div class="col-md-10">
             <div class="form-floating border-gray-100 border">
@@ -210,10 +218,16 @@
     </form>
 
 
-      <form v-on:submit.prevent="submit(2)" class="row mb-3">
+    <form v-on:submit.prevent="submit(2)" class="row mb-3">
         <div class="col-12">
-            <a class="mb-0 small text-red-600" href="/orders/download-template?type=2" target="_blank">Скачать текущий
+
+                      <a class="mb-0 small text-red-600" href="/orders/download-template?type=2" target="_blank">Скачать текущий
                 шаблон ФЛ</a>
+            <a class="ml-2 mb-0 small text-blue-600" href="/orders/download-demo?type=2" target="_blank">(Посмотреть демо-версию)</a>
+
+
+
+
         </div>
         <div class="col-md-10">
             <div class="form-floating border-gray-100 border">
@@ -230,16 +244,18 @@
             <button class="btn btn-dark rounded-0 w-100 h-100">Загрузить</button>
         </div>
     </form>
-
-
-
-
+<DownloadDocumentForm>
+    <template #name>
+        Скачать договор по номеру заказа
+    </template>
+</DownloadDocumentForm>
 </template>
 <script>
 export default {
     data() {
         return {
-            file: null
+            file: null,
+
         }
     },
     methods: {
@@ -248,6 +264,7 @@ export default {
             this.file = files[0]
 
         },
+
         submit(type) {
             let data = new FormData();
 
@@ -270,7 +287,7 @@ export default {
                 this.$notify({
                     title: "DoDoors",
                     text: "Договор успешно загружен",
-                    type:"success"
+                    type: "success"
                 });
 
                 this.$emit("callback")
@@ -278,7 +295,7 @@ export default {
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибка загрузки договора",
-                    type:"error"
+                    type: "error"
                 });
             })
         }

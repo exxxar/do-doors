@@ -467,6 +467,10 @@ export default {
     watch: {
         'discount': {
             handler(val) {
+                this.modelValue.discount_data = {
+                    discount_percent:this.discount,
+                    discount_amount: Math.round((this.cartTotalPrice * this.discount) / 100)
+                }
                 this.changeDiscount()
             },
             deep: true

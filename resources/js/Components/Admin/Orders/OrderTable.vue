@@ -2,6 +2,7 @@
 import Pagination from "@/Components/Pagination.vue";
 import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
 import CalcPreview from "@/Components/Calc/CalcPreview.vue";
+import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentForm.vue";
 </script>
 
 
@@ -61,7 +62,7 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
 
             </VueDatePicker>
         </div>
-        <div class="col-12">
+        <div class="col-12 mb-2">
             <span
                 class="badge  mr-1 rounded-0 cursor-pointer"
                 v-bind:class="{'bg-dark':table[item].value===true,'bg-secondary':table[item].value===false}"
@@ -73,6 +74,13 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
             <span
                 @click="resetColumns"
                 class="badge  mr-1 bg-secondary rounded-0 cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+        </div>
+        <div class="col-12 ">
+            <DownloadDocumentForm>
+                <template #name>
+                    Скачать договор по номеру заказа
+                </template>
+            </DownloadDocumentForm>
         </div>
     </div>
 
@@ -272,6 +280,24 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item"
+                                   @click="selectItemForEdit(item)"
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item disabled"
+                                   @click="sendToTelegram(item)"
+                                   href="javascript:void(0)">
+                                <i class="fa-solid fa-paper-plane mr-2"></i>
+                            Отправить в телеграм
+                            </a></li>
+                            <li><a class="dropdown-item disabled"
+                                   @click="sendToBitrix(item)"
+                                   href="javascript:void(0)">
+                                <i class="fa-solid fa-square-arrow-up-right mr-2"></i>
+                                Отправить в Битрикс
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item"
                                    target="_blank"
                                    :href="'/orders/download-order-excel/'+item.id"><i
                                 class="fa-regular fa-file-excel mr-2"></i>Скачать
@@ -283,10 +309,7 @@ import CalcPreview from "@/Components/Calc/CalcPreview.vue";
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-file-signature mr-2"></i>Скачать
                                 договор</a></li>
-                            <li><a class="dropdown-item"
-                                   @click="selectItemForEdit(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a>
-                            </li>
+                            <li><hr class="dropdown-divider"></li>
 
                             <!--
                                                         <li><a class="dropdown-item"
@@ -689,10 +712,43 @@ export default {
 
             window.open(tmp, '_blank').focus();
         },
+        sendToBitrix(item){
+            this.$store.dispatch("sendOrderToBitrix", {
+                order_id: item.id
+            }).then(() => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Информация успешно отправлена в Битрикс",
+                    type: "success",
+                });
+            }).catch(()=>{
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка отправки информации в Битрикс",
+                    type: "error",
+                });
+            })
+        },
+        sendToTelegram(item){
+            this.$store.dispatch("sendOrderToTelegram", {
+                order_id: item.id
+            }).then(() => {
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Информация успешно отправлена в Телеграм",
+                    type: "success",
+                });
+            }).catch(()=>{
+                this.$notify({
+                    title: "DoDoors",
+                    text: "Ошибка отправки информации в Телеграм",
+                    type: "error",
+                });
+            })
+        },
         downloadDocument(order) {
-
-            window.open(`/orders/download-contract?c=${order.client_id}&o=${order.id}`, '_blank').focus();
-            this.confirm_modal.hide()
+            window.open(`/orders/download-contract?id=${order.id}`, '_blank').focus();
+           // this.confirm_modal.hide()
         },
         loadOrders(page = 0) {
             this.current_page = page

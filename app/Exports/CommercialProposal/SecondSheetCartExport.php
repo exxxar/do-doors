@@ -69,7 +69,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
 
                 $stampEndPos = $endPosTable2 + 25;
                 // Устанавливаем область печати (например, A1:D20)
-                $sheet->getPageSetup()->setPrintArea("A1:I$stampEndPos");
+                $sheet->getPageSetup()->setPrintArea("A1:J$stampEndPos");
 
                 // Устанавливаем ориентацию страницы (книжная или альбомная)
                 $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_PORTRAIT); // Альбомная
@@ -102,7 +102,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
                     'wrapText' => true,
                 ],
             ],
-            "A2:I$count" => [ // Укажите диапазон таблицы
+            "A2:J$count" => [ // Укажите диапазон таблицы
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN, // Жирные границы

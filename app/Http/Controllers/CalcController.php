@@ -189,12 +189,20 @@ class CalcController extends Controller
 
         // Initialize variables with defaults
         $orderId = $request->input('order_id');
-        $currentPayed = (float) $request->input('current_payed', 0);
-        $payedPercent = (float) $request->input('payed_percent', 0);
-        $payedPercentType = (int) $request->input('payed_percent_type', 0);
+        $currentPayed = (float)$request->input('current_payed', 0);
+        $payedPercent = (float)$request->input('payed_percent', 0);
+        $payedPercentType = (int)$request->input('payed_percent_type', 0);
         $ascentFloor = filter_var($request->input('ascent_floor', false), FILTER_VALIDATE_BOOLEAN);
         $deliveryTerms = $request->input('delivery_terms');
-        $deliveryType = (int) $request->input('delivery_type', 0);
+        $deliveryType = (int)$request->input('delivery_type', 0);
+
+        $discountPercent = 0;
+        $discountValue = 0;
+        if (!is_null($request->discount_data ?? null)) {
+            $discountData = json_decode($request->discount_data ?? '[]');
+            $discountPercent = $discountData->discount_percent ?? 0;
+            $discountValue = $discountData->discount_amount ?? 0;
+        }
 
         // Decode JSON inputs with error handling
         try {
@@ -207,15 +215,15 @@ class CalcController extends Controller
 
         // Extract designer and installation data with null checks
         $designerWorkType = isset($designer['is_fix']) && filter_var($designer['is_fix'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-        $designerValue = (float) ($designer['value'] ?? 0);
-        $designerPrice = (float) ($designer['price'] ?? 0);
-        $installPrice = (float) ($installation['price'] ?? 0);
-        $installCount = (int) ($installation['count'] ?? 0);
-        $installRecountType = (int) ($installation['recount_type'] ?? 0);
+        $designerValue = (float)($designer['value'] ?? 0);
+        $designerPrice = (float)($designer['price'] ?? 0);
+        $installPrice = (float)($installation['price'] ?? 0);
+        $installCount = (int)($installation['count'] ?? 0);
+        $installRecountType = (int)($installation['recount_type'] ?? 0);
         $needInstall = isset($installation['need_door_install']) && filter_var($installation['need_door_install'], FILTER_VALIDATE_BOOLEAN);
 
         $bitrix = new \App\Services\BitrixService();
-        $workWithNds = (int) $request->input('work_with_nds', 1);
+        $workWithNds = (int)$request->input('work_with_nds', 1);
         $clientId = $request->input('id');
 
         // Gather other request data
@@ -223,11 +231,11 @@ class CalcController extends Controller
         $email = $request->input('email', 'не указано');
         $phone = $request->input('phone');
         $passport = $request->input('passport', 'не указано');
-        $workDays = (int) $request->input('work_days', 0);
+        $workDays = (int)$request->input('work_days', 0);
         $passportIssued = $request->input('passport_issued', 'не указано');
         $info = $request->input('info', 'не указан');
-        $totalPrice = (float) $request->input('total_price', 0);
-        $totalCount = (int) $request->input('total_count', 1);
+        $totalPrice = (float)$request->input('total_price', 0);
+        $totalCount = (int)$request->input('total_count', 1);
 
         // Handle client creation/update
         $client = Client::query()->where('phone', $phone)->first();
@@ -246,9 +254,10 @@ class CalcController extends Controller
             }
         }
 
-        $buyerData = $client->getBueryData();
+        $buyerData = $client->getBuyerData();
         $famInitial = $client->status === 'individual' ? ($client->fio ?? "Клиент №{$client->id}") : ($client->title ?? "Клиент №{$client->id}");
 
+        $buyerData["status"] = ['individual', 'legal_entity', 'phys'][$workWithNds] ?? 'individual';
         // Prepare order data
         $tmpData = [
             'contract_date' => Carbon::now(),
@@ -266,6 +275,10 @@ class CalcController extends Controller
             'total_count' => $totalCount,
             'current_payed' => $currentPayed,
             'payed_percent' => $payedPercent,
+            'discount' => (object)[
+                'amount' => $discountValue,
+                'percent' => $discountPercent
+            ]
         ];
 
         // Create or update order
@@ -345,7 +358,7 @@ class CalcController extends Controller
                 continue;
             }
 
-            $product = (object) $item['product'];
+            $product = (object)$item['product'];
             $priceType = $product->price_type->key ?? 'retail';
 
             $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
@@ -373,10 +386,10 @@ class CalcController extends Controller
             $productData = [
                 'NAME' => $doorDescription,
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => (float) ($product->price ?? 0),
+                'PRICE' => (float)($product->price ?? 0),
                 'DESCRIPTION' => $doorDescription . '. Комментарий к двери: ' . ($product->comment ?? '-'),
                 'MEASURE' => 6,
-                'QUANTITY' => (int) ($product->count ?? 1),
+                'QUANTITY' => (int)($product->count ?? 1),
             ];
 
             try {
@@ -385,8 +398,8 @@ class CalcController extends Controller
                     OrderDetail::create([
                         'order_id' => $order->id,
                         'door_type' => $product->title ?? null,
-                        'count' => (int) ($product->count ?? 1),
-                        'price' => (float) ($product->price ?? 0),
+                        'count' => (int)($product->count ?? 1),
+                        'price' => (float)($product->price ?? 0),
                         'comment' => $product->comment ?? null,
                         'purpose' => $product->purpose ?? null,
                         'door' => $item['product'],
@@ -395,8 +408,8 @@ class CalcController extends Controller
 
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
-                        'PRICE' => (float) ($product->price ?? 0),
-                        'QUANTITY' => (int) ($product->count ?? 1),
+                        'PRICE' => (float)($product->price ?? 0),
+                        'QUANTITY' => (int)($product->count ?? 1),
                     ];
                 }
             } catch (Exception $e) {
@@ -405,12 +418,12 @@ class CalcController extends Controller
 
             // Handle door handles
             if (isset($item['handle_holes_type'])) {
-                $handle = (object) $item['handle_holes_type'];
-                $price = (array) ($handle->price ?? []);
+                $handle = (object)$item['handle_holes_type'];
+                $price = (array)($handle->price ?? []);
                 $installDoorsData = [
                     'NAME' => 'Ручка: ' . ($handle->title ?? '-'),
                     'CURRENCY_ID' => 'RUB',
-                    'PRICE' => (float) ($price[$priceType] ?? 0),
+                    'PRICE' => (float)($price[$priceType] ?? 0),
                     'DESCRIPTION' => 'Цена комплекта ручек у поставщика',
                     'MEASURE' => 0,
                     'QUANTITY' => 1,
@@ -421,14 +434,14 @@ class CalcController extends Controller
                     if ($bitrixProductId) {
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
-                            'PRICE' => (float) ($price[$priceType] ?? 0),
+                            'PRICE' => (float)($price[$priceType] ?? 0),
                             'QUANTITY' => 1,
                         ];
 
-                        $otherProducts[] = (object) [
+                        $otherProducts[] = (object)[
                             'title' => 'Ручка: ' . ($handle->title ?? '-'),
                             'description' => 'Цена комплекта ручек у поставщика',
-                            'price' => (float) ($price[$priceType] ?? 0),
+                            'price' => (float)($price[$priceType] ?? 0),
                         ];
                     }
                 } catch (Exception $e) {
@@ -438,30 +451,30 @@ class CalcController extends Controller
 
             // Handle wrappers
             if (isset($item['handle_wrapper_type'])) {
-                $wrapper = (object) $item['handle_wrapper_type'];
-                $price = (array) ($wrapper->price ?? []);
-                $installDoorsData = [
+                $wrapper = (object)$item['handle_wrapper_type'];
+                $price = (array)($wrapper->price ?? []);
+                $handleDoorsData = [
                     'NAME' => 'Завертка: ' . ($wrapper->title ?? '-'),
                     'CURRENCY_ID' => 'RUB',
-                    'PRICE' => (float) ($price[$priceType] ?? 0),
+                    'PRICE' => (float)($price[$priceType] ?? 0),
                     'DESCRIPTION' => 'Цена завертки поставщика',
                     'MEASURE' => 0,
                     'QUANTITY' => 1,
                 ];
 
                 try {
-                    $bitrixProductId = $bitrix->addProduct($installDoorsData)['result'] ?? null;
+                    $bitrixProductId = $bitrix->addProduct($handleDoorsData)['result'] ?? null;
                     if ($bitrixProductId) {
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
-                            'PRICE' => (float) ($price[$priceType] ?? 0),
+                            'PRICE' => (float)($price[$priceType] ?? 0),
                             'QUANTITY' => 1,
                         ];
 
-                        $otherProducts[] = (object) [
+                        $otherProducts[] = (object)[
                             'title' => 'Завертка: ' . ($wrapper->title ?? '-'),
                             'description' => 'Цена завертки поставщика',
-                            'price' => (float) ($price[$priceType] ?? 0),
+                            'price' => (float)($price[$priceType] ?? 0),
                         ];
                     }
                 } catch (Exception $e) {
@@ -472,28 +485,28 @@ class CalcController extends Controller
 
         // Handle installation
         if ($needInstall) {
-            $installDoorsData = [
+            $handleInstallDoorsData = [
                 'NAME' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => (float) $installPrice,
+                'PRICE' => (float)$installPrice,
                 'DESCRIPTION' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
                 'MEASURE' => 0,
                 'QUANTITY' => $installRecountType == 0 ? 1 : $installCount,
             ];
 
             try {
-                $bitrixProductId = $bitrix->addProduct($installDoorsData)['result'] ?? null;
+                $bitrixProductId = $bitrix->addProduct($handleInstallDoorsData)['result'] ?? null;
                 if ($bitrixProductId) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
-                        'PRICE' => (float) $installPrice,
+                        'PRICE' => (float)$installPrice,
                         'QUANTITY' => $installRecountType == 0 ? 1 : $installCount,
                     ];
 
-                    $otherProducts[] = (object) [
+                    $otherProducts[] = (object)[
                         'title' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
                         'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
-                        'price' => (float) $installPrice,
+                        'price' => (float)$installPrice,
                     ];
                 }
             } catch (Exception $e) {
@@ -506,7 +519,7 @@ class CalcController extends Controller
             $deliveryProductData = [
                 'NAME' => 'Доставка комплекта дверей',
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => (float) ($request->input('delivery_price', 0)),
+                'PRICE' => (float)($request->input('delivery_price', 0)),
                 'DESCRIPTION' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
                 'MEASURE' => 0,
                 'QUANTITY' => 1,
@@ -517,7 +530,7 @@ class CalcController extends Controller
                 if ($bitrixProductId) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
-                        'PRICE' => (float) ($request->input('delivery_price', 0)),
+                        'PRICE' => (float)($request->input('delivery_price', 0)),
                         'QUANTITY' => 1,
                     ];
                 }
@@ -760,7 +773,7 @@ class CalcController extends Controller
         $work_days = ($order->work_days ?? 7);
         $work_days_string = $work_days . "(" . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $work_days]) . ")";
 
-        $buyerData = $client->getBueryData();
+        $buyerData = $client->getBuyerData();
 
         $passport = $client->client_data["passport"] ?? '';
         $passport_issued = $client->client_data["passport_issued"] ?? '';

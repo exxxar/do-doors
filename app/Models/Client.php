@@ -51,7 +51,7 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getBueryData()
+    public function getBuyerData()
     {
         $main_requisites = [];
         foreach ($this->requisites ?? [] as $item) {

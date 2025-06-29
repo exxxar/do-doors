@@ -20,6 +20,36 @@ const actions = {
 
 
 
+    async sendOrderToBitrix(context, payload ) {
+        let link = `${BASE_ORDERS_LINK}/send-to-bitrix`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
+    async sendOrderToTelegram(context, payload ) {
+        let link = `${BASE_ORDERS_LINK}/send-to-telegram`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload)
+
+        return _axios.then((response) => {
+
+            return Promise.resolve(response);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async sendMsgBackCall(context, payload = { form: null }) {
         let link = `/sendReqCallToBot`
 
