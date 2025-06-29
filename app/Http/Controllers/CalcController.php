@@ -447,7 +447,7 @@ class CalcController extends Controller
                 }
             }
 
-            Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)".print_r($item['handle_wrapper_type'], true));
+            Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)".print_r($product->handle_wrapper_type??null, true));
             // Handle wrappers
             if (!is_null($product->handle_wrapper_type?? null)) {
                 $wrapper = (object)$product->handle_wrapper_type;
