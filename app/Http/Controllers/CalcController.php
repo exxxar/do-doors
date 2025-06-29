@@ -415,8 +415,8 @@ class CalcController extends Controller
             }
 
             // Handle door handles
-            if (isset($item['handle_holes_type'])) {
-                $handle = (object)$item['handle_holes_type'];
+            if (!is_null($product->handle_holes_type ?? null)) {
+                $handle = (object)$product->handle_holes_type ;
                 $price = (array)($handle->price ?? []);
                 $installDoorsData = [
                     'NAME' => 'Ручка: ' . ($handle->title ?? '-'),
@@ -449,8 +449,8 @@ class CalcController extends Controller
 
             Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)".print_r($item['handle_wrapper_type'], true));
             // Handle wrappers
-            if (!is_null($item['handle_wrapper_type'] ?? null)) {
-                $wrapper = (object)$item['handle_wrapper_type'];
+            if (!is_null($product->handle_wrapper_type?? null)) {
+                $wrapper = (object)$product->handle_wrapper_type;
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
                     'NAME' => 'Завертка: ' . ($wrapper->title ?? '-'),
