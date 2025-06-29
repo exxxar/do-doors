@@ -302,8 +302,6 @@ class CalcController extends Controller
 
             try {
                 $contact = $bitrix->upsertContact($contactData);
-                Log::info('Contact data: ' . print_r($contactData, true));
-                Log::info('Contact response: ' . print_r($contact, true));
             } catch (Exception $e) {
                 Log::error('Bitrix contact creation failed: ' . $e->getMessage());
             }
@@ -464,7 +462,8 @@ class CalcController extends Controller
 
                 try {
                     $bitrixProductId = $bitrix->addProduct($handleDoorsData)['result'] ?? null;
-                    if ($bitrixProductId) {
+                    Log::info("ЗАВЕРТКА: ".print_r($bitrixProductId, true));
+                    if (!is_null($bitrixProductId)) {
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
                             'PRICE' => (float)($price[$priceType] ?? 0),
@@ -483,7 +482,7 @@ class CalcController extends Controller
             }
         }
 
-        // Handle installation
+
         if ($needInstall) {
             $handleInstallDoorsData = [
                 'NAME' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
@@ -496,7 +495,8 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($handleInstallDoorsData)['result'] ?? null;
-                if ($bitrixProductId) {
+                Log::info("УСТАНОВКА: ".print_r($bitrixProductId, true));
+                if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
                         'PRICE' => (float)$installPrice,
@@ -527,7 +527,8 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($deliveryProductData)['result'] ?? null;
-                if ($bitrixProductId) {
+                Log::info("ДОСТАВКА: ".print_r($bitrixProductId, true));
+                if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
                         'PRICE' => (float)($request->input('delivery_price', 0)),
