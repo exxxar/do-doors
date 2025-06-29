@@ -68,7 +68,7 @@
 
 
                 <td style="width: 150px;">{{$item->product->height ?? 0}}x{{$item->product->width ?? 0}}</td>
-                <td style="width: 150px;">{{$item->product->loops->title ?? 0}} ({{$item->product->loops_count ?? 0}})</td>
+                <td style="width: 150px;">{{$item->product->hinge_manufacturer->title ?? '-'}} ({{$item->product->loops_count ?? 0}})</td>
                 <td style="width: 150px;">{{$item->product->box_and_frame_color->title ?? 'не указано'}}</td>
                 <td style="width: 50px;">{{$item->quantity ?? 0}}</td>
                 <td style="width: 150px;">{{$item->product->price ?? 0}}</td>

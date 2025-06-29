@@ -26,7 +26,7 @@
                     {{($item->product->need_upper_jumper ?? false) == "true" ? '' : 'без верх. перемычки'}}
                     {{$item->product->height ?? 0}}х{{$item->product->width ?? 0}},
                     открывание {{$item->product->opening_type->title ?? 'не указано'}},
-                    петли {{$item->product->loops->title ?? 'не указано'}}
+                    петли {{$item->product->hinge_manufacturer->title  ?? 'не указано'}} ({{$item->product->loops_count ?? 0}})
                     . {{$item->product->front_side_finish->title ?? '-'}}
                     {{$item->product->front_side_finish_color->title ?? 'Грунт'}}
                     / {{$item->product->back_side_finish->title ?? 'Грунт'}}
