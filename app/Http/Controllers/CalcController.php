@@ -424,7 +424,7 @@ class CalcController extends Controller
                     'PRICE' => (float)($price[$priceType] ?? 0),
                     'DESCRIPTION' => 'Цена комплекта ручек у поставщика',
                     'MEASURE' => 0,
-                    'QUANTITY' => 1,
+                    'QUANTITY' => (int)($product->count ?? 1),
                 ];
 
                 try {
@@ -433,7 +433,7 @@ class CalcController extends Controller
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
                             'PRICE' => (float)($price[$priceType] ?? 0),
-                            'QUANTITY' => 1,
+                            'QUANTITY' => (int)($product->count ?? 1),
                         ];
 
                         $otherProducts[] = (object)[
@@ -458,7 +458,7 @@ class CalcController extends Controller
                     'PRICE' => (float)($price[$priceType] ?? 0),
                     'DESCRIPTION' => 'Цена завертки поставщика',
                     'MEASURE' => 0,
-                    'QUANTITY' => 1,
+                    'QUANTITY' => (int)($product->count ?? 1),
                 ];
                 Log::info("ДА, ЕСТЬ? (РУЧКА)".print_r($handleDoorsData, true));
                 try {
@@ -468,7 +468,7 @@ class CalcController extends Controller
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
                             'PRICE' => (float)($price[$priceType] ?? 0),
-                            'QUANTITY' => 1,
+                            'QUANTITY' => (int)($product->count ?? 1),
                         ];
 
                         $otherProducts[] = (object)[
