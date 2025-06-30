@@ -112,7 +112,7 @@
 
         <tr>
             <td></td>
-            <td colspan="7">Итого:</td>
+            <td colspan="8">Итого:</td>
             <td>{{$summary}}</td>
 
         </tr>
