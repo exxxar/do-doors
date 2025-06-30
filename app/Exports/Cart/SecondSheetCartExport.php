@@ -57,7 +57,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
         $stampStartPos = $signStartPos+7;
 
-        switch($this->buyer["status"]){
+        switch($this->buyer["status"] ?? 'phys'){
             default:
             case 'individual':
                     $sign = 'docs/sign_ip.jpg';
