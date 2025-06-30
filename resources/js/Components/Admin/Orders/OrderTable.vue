@@ -3,6 +3,7 @@ import Pagination from "@/Components/Pagination.vue";
 import OrderDetailTable from "@/Components/Admin/Orders/OrderDetailTable.vue";
 import CalcPreview from "@/Components/Calc/CalcPreview.vue";
 import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentForm.vue";
+import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
 </script>
 
 
@@ -85,10 +86,10 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
     </div>
 
     <template v-if="selected_orders.length>0">
-        <p  class="my-3">Выбрано <span>({{selected_orders.length}})</span> элементов:
+        <p class="my-3">Выбрано <span>({{ selected_orders.length }})</span> элементов:
             <span
                 @click="selectOrder(item)"
-                class="badge mr-1 bg-dark rounded-0 cursor-pointer" v-for="item in selected_orders">{{item}}</span>
+                class="badge mr-1 bg-dark rounded-0 cursor-pointer" v-for="item in selected_orders">{{ item }}</span>
             <span
                 @click="selected_orders = []"
                 class="badge mr-1 bg-secondary rounded-0 cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
@@ -96,7 +97,8 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
         <div class="d-flex flex-wrap">
             <button
                 @click="downloadSelectedOrders"
-                type="button" class="btn btn-dark rounded-0 mr-2">Скачать эксель</button>
+                type="button" class="btn btn-dark rounded-0 mr-2">Скачать эксель
+            </button>
 
         </div>
     </template>
@@ -283,12 +285,14 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                                    @click="selectItemForEdit(item)"
                                    href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item disabled"
                                    @click="sendToTelegram(item)"
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-paper-plane mr-2"></i>
-                            Отправить в телеграм
+                                Отправить в телеграм
                             </a></li>
                             <li><a class="dropdown-item disabled"
                                    @click="sendToBitrix(item)"
@@ -296,7 +300,9 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                                 <i class="fa-solid fa-square-arrow-up-right mr-2"></i>
                                 Отправить в Битрикс
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item"
                                    target="_blank"
                                    :href="'/orders/download-order-excel/'+item.id"><i
@@ -309,7 +315,9 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-file-signature mr-2"></i>Скачать
                                 договор</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
 
                             <!--
                                                         <li><a class="dropdown-item"
@@ -343,7 +351,16 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                 <td
                     v-if="table.client_id.value"
                     class="text-center">
-                    {{ item.client_id || '-' }}
+                    <a
+                        class="btn btn-link"
+                        @click="selectClient(item.client)"
+                        href="javascript:void(0)">
+                        {{ item.client?.title || '-' }}
+                        <span v-if="item.client?.title!==item.client?.fio">
+                           ( {{ item.client?.fio || '-' }})
+                    </span>
+                    </a>
+
                 </td>
 
                 <td
@@ -374,7 +391,7 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                 <td
                     v-if="table.organizational_form.value"
                     class="text-center">
-                    {{ item.organizational_form || '-' }}
+                    {{ getStatusByOrgForm(item.organizational_form || '-') }}
                 </td>
 
                 <td
@@ -424,6 +441,23 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="client-editor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg ">
+            <div class="modal-content rounded-0">
+
+                <div class="modal-body ">
+                    <template v-if="selected_client_item">
+
+                        <ClientForm
+                            :item="selected_client_item"
+                            v-on:callback="selectClient(null)"></ClientForm>
+                    </template>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <!-- Modal -->
     <div class="modal fade" id="order-details" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
@@ -538,9 +572,15 @@ export default {
     components: {VueDatePicker},
     data() {
         return {
+            selected_client_item:null,
             editor_modal: null,
             selected_orders: [],
             selected_item: null,
+            organization_forms: {
+                individual: 'ИП',
+                legal_entity: 'ООО',
+                phys: 'ФЛ'
+            },
             table: {
                 contract_number: {
                     title: 'Номер договора',
@@ -643,8 +683,31 @@ export default {
         this.order_detail_modal = new bootstrap.Modal(document.getElementById('order-details'), {})
         this.confirm_modal = new bootstrap.Modal(document.getElementById('confirm-modal'), {})
         this.editor_modal = new bootstrap.Modal(document.getElementById('order-editor-modal'), {})
+        this.client_editor_modal = new bootstrap.Modal(document.getElementById('client-editor-modal'), {})
     },
     methods: {
+        selectClient(item) {
+            // this.$emit("select", item)
+
+            if (item == null) {
+                this.selected_client_item = null
+                this.client_editor_modal.hide()
+                return;
+            }
+
+            this.selected_client_item = null
+            this.$nextTick(() => {
+                this.selected_client_item = item
+                this.client_editor_modal.show()
+            })
+        },
+        getStatusByOrgForm(form) {
+            let find = this.organization_forms[form] || false
+
+
+            return !find ? "Новый клиент" : find
+
+        },
         selectOrder(id) {
             let index = this.selected_orders.findIndex(index => index === id)
 
@@ -679,13 +742,12 @@ export default {
             this.sort.direction = this.sort.direction === "desc" ? "asc" : "desc"
             this.loadOrders(this.current_page)
         },
-        downloadSelectedOrders(){
+        downloadSelectedOrders() {
             let order = this.sort
             let from = (order.date || []).length > 0 ? (new Date(order.date[0])).getTime() : null;
             let to = (order.date || []).length > 1 ? (new Date(order.date[1])).getTime() : null;
 
             let tmp = `/orders/download-filtered-orders?order=id&ids=${this.selected_orders.join(',')}&type=multiply`
-
 
 
             if (from && to)
@@ -712,7 +774,7 @@ export default {
 
             window.open(tmp, '_blank').focus();
         },
-        sendToBitrix(item){
+        sendToBitrix(item) {
             this.$store.dispatch("sendOrderToBitrix", {
                 order_id: item.id
             }).then(() => {
@@ -721,7 +783,7 @@ export default {
                     text: "Информация успешно отправлена в Битрикс",
                     type: "success",
                 });
-            }).catch(()=>{
+            }).catch(() => {
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибка отправки информации в Битрикс",
@@ -729,7 +791,7 @@ export default {
                 });
             })
         },
-        sendToTelegram(item){
+        sendToTelegram(item) {
             this.$store.dispatch("sendOrderToTelegram", {
                 order_id: item.id
             }).then(() => {
@@ -738,7 +800,7 @@ export default {
                     text: "Информация успешно отправлена в Телеграм",
                     type: "success",
                 });
-            }).catch(()=>{
+            }).catch(() => {
                 this.$notify({
                     title: "DoDoors",
                     text: "Ошибка отправки информации в Телеграм",
@@ -748,7 +810,7 @@ export default {
         },
         downloadDocument(order) {
             window.open(`/orders/download-contract?id=${order.id}`, '_blank').focus();
-           // this.confirm_modal.hide()
+            // this.confirm_modal.hide()
         },
         loadOrders(page = 0) {
             this.current_page = page

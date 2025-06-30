@@ -167,10 +167,10 @@ class Client extends Model
     {
         $statusClient = '';
         switch ($this->status) {
-            case 'individual':
+            case 'phys':
                 $statusClient = "ФЛ";
                 break;
-            case 'sole_proprietor':
+            case 'individual':
                 $statusClient = "ИП";
                 break;
             case 'legal_entity':
