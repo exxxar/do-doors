@@ -40,14 +40,14 @@
                     DoDoors: {{$item->door_type["title"]  ?? 'не указано'}},
                     открывание {{$item->opening_type["title"]  ?? 'не указано'}},
                     петли {{$item->loops->title ?? 'не указано'}}.
-                    Отделка с передней стороны: {{$item->front_side_finish["title"]  ?? 'не указано'}}
+                    Отделка с передней стороны: {{$item->front_side_finish["title"]  ?? 'Грунт'}}
                     @if (is_null($item->front_side_finish_color["title"]  ?? null))
-                    ({{$item->front_side_finish_color["title"] ?? '-'}})
+                    ({{$item->front_side_finish_color["title"] ?? 'Грунт'}})
                     @endif
                     .
-                    Отделка с задней стороны: {{$item->back_side_finish["title"]  ?? 'не указано'}}
+                    Отделка с задней стороны: {{$item->back_side_finish["title"]  ?? 'Грунт'}}
                     @if(is_null($item->back_side_finish_color["title"]   ?? null))
-                        ({{$item->back_side_finish_color["title"]  ?? '-'}})
+                        ({{$item->back_side_finish_color["title"]  ?? 'Грунт'}})
                     @endif
                     .
 
