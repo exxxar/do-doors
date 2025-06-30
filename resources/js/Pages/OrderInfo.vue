@@ -19,7 +19,7 @@ defineProps(['doors','order'])
             <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden rounded-0">
                     <div class="p-6 text-gray-900">
-                        <CalcPreview :doors="doors" :order="order"></CalcPreview>
+                        <CalcPreview :doors="doors||[]" :order="order"></CalcPreview>
                     </div>
                 </div>
             </div>
