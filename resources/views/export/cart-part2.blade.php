@@ -29,6 +29,7 @@
         @php
         $summary = 0;
         $index = 1;
+
         @endphp
 
         @foreach($items as $key=>$item)
@@ -36,25 +37,25 @@
                 <td style="width: 50px;">{{$index}}</td>
 
                 <td style="width: 100px;" colspan="2">
-                    DoDoors: {{$item->product->door_type->title ?? 'не указано'}},
-                    открывание {{$item->product->opening_type->title ?? 'не указано'}},
-                    петли {{$item->product->loops->title ?? 'не указано'}}.
-                    Отделка с передней стороны: {{$item->product->front_side_finish->title ?? 'не указано'}}
-                    @if (is_null($item->product->front_side_finish_color->title ?? null))
-                    ({{$item->product->front_side_finish_color->title ?? '-'}})
+                    DoDoors: {{$item->door_type["title"]  ?? 'не указано'}},
+                    открывание {{$item->opening_type["title"]  ?? 'не указано'}},
+                    петли {{$item->loops->title ?? 'не указано'}}.
+                    Отделка с передней стороны: {{$item->front_side_finish["title"]  ?? 'не указано'}}
+                    @if (is_null($item->front_side_finish_color["title"]  ?? null))
+                    ({{$item->front_side_finish_color["title"] ?? '-'}})
                     @endif
                     .
-                    Отделка с задней стороны: {{$item->product->back_side_finish->title ?? 'не указано'}}
-                    @if(is_null($item->product->back_side_finish_color->title  ?? null))
-                        ({{$item->product->back_side_finish_color->title ?? '-'}})
+                    Отделка с задней стороны: {{$item->back_side_finish["title"]  ?? 'не указано'}}
+                    @if(is_null($item->back_side_finish_color["title"]   ?? null))
+                        ({{$item->back_side_finish_color["title"]  ?? '-'}})
                     @endif
                     .
 
-                    @if (!is_null($item->product->box_and_frame_color->title ?? null))
-                        Цвет короба и полотна: {{$item->product->box_and_frame_color->title ?? 'не указано'}}.
+                    @if (!is_null($item->box_and_frame_color["title"]  ?? null))
+                        Цвет короба и полотна: {{$item->box_and_frame_color["title"]  ?? 'не указано'}}.
                     @endif
-                    @if (!is_null($item->product->fittings_color->title ?? null))
-                        Цвет фурнитуры: {{$item->product->fittings_color->title ?? 'не указано'}}.
+                    @if (!is_null($item->fittings_color["title"]  ?? null))
+                        Цвет фурнитуры: {{$item->fittings_color["title"]  ?? 'не указано'}}.
                     @endif
                 </td>
 
@@ -63,16 +64,16 @@
                     Каркас полотна: алюминий анодированный, отфрезерованный для монтажа петель и защелки. Короб двери: алюминий анодированный отфрезерованный для монтажа петель, с запилами сверху под 45 градусов, снизу под 90 градусов, для последующего, рассчитанного крепления полотна в коробе и монтажа короба в проёме стены. Отверстие под ручку. В комплект входит: короб двери, полотно, скрытые петли, магнитная защелка, уплотнитель короба, монтажные угловые пластины для сборки короба, монтажные пластины для крепления короба в проёме, метизы, ответная часть под защелку.
                 </td>
 
-                <td style="width: 150px;">{{$item->product->height ?? 0}}x{{$item->product->width ?? 0}}</td>
+                <td style="width: 150px;">{{$item->height ?? 0}}x{{$item->width ?? 0}}</td>
 
-                <td style="width: 150px;">{{$item->product->hinge_manufacturer->title ?? '-'}} ({{$item->product->loops_count ?? 0}})</td>
-                <td style="width: 150px;">{{$item->product->box_and_frame_color->title ?? 'не указано'}}</td>
-                <td style="width: 50px;">{{$item->quantity ?? 0}}</td>
-                <td style="width: 150px;">{{$item->product->price ?? 0}}</td>
-                <td style="width: 150px;">{{($item->product->price ?? 0)*($item->quantity ?? 0)}}</td>
+                <td style="width: 150px;">{{$item->hinge_manufacturer["title"] ?? '-'}} ({{$item->loops_count ?? 0}})</td>
+                <td style="width: 150px;">{{$item->box_and_frame_color["title"]  ?? 'не указано'}}</td>
+                <td style="width: 50px;">{{$item->count ?? 0}}</td>
+                <td style="width: 150px;">{{$item->price ?? 0}}</td>
+                <td style="width: 150px;">{{($item->price ?? 0)*($item->count ?? 0)}}</td>
 
                 @php
-                    $summary += (($item->product->price ?? 0) *($item->quantity ?? 0));
+                    $summary += (($item->price ?? 0) *($item->count ?? 0));
                     $index++;
                 @endphp
             </tr>

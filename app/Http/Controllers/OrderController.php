@@ -276,6 +276,7 @@ class OrderController extends Controller
         foreach ($details as $detail) {
             $door = (object)$detail->door;
             $items[] = $door;
+
         }
 
         return Excel::download(new MultiSheetsCartExport($items, $buyerData), "заказ $id.xlsx");
