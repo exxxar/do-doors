@@ -15,7 +15,8 @@ use Carbon\Carbon;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Mail\Mailables\Attachment;
+
+use Illuminate\Mail\Attachment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
