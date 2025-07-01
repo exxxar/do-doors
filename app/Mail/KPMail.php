@@ -17,12 +17,26 @@ class KPMail extends Mailable
     use Queueable, SerializesModels;
 
     public $name;
-    public $attachments;
+    public $paths;
 
-    public function __construct($name, array $attachments = [])
+
+    public function __construct($name, $paths)
     {
         $this->name = $name;
-        $this->attachments = $attachments;
+        $this->paths = $paths;
+
+
+    }
+
+    public function attachments(): array
+    {
+        $tmp = [];
+
+        foreach ($this->paths as $path)
+        {
+            $tmp[] =   Attachment::fromPath($path);
+        }
+        return $tmp;
     }
 
     public function build()
@@ -30,12 +44,10 @@ class KPMail extends Mailable
         $mail = $this->view('emails.kp')
             ->subject('Коммерческое предложение');
 
-        Log::info("build".print_r($this->attachments, true));
-        // Добавляем вложения
-        foreach ($this->attachments as $filePath) {
-            if (!is_null($filePath))
-                $mail->attach(Attachment::fromStorage($filePath));
-        }
+
+
+
+
 
         return $mail;
     }

@@ -727,8 +727,8 @@ class CalcController extends Controller
 
         try {
             $attachments = [
-             storage_path("app/$excelFileName1"),
-               storage_path("app/$excelFileName2"),
+                storage_path("app/$excelFileName1"),
+                storage_path("app/$excelFileName2"),
             ];
 
             Mail::to($email)->send(new KPMail($name, $attachments));
