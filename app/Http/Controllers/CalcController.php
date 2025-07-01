@@ -731,7 +731,7 @@ class CalcController extends Controller
                storage_path("app/$excelFileName2"),
             ];
 
-            Mail::to($email)->send(new KPMail($name, []));
+            Mail::to($email)->send(new KPMail($name, $attachments));
         } catch (Exception $e) {
             Log::error('Email sending failed: ' . $e->getMessage());
         }
