@@ -4,7 +4,9 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -29,7 +31,8 @@ class KPMail extends Mailable
 
         // Добавляем вложения
         foreach ($this->attachments as $filePath) {
-            $mail->attach($filePath);
+            if (!is_null($filePath))
+                $mail->attach(Attachment::fromStorage($filePath));
         }
 
         return $mail;
