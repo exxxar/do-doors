@@ -728,7 +728,7 @@ class CalcController extends Controller
             $attachments = [
                 Storage::exists($excelFileName1)  ? Attachment::fromStorage(storage_path("app/$excelFileName1")):null,
                 Storage::exists($excelFileName2)  ? Attachment::fromStorage(storage_path("app/$excelFileName2")):null,
-            );
+            ];
 
             Mail::to($email)->send(new KPMail($name, $attachments));
         } catch (Exception $e) {
