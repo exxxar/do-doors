@@ -10,7 +10,9 @@ use App\Models\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -26,10 +28,13 @@ class ClientController extends Controller
 
         $offset = 0;
         $tmpClients = [];
-
+        File::delete(public_path()."\\moyscklad-client-log.txt");
         do {
 
             $tmpSklad = $sklad->getClients(["offset" => $offset])["rows"];
+
+
+            File::append(public_path()."\\moyscklad-client-log.txt",print_r($tmpSklad, true));
             $offset += count($tmpSklad ?? []);
 
             $clients = array_values(\Illuminate\Support\Collection::make($tmpSklad)

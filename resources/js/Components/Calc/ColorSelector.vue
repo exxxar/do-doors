@@ -8,7 +8,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
     <div v-if="color" class="mb-2">
 
 
-        <template v-if="!material?.config?.is_custom_color">
+        <template v-if="!(material?.config?.is_custom_color||false)">
             <div
                 class="dropdown-center"
                 v-if="(color.code||null)!=='RAL'">
@@ -52,7 +52,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
         </template>
 
         <div
-            v-if="(color.code||'').toLowerCase()==='ral'||material?.config?.is_custom_color"
+            v-if="(color.code||'').toLowerCase()==='ral'||(material?.config?.is_custom_color||false)"
             class="input-group mb-0">
                       <span class="input-group-text border-secondary"
                             v-if="isHex(color.title)"
@@ -69,7 +69,7 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
                 </label>
             </div>
             <button
-                v-if="!material.config?.is_custom_color"
+                v-if="!material?.config?.is_custom_color"
                 class="btn btn-outline-secondary" type="button"
                     data-bs-auto-close="true"
                     data-bs-toggle="dropdown"

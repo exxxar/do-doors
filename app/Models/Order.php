@@ -61,6 +61,7 @@ class Order extends Model
         'total_count' => 'double',
         'client_data' => 'array',
         'discount' => 'array',
+        'config' => 'array',
         'current_payed' => 'double',
         'payed_percent' => 'integer',
         'contract_date' => 'datetime:Y-m-d H:i:s',

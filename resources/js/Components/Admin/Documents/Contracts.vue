@@ -159,6 +159,18 @@ import DownloadDocumentForm from "@/Components/Admin/Documents/DownloadDocumentF
                     <td>Оставшиеся денежные средства</td>
                 </tr>
 
+                <tr>
+                    <th scope="row" style="width: 30px;">25</th>
+                    <td style="width: 100px;"><strong>${delivery}</strong></td>
+                    <td>Входит / не входит доставка</td>
+                </tr>
+
+                <tr>
+                    <th scope="row" style="width: 30px;">26</th>
+                    <td style="width: 100px;"><strong>${install}</strong></td>
+                    <td>Входит / не входит установка</td>
+                </tr>
+
                 <!-- <tr>
                     <th scope="row" style="width: 30px;">13</th>
                     <td style="width: 100px;"><strong>${delivery_terms}</strong></td>

@@ -28,6 +28,11 @@ import {Head} from '@inertiajs/vue3';
                             </div>
                             Загрузить данные из Мой Склад
                         </button>
+
+                        <a
+                            v-if="import_success"
+                            class="my-3 p-3 border-gray-100 border btn rounded-0 mx-2"
+                            href="/moyscklad-service-log.txt" target="_blank">Лог операции</a>
                         <ServiceForm
                             v-if="!loading"
                             :item="selectedService"
@@ -49,6 +54,7 @@ export default {
         return {
             loading: false,
             moysklad_loading: false,
+            import_success: false,
             selectedService: null,
         }
     },
@@ -74,7 +80,7 @@ export default {
             });
 
             this.moysklad_loading = true
-
+            this.import_success = false
             this.$store.dispatch("importServicesFromMoySklad")
                 .then(()=>{
                     this.$notify({
@@ -82,7 +88,7 @@ export default {
                         text: "Данные успешно загружены",
                         type: "success",
                     });
-
+                    this.import_success = true
                     this.loading = true
                     this.$nextTick(()=>{
                         this.loading = false

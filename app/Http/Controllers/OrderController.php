@@ -41,16 +41,17 @@ class OrderController extends Controller
 {
     use Utility;
 
-    public function sendToTelegram(Request $request){
+    public function sendToTelegram(Request $request)
+    {
         $request->validate([
             "order_id" => "required",
         ]);
 
 
-
     }
 
-    public function sendToBitrix(Request $request){
+    public function sendToBitrix(Request $request)
+    {
         $request->validate([
             "order_id" => "required",
         ]);
@@ -467,6 +468,11 @@ class OrderController extends Controller
         $templateProcessor->setValue('delivery_terms', $order->delivery_terms ?? '-');
         $templateProcessor->setValue('work_days', $work_days_string);
 
+        ///delivery и install поля
+        $templateProcessor->setValue('delivery', ($order->config["delivery_type"] ?? 1) == 0 ? "входит" : "не входит");
+        $templateProcessor->setValue('install', ($order->config["need_install"] ?? 0) == 1 ? "входит" : "не входит");
+        ///
+        ///
         // requisites
         $templateProcessor->setValue('bik', $buyerData["buyer_bank_bic"]);
         $templateProcessor->setValue('ksch', $buyerData["buyer_correspondent_account"]);

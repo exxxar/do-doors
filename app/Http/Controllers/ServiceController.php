@@ -9,6 +9,7 @@ use App\Http\Resources\ServiceResource;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -27,10 +28,13 @@ class ServiceController extends Controller
 
         $offset = 0;
         $tmpServices = [];
+        File::delete(public_path()."\\moyscklad-service-log.txt");
 
         do {
 
             $tmpSklad = $sklad->getServices(["offset" => $offset])["rows"];
+            File::append(public_path()."\\moyscklad-service-log.txt",print_r($tmpSklad, true));
+
             $offset += count($tmpSklad ?? []);
 
             foreach ($needPaths as $path) {

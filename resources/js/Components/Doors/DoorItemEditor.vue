@@ -668,30 +668,35 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                             <span class="mr-1" v-if="doorForm.box_and_frame_color?.title">({{
                                     doorForm.box_and_frame_color.title
                                 }}),</span>
-                            <span class="mr-1" v-if="doorForm.front_side_finish_color?.title">первая сторона {{
+                            <span class="mr-1"
+                                  v-if="doorForm.front_side_finish_color?.title">первая сторона {{ doorForm.front_side_finish?.title }} цвет {{
                                     doorForm.front_side_finish_color.title
                                 }},</span>
-                            <span class="mr-1" v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{
+                            <span class="mr-1"
+                                  v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{ doorForm.back_side_finish?.title }} цвет {{
                                     doorForm.back_side_finish_color.title
                                 }},</span>
-                            <span class="mr-1" v-if="doorForm.loops?.title">петли {{ doorForm.loops.title }}</span>
-                            <span class="mr-1" v-if="doorForm.fittings_color?.title">({{
+                            <span class="mr-1" v-if="doorForm.loops?.title">петли {{doorForm.hinge_manufacturer?.title}} {{
+                                    doorForm.loops.title
+                                }} ({{ doorForm.loops_count || 0 }} шт.)</span>
+                            <span class="mr-1" v-if="doorForm.fittings_color?.title">цвет {{
                                     doorForm.fittings_color.title
-                                }}),</span>
+                                }},</span>
                             <span class="mr-1" v-if="doorForm.opening_type?.title">{{
                                     doorForm.opening_type.title
                                 }},</span>
-                            <span class="mr-1" v-if="doorForm.depth">Толщина профиля {{ doorForm.depth }} мм,</span>
-                            <span class="mr-1" v-if="doorForm.need_upper_jumper !== 'true'">без верх. перемычки,</span>
                             <span class="mr-1"
-                                  v-if="doorForm.need_automatic_doorstep === 'true'">Автоматический порог,</span>
-                            <span class="mr-1" v-if="doorForm.need_hidden_stopper === 'true'">Скрытый стопор,</span>
+                                  v-if="doorForm.opening_type?.depth">Толщина профиля {{ doorForm.opening_type?.depth }} мм,</span>
+                            <span class="mr-1" v-if="!doorForm.need_upper_jumper">без верх. перемычки,</span>
                             <span class="mr-1"
-                                  v-if="doorForm.need_hidden_door_closer === 'true'">Скрытый доводчик,</span>
+                                  v-if="doorForm.need_automatic_doorstep">Автоматический порог,</span>
+                            <span class="mr-1" v-if="doorForm.need_hidden_stopper">Скрытый стопор,</span>
                             <span class="mr-1"
-                                  v-if="doorForm.need_hidden_skirting_board === 'true'">Скрытый плинтус,</span>
-                            <span class="mr-1" v-if="doorForm.need_door_install === 'true'">Установка двери,</span>
-                            <span class="mr-1" v-if="doorForm.need_handle_holes === 'true'">Ручка в комплекте</span>
+                                  v-if="doorForm.need_hidden_door_closer">Скрытый доводчик,</span>
+                            <span class="mr-1"
+                                  v-if="doorForm.need_hidden_skirting_board">Скрытый плинтус,</span>
+                            <span class="mr-1" v-if="doorForm.need_door_install">Установка двери,</span>
+                            <span class="mr-1" v-if="doorForm.need_handle_holes">Ручка в комплекте</span>
                         </h6>
                     </div>
                 </div>
@@ -1053,7 +1058,7 @@ export default {
                             let price = index === -1 ? 0 : this.doorForm[item].sizes[index].price[type]
                             sum += parseInt(price || 0)
 
-                            console.log("opening_type", price, item)
+
                             this.tmp_prices.push({
                                 type: item,
                                 price: price
@@ -1167,6 +1172,9 @@ export default {
                 if (item.width === this.doorForm.width && item.height === this.doorForm.height) {
                     find = true
                     section = item;
+
+                    this.doorForm.loops_count = item.loops?.count || 2
+
                 }
 
 
@@ -1240,8 +1248,39 @@ export default {
 
             } else {
 
+                function indexOf(arr, direction = 0) {
+                    if (arr.length === 0) {
+                        return -1;
+                    }
+                    var orderValue = arr[0].height;
+                    var orderIndex = 0;
+                    for (var i = 1; i < arr.length; i++) {
+                        if (arr[i].height > orderValue && direction === 0) {
+                            orderIndex = i;
+                            orderValue = arr[i].height;
+                        }
+
+                        if (arr[i].height < orderValue && direction === 1) {
+                            orderIndex = i;
+                            orderValue = arr[i].height;
+                        }
+                    }
+                    return orderIndex;
+                }
+
+                const max = Math.max(...basePrices.map(o => o.height))
+                const indexOfMax = indexOf(basePrices, 0)
+                const min = Math.min(...basePrices.map(o => o.height))
+                const indexOfMin = indexOf(basePrices, 1)
+
+                if (this.doorForm.height > max || this.doorForm.height < min) {
+                    this.doorForm.loops_count = basePrices[this.doorForm.height > max ? indexOfMax : indexOfMin]?.loops?.count || 2
+                }
+
                 for (let i = 0; i < basePrices.length; i++) {
                     if (basePrices[i].width >= this.doorForm.width && basePrices[i].height >= this.doorForm.height) {
+
+                        this.doorForm.loops_count = basePrices[i].loops?.count || 2
 
                         base = basePrices[i].materials.find(m => m.is_base) || {
                             price: {
@@ -1392,7 +1431,7 @@ export default {
             deep: true
         },
 
-        'doorForm.handle_holes':{
+        'doorForm.handle_holes': {
             handler(val) {
                 if (this.doorForm.handle_holes.id === 3) {
                     this.doorForm.handle_holes_type = {title: null}
@@ -1521,8 +1560,8 @@ export default {
 
                     this.loaded = true
 
-                    if (this.cartTotalCount>0)
-                        this.doorForm.price_type = this.cartProducts[0]?.product?.price_type  || {title: null}
+                    if (this.cartTotalCount > 0)
+                        this.doorForm.price_type = this.cartProducts[0]?.product?.price_type || {title: null}
                 })
 
 
@@ -1707,7 +1746,7 @@ export default {
         },
         swapDoorstepStopper(index) {
             this.doorForm.need_automatic_doorstep = this.doorForm.need_automatic_doorstep ? index === 0 : false
-            this.doorForm.need_hidden_stopper =  this.doorForm.need_hidden_stopper ? index === 1 : false
+            this.doorForm.need_hidden_stopper = this.doorForm.need_hidden_stopper ? index === 1 : false
         },
         getServiceByType(type) {
             if ((this.getDictionary.services || []).length === 0)
@@ -1845,7 +1884,7 @@ export default {
                     });
 
                     this.$emit("callback")
-                    this.resetForm()
+                   //this.clearForm()
                 }).catch(() => {
                     this.$notify({
                         title: "DoDoors",

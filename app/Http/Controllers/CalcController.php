@@ -196,6 +196,7 @@ class CalcController extends Controller
         $deliveryTerms = $request->input('delivery_terms');
         $deliveryType = (int)$request->input('delivery_type', 0);
 
+
         $discountPercent = 0;
         $discountValue = 0;
         if (!is_null($request->discount_data ?? null)) {
@@ -275,6 +276,10 @@ class CalcController extends Controller
             'total_count' => $totalCount,
             'current_payed' => $currentPayed,
             'payed_percent' => $payedPercent,
+            'config' => (object)[
+                "delivery_type" => $deliveryType == 0 ? 0 : 1,
+                "need_install" => $needInstall ? 1 : 0,
+            ],
             'discount' => (object)[
                 'amount' => $discountValue,
                 'percent' => $discountPercent
@@ -416,7 +421,7 @@ class CalcController extends Controller
 
             // Handle door handles
             if (!is_null($product->handle_holes_type ?? null)) {
-                $handle = (object)$product->handle_holes_type ;
+                $handle = (object)$product->handle_holes_type;
                 $price = (array)($handle->price ?? []);
                 $installDoorsData = [
                     'NAME' => 'Ручка: ' . ($handle->title ?? '-'),
@@ -447,9 +452,9 @@ class CalcController extends Controller
                 }
             }
 
-            Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)".print_r($product->handle_wrapper_type??null, true));
+            Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)" . print_r($product->handle_wrapper_type ?? null, true));
             // Handle wrappers
-            if (!is_null($product->handle_wrapper_type?? null)) {
+            if (!is_null($product->handle_wrapper_type ?? null)) {
                 $wrapper = (object)$product->handle_wrapper_type;
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
@@ -460,10 +465,10 @@ class CalcController extends Controller
                     'MEASURE' => 0,
                     'QUANTITY' => (int)($product->count ?? 1),
                 ];
-                Log::info("ДА, ЕСТЬ? (РУЧКА)".print_r($handleDoorsData, true));
+                Log::info("ДА, ЕСТЬ? (РУЧКА)" . print_r($handleDoorsData, true));
                 try {
                     $bitrixProductId = $bitrix->addProduct($handleDoorsData)['result'] ?? null;
-                    Log::info("ЗАВЕРТКА: ".print_r($bitrixProductId, true));
+                    Log::info("ЗАВЕРТКА: " . print_r($bitrixProductId, true));
                     if (!is_null($bitrixProductId)) {
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
@@ -496,7 +501,7 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($handleInstallDoorsData)['result'] ?? null;
-                Log::info("УСТАНОВКА: ".print_r($bitrixProductId, true));
+                Log::info("УСТАНОВКА: " . print_r($bitrixProductId, true));
                 if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
@@ -528,7 +533,7 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($deliveryProductData)['result'] ?? null;
-                Log::info("ДОСТАВКА: ".print_r($bitrixProductId, true));
+                Log::info("ДОСТАВКА: " . print_r($bitrixProductId, true));
                 if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
@@ -629,6 +634,10 @@ class CalcController extends Controller
                 $templateProcessor->setValue('info', $info);
                 $templateProcessor->setValue('total_price', $totalPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
+                ///delivery и install поля
+                $templateProcessor->setValue('delivery', $deliveryType == 0 ? "входит" : "не входит");
+                $templateProcessor->setValue('install', $needInstall ? "входит" : "не входит");
+                ///
                 $templateProcessor->setValue('current_payed', $currentPayed);
                 $templateProcessor->setValue('payed_percent', $payedPercent);
                 $templateProcessor->setValue('last_payment', $totalPrice - $currentPayed);
@@ -666,66 +675,66 @@ class CalcController extends Controller
         }
 
         // Send to Telegram
-        if (in_array(2, $action) && !in_array(3, $action)) {
-            try {
-                $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-                $telegram->sendMessage([
-                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'text' => "#заказ\nПоступил новый заказ!\n" .
-                        "Имя клиента: $name\n" .
-                        "E-mail: $email\n" .
-                        "Телефон: $phone\n" .
-                        "Доп.инфо: $info\n" .
-                        "Общее кол-во товара: $totalCount ед.\n" .
-                        "Цена товара: $totalPrice руб.\n",
-                    'parse_mode' => 'HTML',
-                ]);
 
-                sleep(1);
+        try {
+            $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+            $telegram->sendMessage([
+                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                'text' => "#заказ\nПоступил новый заказ!\n" .
+                    "Имя клиента: $name\n" .
+                    "E-mail: $email\n" .
+                    "Телефон: $phone\n" .
+                    "Доп.инфо: $info\n" .
+                    "Общее кол-во товара: $totalCount ед.\n" .
+                    "Цена товара: $totalPrice руб.\n",
+                'parse_mode' => 'HTML',
+            ]);
+
+            sleep(1);
+            $telegram->sendDocument([
+                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
+                'parse_mode' => 'HTML',
+            ]);
+            sleep(1);
+            $telegram->sendDocument([
+                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
+                'parse_mode' => 'HTML',
+            ]);
+            sleep(1);
+            $telegram->sendDocument([
+                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
+                'parse_mode' => 'HTML',
+            ]);
+            sleep(1);
+            if (file_exists($path . $newName)) {
                 $telegram->sendDocument([
                     'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
+                    'document' => InputFile::create($path . $newName),
                     'parse_mode' => 'HTML',
                 ]);
-                sleep(1);
-                $telegram->sendDocument([
-                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
-                    'parse_mode' => 'HTML',
-                ]);
-                sleep(1);
-                $telegram->sendDocument([
-                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
-                    'parse_mode' => 'HTML',
-                ]);
-                sleep(1);
-                if (file_exists($path . $newName)) {
-                    $telegram->sendDocument([
-                        'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                        'document' => InputFile::create($path . $newName),
-                        'parse_mode' => 'HTML',
-                    ]);
-                }
-            } catch (Exception $e) {
-                Log::error('Telegram notification failed: ' . $e->getMessage());
             }
+        } catch (Exception $e) {
+            Log::error('Telegram notification failed: ' . $e->getMessage());
         }
+
 
         // Send email
-        if (in_array(1, $action) && !in_array(3, $action) && $email !== 'не указано') {
-            try {
-                $attachments = array_filter([
-                    file_exists($path . $newName) ? $path . $newName : null,
-                    Storage::exists($excelFileName1) ? storage_path("app/$excelFileName1") : null,
-                    Storage::exists($excelFileName2) ? storage_path("app/$excelFileName2") : null,
-                ]);
 
-                Mail::to($email)->send(new KPMail($name, $attachments));
-            } catch (Exception $e) {
-                Log::error('Email sending failed: ' . $e->getMessage());
-            }
+        try {
+            $attachments = array_filter([
+                file_exists($path . $newName) ? $path . $newName : null,
+                Storage::exists($excelFileName1) ? storage_path("app/$excelFileName1") : null,
+                Storage::exists($excelFileName2) ? storage_path("app/$excelFileName2") : null,
+            ]);
+
+            Mail::to($email)->send(new KPMail($name, $attachments));
+        } catch (Exception $e) {
+            Log::error('Email sending failed: ' . $e->getMessage());
         }
+
 
         // Clean up
         Storage::delete([$excelFileName1, $excelFileName2]);
