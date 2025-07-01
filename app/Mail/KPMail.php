@@ -32,7 +32,7 @@ class KPMail extends Mailable
         // Добавляем вложения
         foreach ($this->attachments as $filePath) {
             if (!is_null($filePath))
-                $mail->attach(Attachment::fromStorage($filePath));
+                $mail->attach(Attachment::fromStorage($filePath),);
         }
 
         return $mail;
