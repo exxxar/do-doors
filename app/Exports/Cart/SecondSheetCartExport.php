@@ -42,6 +42,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
     {
         $doc = new DocumentLogic();
 
+
         return view('export.cart-part2', [
             'items' => $this->items,
             'other_products' => $this->otherProducts,

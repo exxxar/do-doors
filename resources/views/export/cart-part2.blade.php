@@ -35,6 +35,10 @@
         @foreach($items as $key=>$item)
             @php
                 $item = json_decode(json_encode($item));
+
+                if (!is_null($item->product ?? null))
+                    $item = $item->product;
+
             @endphp
 
             <tr>
