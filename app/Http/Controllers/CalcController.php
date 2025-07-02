@@ -447,6 +447,7 @@ class CalcController extends Controller
                             'title' => 'Ручка: ' . ($handle->title ?? '-'),
                             'description' => 'Цена комплекта ручек у поставщика',
                             'price' => (float)($price[$priceType] ?? 0),
+                            'count'=> (int)($product->count ?? 1),
                         ];
                     }
                 } catch (Exception $e) {
@@ -482,6 +483,7 @@ class CalcController extends Controller
                             'title' => 'Завертка: ' . ($wrapper->title ?? '-'),
                             'description' => 'Цена завертки поставщика',
                             'price' => (float)($price[$priceType] ?? 0),
+                            'count'=>(int)($product->count ?? 1),
                         ];
                     }
                 } catch (Exception $e) {
@@ -515,6 +517,7 @@ class CalcController extends Controller
                         'title' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
                         'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
                         'price' => (float)$installPrice,
+                        'count'=> $installRecountType == 0 ? 1 : $installCount,
                     ];
                 }
             } catch (Exception $e) {
@@ -541,6 +544,13 @@ class CalcController extends Controller
                         'PRODUCT_ID' => $bitrixProductId,
                         'PRICE' => (float)($request->input('delivery_price', 0)),
                         'QUANTITY' => 1,
+                    ];
+
+                    $otherProducts[] = (object)[
+                        'title' => 'Доставка комплекта дверей ',
+                        'description' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
+                        'price' => (float)($request->input('delivery_price', 0)),
+                        'count'=> 1
                     ];
                 }
             } catch (Exception $e) {

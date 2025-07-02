@@ -94,17 +94,18 @@
                     <td style="width: 50px;">{{$index}}</td>
 
                     <td style="width: 100px;" colspan="2">
-                      {{$item->title ?? '-'}}
+                      {{$item->title ?? ''}}
                     </td>
 
 
                     <td style="width: 150px;" >
-                        {{$item->description ?? '-'}}
+                        {{$item->description ?? ''}}
                     </td>
 
-                    <td style="width: 150px;">-</td>
-                    <td style="width: 150px;">-</td>
-                    <td style="width: 50px;">1</td>
+                    <td style="width: 150px;"></td>
+                    <td style="width: 150px;"></td>
+                    <td style="width: 150px;"></td>
+                    <td style="width: 50px;">{{$item->count ?? 1}}</td>
                     <td style="width: 150px;">{{$item->price ?? 0}}</td>
                     <td style="width: 150px;">{{$item->price ?? 0}}</td>
 
