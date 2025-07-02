@@ -37,7 +37,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             <input type="search"
                                    v-model="search"
                                    class="form-control" id="floatingInput" placeholder="Имя">
-                            <label for="floatingInput">Поиск (найдено {{filteredClients.length||0}} клиентов)
+                            <label for="floatingInput">Поиск (найдено {{ filteredClients.length || 0 }} клиентов)
                             </label>
                         </div>
                     </div>
@@ -46,8 +46,10 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             v-bind:class="{'btn-light':index%2===0}"
                             style="word-wrap: break-word; overflow-wrap: break-word;"
                             class="p-2 d-block btn rounded-0" href="javascript:void(0)"
-                           @click="selectInfo(client)">{{ client.title || client.phone }}
-                            <br><span class="badge rounded-0 btn-dark" style="font-size:8px;">{{ preparedLawStatus(client.status) || 'Не указан' }}</span></a>
+                            @click="selectInfo(client)">{{ client.title || client.phone }}
+                            <br><span class="badge rounded-0 btn-dark" style="font-size:8px;">{{
+                                    preparedLawStatus(client.status) || 'Не указан'
+                                }}</span></a>
                     </template>
                 </li>
             </ul>
@@ -103,7 +105,7 @@ export default {
         ...mapGetters(['getErrors',
             'getDictionary',
             'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
-        filteredClients(){
+        filteredClients() {
             if (!this.search)
                 return this.self_clients || []
 
@@ -118,8 +120,8 @@ export default {
     watch: {},
     data() {
         return {
-            edit_requisites:false,
-            search:null,
+            edit_requisites: false,
+            search: null,
             tab: 0,
             timer: null,
             step: 0,
@@ -128,13 +130,18 @@ export default {
 
             clientForm: {
                 id: null,
+                send_to_bitix: true,
+                send_to_mail: false,
+                send_to_telegram: true,
+                send_to_self_mail: false,
+                self_email: null,
                 name: null,
                 phone: null,
                 email: null,
                 info: null,
                 promo: null,
-                dealer_percent:0,
-                summary_price_type:null,
+                dealer_percent: 0,
+                summary_price_type: null,
                 work_with_nds: 1,
                 items: [],
                 current_payed: 0,
@@ -150,10 +157,10 @@ export default {
                     price: 0,
                     recount_type: 0,
                 },
-                designer:{
-                    is_fix:false,
-                    value:0,
-                    price:0,
+                designer: {
+                    is_fix: false,
+                    value: 0,
+                    price: 0,
                 },
                 passport: null,
                 passport_issued: null,
@@ -163,8 +170,8 @@ export default {
                 delivery_price: null,
                 delivery_city: null,
 
-                delivery_service:null,
-                discount_data:null,
+                delivery_service: null,
+                discount_data: null,
 
             }
         }
@@ -274,7 +281,6 @@ export default {
                         data.append(key, item)
                 });
 
-            data.append("action", this.action)
             data.append("total_price", this.cartTotalPrice)
             data.append("total_count", this.cartTotalCount)
 

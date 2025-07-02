@@ -661,7 +661,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <div class="card-body">
                         <h6>Характеристики </h6>
                         <h6 class="text-muted font-bold">
-                            {{ shortDoorTitle }}
+                            {{ doorForm.purpose || 'Дверь' }}:{{ shortDoorTitle }}
                             {{ doorForm.width || 0 }}x{{ doorForm.height || 0 }}x{{ doorForm.opening_type?.depth || 0 }}
                         </h6>
                         <h6 class="text-black mb-0">
@@ -669,14 +669,19 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                                     doorForm.box_and_frame_color.title
                                 }}),</span>
                             <span class="mr-1"
-                                  v-if="doorForm.front_side_finish_color?.title">первая сторона {{ doorForm.front_side_finish?.title }} цвет {{
+                                  v-if="doorForm.front_side_finish_color?.title">первая сторона {{
+                                    doorForm.front_side_finish?.title
+                                }} цвет {{
                                     doorForm.front_side_finish_color.title
                                 }},</span>
                             <span class="mr-1"
-                                  v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{ doorForm.back_side_finish?.title }} цвет {{
+                                  v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{
+                                    doorForm.back_side_finish?.title
+                                }} цвет {{
                                     doorForm.back_side_finish_color.title
                                 }},</span>
-                            <span class="mr-1" v-if="doorForm.loops?.title">петли {{doorForm.hinge_manufacturer?.title}} {{
+                            <span class="mr-1"
+                                  v-if="doorForm.loops?.title">петли {{ doorForm.hinge_manufacturer?.title }} {{
                                     doorForm.loops.title
                                 }} ({{ doorForm.loops_count || 0 }} шт.)</span>
                             <span class="mr-1" v-if="doorForm.fittings_color?.title">цвет {{
@@ -1884,7 +1889,7 @@ export default {
                     });
 
                     this.$emit("callback")
-                   //this.clearForm()
+                    //this.clearForm()
                 }).catch(() => {
                     this.$notify({
                         title: "DoDoors",

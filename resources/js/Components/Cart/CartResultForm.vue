@@ -354,6 +354,42 @@
 
             </template>
 
+            <div class="form-check form-switch">
+                <input
+                    v-model="modelValue.send_to_bitix"
+                    class="form-check-input" type="checkbox" role="switch" id="send_to_bitix">
+                <label class="form-check-label" for="send_to_bitix">Отправить в Битрикс</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       v-model="modelValue.send_to_mail"
+                       type="checkbox" role="switch" id="send_to_mail">
+                <label class="form-check-label" for="send_to_mail">Отправить на почту клиента</label>
+            </div>
+
+
+            <div class="form-check form-switch">
+                <input class="form-check-input"
+                       v-model="modelValue.send_to_telegram"
+                       type="checkbox" role="switch" id="send_to_telegram">
+                <label class="form-check-label" for="send_to_telegram">Отправить в телеграм</label>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input"
+                       v-model="modelValue.send_to_self_mail"
+                       type="checkbox" role="switch" id="send_to_self_mail">
+                <label class="form-check-label" for="send_to_self_mail">Отправить себе на почту</label>
+            </div>
+            <template v-if="modelValue.send_to_self_mail">
+                <div class="form-floating mb-2">
+                    <input type="email"
+                           v-model="modelValue.self_email"
+                           class="form-control" id="self_email_address" placeholder="name@example.com" required>
+                    <label for="self_email_address">Почта</label>
+                </div>
+            </template>
+
             <p class="alert alert-light rounded-0 mb-2" v-if="blocks.price_type_attention">
                 <strong class="fw-bold">Внимание!</strong> При смене типа цены будет проведен перерасчет всех цен на
                 двери и изменены значения начальной внесенной суммы для покупателя
@@ -370,16 +406,16 @@
                         class="btn btn-dark rounded-0 p-3">Отправить
                 </button>
                 <button type="button"
-                        style="width: 70px;"
-                        class="btn btn-outline-dark rounded-0 p-3 dropdown-toggle dropdown-toggle-split"
+                        class="btn btn-outline-dark rounded-0 dropdown-toggle dropdown-toggle-split"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                    <span v-if="!clientForm.summary_price_type">Тип цены</span>
-                    <span v-else>{{ clientForm.summary_price_type.title || '-' }}</span>
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
                 </button>
                 <ul class="dropdown-menu rounded-0">
                     <li v-for="item in getDictionary.price_type_variants"><a
                         @click="selectPriceType(item)"
-                        class="dropdown-item" href="javascript:void(0)">{{ item.title || '-' }}</a></li>
+                        class="dropdown-item"
+                        v-bind:class="{'bg-dark text-white':clientForm.summary_price_type.title===item.title}"
+                        href="javascript:void(0)">{{ item.title || '-' }}</a></li>
 
                 </ul>
             </div>

@@ -41,47 +41,11 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
                 v-if="step===1"></CartCheckoutForm>
         </div>
         <div class="offcanvas-footer p-3" v-if="cartProducts.length>0&&tab===0">
-            <div class="card rounded-0">
-                <div class="card-body">
-                    <div v-if="step===0">
 
-                        <div class="d-flex justify-content-between mb-2">
-                            <label for="send-to-mail" class="d-flex">
-                                <button
-                                    id="send-to-mail"
-                                    v-bind:class="{'btn-outline-secondary':action.indexOf(1)!==-1}"
-                                    class="btn btn-outline-light text-gray-400 rounded-0 mr-2"
-                                    @click="preCheckAction(1)">
-                                    <i
-                                        v-if="action.indexOf(1)!==-1"
-                                        v-bind:class="{'text-success':action.indexOf(1)!==-1}"
-                                        class="fa-solid fa-check-double"></i>
+            <div v-if="step===0">
+                <button class="btn btn-success rounded-0 w-100" @click="checkout(0)">Перейти к оформлению
+                </button>
 
-                                    <i v-else class="fa-solid fa-check"></i>
-
-                                </button>
-
-                                <span>
-                                     Отправить КП на почту клиента и в телеграм
-                                </span>
-
-
-                            </label>
-
-                            <button
-                                :disabled="action.indexOf(1)===-1"
-                                @click="checkout(3)"
-                                class="btn btn-dark rounded-0 ml-2"><i class="fa-solid fa-paper-plane"></i></button>
-                        </div>
-
-                        <button class="btn btn-success rounded-0 w-100 mb-2" @click="checkout(0)">Отправить сделку в СРМ
-                        </button>
-
-                        <button class="btn btn-outline-dark  rounded-0 w-100 mb-2" @click="checkout(3)"><i
-                            class="fa-solid fa-floppy-disk"></i> Сохранить
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -116,7 +80,7 @@ export default {
 
         this.step = 0
         this.tab = 0
-       // useCalcUtilities().summaryPrice(this.d)
+        // useCalcUtilities().summaryPrice(this.d)
     },
     methods: {
         back() {

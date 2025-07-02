@@ -1,7 +1,9 @@
 <template>
     <div class="row mb-4 d-flex justify-content-between align-items-center">
         <div class="col-md-5 col-lg-5 col-xl-5">
-            <h6 class="text-muted font-bold">{{item.product.door_type.title}} {{ item.product.width }}x{{ item.product.height }}x
+            <h6 class="text-muted font-bold">
+                {{item.product.purpose || 'Дверь'}}:
+                {{shortDoorTitle}} {{ item.product.width }}x{{ item.product.height }}x
                 {{ item.product.opening_type?.depth || 0 }}
             </h6>
             <h6 class="text-black mb-0">
@@ -59,7 +61,14 @@ export default {
     props: ["item"],
     computed: {
         ...mapGetters(['getDictionary']),
+        shortDoorTitle() {
+            let key = this.item.product.door_type?.title || 'КДС'
+            const abbreviations = {
+                "Комплект двери скрытого монтажа": "КДС",
+            };
 
+            return abbreviations[key] || key;
+        },
     },
     methods: {
         removeProduct(){

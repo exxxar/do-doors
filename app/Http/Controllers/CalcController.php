@@ -186,8 +186,12 @@ class CalcController extends Controller
             return response()->json(['errors' => $e->errors()], 422);
         }
 
-        // Parse action parameter
-        $action = array_map('intval', explode(',', $request->input('action', '0')));
+
+        $sendToBitrix = $request->input("send_to_bitrix") ?? false;
+        $sendToMail = $request->input("send_to_mail") ?? false;
+        $sendToTelegram = $request->input("send_to_telegram") ?? false;
+        $sendToSelf = $request->input("send_to_self_mail") ?? false;
+        $selfMail = $request->input("self_email") ?? null;
 
         // Initialize variables with defaults
         $orderId = $request->input('order_id');
@@ -299,7 +303,7 @@ class CalcController extends Controller
         $leadId = $order->bitrix24_lead_id;
 
         // Handle Bitrix integration
-        if (in_array(0, $action) && !in_array(3, $action)) {
+        if ($sendToBitrix) {
             $contactData = [
                 'NAME' => $client->title ?? $name,
                 'TYPE_ID' => 'CLIENT',
@@ -447,7 +451,7 @@ class CalcController extends Controller
                             'title' => 'Ручка: ' . ($handle->title ?? '-'),
                             'description' => 'Цена комплекта ручек у поставщика',
                             'price' => (float)($price[$priceType] ?? 0),
-                            'count'=> (int)($product->count ?? 1),
+                            'count' => (int)($product->count ?? 1),
                         ];
                     }
                 } catch (Exception $e) {
@@ -483,7 +487,7 @@ class CalcController extends Controller
                             'title' => 'Завертка: ' . ($wrapper->title ?? '-'),
                             'description' => 'Цена завертки поставщика',
                             'price' => (float)($price[$priceType] ?? 0),
-                            'count'=>(int)($product->count ?? 1),
+                            'count' => (int)($product->count ?? 1),
                         ];
                     }
                 } catch (Exception $e) {
@@ -517,7 +521,7 @@ class CalcController extends Controller
                         'title' => 'Установка комплекта дверей: ' . ($installRecountType == 0 ? "суммарно за все двери ($installCount)" : 'цена за установку одной двери'),
                         'description' => $installRecountType == 0 ? "Суммарно за все двери ($installCount)" : 'Цена за установку одной двери',
                         'price' => (float)$installPrice,
-                        'count'=> $installRecountType == 0 ? 1 : $installCount,
+                        'count' => $installRecountType == 0 ? 1 : $installCount,
                     ];
                 }
             } catch (Exception $e) {
@@ -550,7 +554,7 @@ class CalcController extends Controller
                         'title' => 'Доставка комплекта дверей ',
                         'description' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
                         'price' => (float)($request->input('delivery_price', 0)),
-                        'count'=> 1
+                        'count' => 1
                     ];
                 }
             } catch (Exception $e) {
@@ -559,7 +563,7 @@ class CalcController extends Controller
         }
 
         // Add products to deal
-        if (in_array(0, $action) && !in_array(3, $action) && $leadId) {
+        if ($sendToBitrix) {
             try {
                 $bitrix->addProductToDeal($leadId, $productsForBitrix);
             } catch (Exception $e) {
@@ -678,7 +682,7 @@ class CalcController extends Controller
         }
 
         // Upload documents to Bitrix
-        if (in_array(0, $action) && !in_array(3, $action) && $leadId) {
+        if ($sendToBitrix) {
             try {
                 $bitrix->addDocumentsToDeal($leadId, $bitrixFiles, env('DOCUMENT_FILED_CODE_SPECIFICATION'));
             } catch (Exception $e) {
@@ -688,52 +692,55 @@ class CalcController extends Controller
 
         // Send to Telegram
 
-        try {
-            $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-            $telegram->sendMessage([
-                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                'text' => "#заказ\nПоступил новый заказ!\n" .
-                    "Имя клиента: $name\n" .
-                    "E-mail: $email\n" .
-                    "Телефон: $phone\n" .
-                    "Доп.инфо: $info\n" .
-                    "Общее кол-во товара: $totalCount ед.\n" .
-                    "Цена товара: $totalPrice руб.\n",
-                'parse_mode' => 'HTML',
-            ]);
-
-            sleep(1);
-            $telegram->sendDocument([
-                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
-                'parse_mode' => 'HTML',
-            ]);
-            sleep(1);
-            $telegram->sendDocument([
-                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
-                'parse_mode' => 'HTML',
-            ]);
-            sleep(1);
-            $telegram->sendDocument([
-                'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
-                'parse_mode' => 'HTML',
-            ]);
-            sleep(1);
-            if (file_exists($path . $newName)) {
-                $telegram->sendDocument([
+        if ($sendToTelegram) {
+            try {
+                $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+                $telegram->sendMessage([
                     'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::create($path . $newName),
+                    'text' => "#заказ\nПоступил новый заказ!\n" .
+                        "Имя клиента: $name\n" .
+                        "E-mail: $email\n" .
+                        "Телефон: $phone\n" .
+                        "Доп.инфо: $info\n" .
+                        "Общее кол-во товара: $totalCount ед.\n" .
+                        "Цена товара: $totalPrice руб.\n",
                     'parse_mode' => 'HTML',
                 ]);
+
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                $telegram->sendDocument([
+                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                    'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
+                    'parse_mode' => 'HTML',
+                ]);
+                sleep(1);
+                if (file_exists($path . $newName)) {
+                    $telegram->sendDocument([
+                        'chat_id' => env('TELEGRAM_CHANNEL_ID'),
+                        'document' => InputFile::create($path . $newName),
+                        'parse_mode' => 'HTML',
+                    ]);
+                }
+            } catch (Exception $e) {
+                Log::error('Telegram notification failed: ' . $e->getMessage());
             }
-        } catch (Exception $e) {
-            Log::error('Telegram notification failed: ' . $e->getMessage());
         }
 
 
         // Send email
+
 
         try {
             $attachments = [
@@ -741,7 +748,14 @@ class CalcController extends Controller
                 storage_path("app/$excelFileName2"),
             ];
 
-            Mail::to($email)->send(new KPMail($name, $attachments));
+            if ($sendToMail)
+                Mail::to($email)
+                    ->send(new KPMail($name, $attachments));
+
+            if ($sendToSelf)
+                Mail::to($selfMail)
+                    ->send(new KPMail($name, $attachments));
+
         } catch (Exception $e) {
             Log::error('Email sending failed: ' . $e->getMessage());
         }
