@@ -184,7 +184,7 @@ Route::get('/link/{orderId}', function ($orderId) {
     if (is_null(Auth::user()->id ?? null)) {
         return Inertia::render('OrderInfo', [
             "order" => $order->toArray(),
-            "doors" =>order->details->toArray()  ?? []
+            "doors" =>$order->details->toArray()  ?? []
         ]);
     }
 
