@@ -172,23 +172,26 @@ Route::get('/link/{orderId}', function ($orderId) {
         ->where("id", $orderId)
         ->first();
 
+
     if (is_null($order))
         return response()->redirectToRoute("calc");
 
     if (is_null($order) && is_null(Auth::user()->id ?? null))
         return response()->redirectToRoute("calc");
 
+    Log::info("print order".print_r($order->toArray(), true));
+
     if (is_null(Auth::user()->id ?? null)) {
         return Inertia::render('OrderInfo', [
             "order" => $order->toArray(),
-            "doors" => $order->details ?? []
+            "doors" =>order->details->toArray()  ?? []
         ]);
     }
 
     if (count($order->details ?? []) > 0)
         return Inertia::render('OrderEditor', [
             "order" => $order->toArray(),
-            "doors" => $order->details ?? []
+            "doors" => $order->details->toArray() ?? []
         ]);
 
 

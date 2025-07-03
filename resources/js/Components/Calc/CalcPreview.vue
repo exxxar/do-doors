@@ -149,6 +149,9 @@ export default {
         ...mapGetters(['getErrors']),
     },
     mounted() {
+        console.log("preview doors", this.doors)
+        console.log("preview order", this.order)
+
         this.formData.contract_number = this.order.contract_number || null
     },
     methods: {

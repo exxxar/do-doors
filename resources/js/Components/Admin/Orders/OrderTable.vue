@@ -841,7 +841,10 @@ export default {
         },
         selectItemForEdit(item) {
             //this.$emit("select", item)
-            if (item == null) {
+
+            window.open("/link/"+item.id,"_blank")
+
+          /*  if (item == null) {
                 this.selected_item = null
                 this.editor_modal.hide()
                 return;
@@ -851,7 +854,7 @@ export default {
             this.$nextTick(() => {
                 this.selected_item = item
                 this.editor_modal.show()
-            })
+            })*/
         },
         selectItem(item) {
             // this.$emit("select", item)
