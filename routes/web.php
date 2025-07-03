@@ -335,12 +335,12 @@ Route::prefix("/orders")
         Route::get("/download-template", "downloadTemplate");
         Route::get("/download-demo", "downloadDemo");
         Route::get('/download-by-contract',  'downloadContract');
-        Route::post('/send-to-telegram',  'sendToTelegram');
         Route::post('/send-to-bitrix',  'sendToBitrix');
         Route::post("/", "getOrderList");
         Route::post("/update-contract-templates", "updateContractTemplates");
         Route::post("/store", "store");
         Route::post("/edit-door-in-order", "editDoorInOrder");
+        Route::post("/edit-order", "editOrderInBitrix");
         Route::delete("/{id}", "destroy");
     });
 

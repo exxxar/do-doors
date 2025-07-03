@@ -288,17 +288,23 @@ import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item disabled"
+                            <li><a class="dropdown-item "
                                    @click="sendToTelegram(item)"
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-paper-plane mr-2"></i>
                                 Отправить в телеграм
                             </a></li>
-                            <li><a class="dropdown-item disabled"
+                            <li><a class="dropdown-item "
                                    @click="sendToBitrix(item)"
                                    href="javascript:void(0)">
                                 <i class="fa-solid fa-square-arrow-up-right mr-2"></i>
                                 Отправить в Битрикс
+                            </a></li>
+                            <li><a class="dropdown-item "
+                                   @click="sendToEmail(item)"
+                                   href="javascript:void(0)">
+                                <i class="fa-solid fa-envelope mr-2"></i>
+                                Отправить на почту клиента
                             </a></li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -774,9 +780,12 @@ export default {
 
             window.open(tmp, '_blank').focus();
         },
-        sendToBitrix(item) {
+        sendOrder(item, sendEmail = false, sendTelegram = false, sendToBitrix = false) {
             this.$store.dispatch("sendOrderToBitrix", {
-                order_id: item.id
+                order_id: item.id,
+                send_to_telegram: sendTelegram,
+                send_to_email: sendEmail,
+                send_to_bitrix: sendToBitrix,
             }).then(() => {
                 this.$notify({
                     title: "DoDoors",
@@ -791,22 +800,14 @@ export default {
                 });
             })
         },
+        sendToBitrix(item){
+            this.sendOrder(item, false, false, true)
+        },
         sendToTelegram(item) {
-            this.$store.dispatch("sendOrderToTelegram", {
-                order_id: item.id
-            }).then(() => {
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Информация успешно отправлена в Телеграм",
-                    type: "success",
-                });
-            }).catch(() => {
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Ошибка отправки информации в Телеграм",
-                    type: "error",
-                });
-            })
+          this.sendOrder(item, false, true, false)
+        },
+        sendToEmail(item) {
+            this.sendOrder(item, true, false, false)
         },
         downloadDocument(order) {
             window.open(`/orders/download-contract?id=${order.id}`, '_blank').focus();

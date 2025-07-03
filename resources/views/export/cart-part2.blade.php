@@ -39,6 +39,9 @@
                 if (!is_null($item->product ?? null))
                     $item = $item->product;
 
+                  if (!is_null($item->door ?? null))
+                    $item = $item->door;
+
             @endphp
 
             <tr>

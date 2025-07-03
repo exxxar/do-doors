@@ -97,6 +97,7 @@ const actions = {
             return Promise.reject(err);
         })
     },
+
     async checkoutItems(context, payload = {clientForm: null}) {
         let link = `${BASE_CART_LINK}/checkout`
 

@@ -89,6 +89,10 @@ trait Utility
         $templateProcessor->setValue('passport', $data['passport']);
         $templateProcessor->setValue('passport_issued', $data['passport_issued']);
 
+        ///delivery и install поля
+        $templateProcessor->setValue('delivery', $data["delivery"] == 0 ? "входит" : "не входит");
+        $templateProcessor->setValue('install', $data["install"] ? "входит" : "не входит");
+
         // Добавляем параметры продавца
         $doc = new DocumentLogic();
         foreach ($doc->getAllSellerParameters($data['workWithNds']) as $key => $value) {

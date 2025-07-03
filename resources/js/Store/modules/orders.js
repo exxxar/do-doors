@@ -117,6 +117,20 @@ const actions = {
             return Promise.reject(err);
         })
     },
+    async editOrder(context, payload = {clientForm: null}) {
+        let link = `${BASE_ORDERS_LINK}/edit-order`
+
+        let _axios = util.makeAxiosFactory(link, "POST", payload.clientForm)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response.data);
+        }).catch(err => {
+
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
     async storeOrder(context, payload = { orderForm: null }) {
         let link = `${BASE_ORDERS_LINK}/store`
 

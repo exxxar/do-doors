@@ -201,7 +201,7 @@ class CalcController extends Controller
         $ascentFloor = filter_var($request->input('ascent_floor', false), FILTER_VALIDATE_BOOLEAN);
         $deliveryTerms = $request->input('delivery_terms');
         $deliveryType = (int)$request->input('delivery_type', 0);
-
+        $deliveryPrice = (float)($request->input('delivery_price', 0));
 
         $discountPercent = 0;
         $discountValue = 0;
@@ -244,6 +244,9 @@ class CalcController extends Controller
         $totalPrice = (float)$request->input('total_price', 0);
         $totalCount = (int)$request->input('total_count', 1);
 
+        $deliveryCity = $request->input('delivery_city', '');
+        $deliveryAddress = $request->input('delivery_address', '');
+
         // Handle client creation/update
         $client = Client::query()->where('phone', $phone)->first();
         if (!$client && !$clientId) {
@@ -284,7 +287,18 @@ class CalcController extends Controller
             'payed_percent' => $payedPercent,
             'config' => (object)[
                 "delivery_type" => $deliveryType == 0 ? 0 : 1,
+                "delivery_city" => $deliveryCity,
+                "delivery_address" => $deliveryAddress,
                 "need_install" => $needInstall ? 1 : 0,
+                "work_with_nds" => $workWithNds,
+                "payed_percent_type" => $payedPercentType,
+                "ascent_floor" => $ascentFloor,
+                "designer_work_type" => $designerWorkType ?? 1,
+                "designer_value" => $designerValue ?? 0,
+                "designer_price" => $designerPrice ?? 0,
+                "install_recount_type" => $installRecountType ?? 0,
+                "delivery_price" => $deliveryPrice,
+                "install_price" => $installPrice ?? 0,
             ],
             'discount' => (object)[
                 'amount' => $discountValue,
@@ -403,17 +417,20 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($productData)['result'] ?? null;
-                if ($bitrixProductId) {
-                    OrderDetail::create([
-                        'order_id' => $order->id,
-                        'door_type' => $product->title ?? null,
-                        'count' => (int)($product->count ?? 1),
-                        'price' => (float)($product->price ?? 0),
-                        'comment' => $product->comment ?? null,
-                        'purpose' => $product->purpose ?? null,
-                        'door' => $item['product'],
-                        'bitrix24_product_id' => $bitrixProductId,
-                    ]);
+
+
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'door_type' => $product->door_type->title ?? null,
+                    'count' => (int)($product->count ?? 1),
+                    'price' => (float)($product->price ?? 0),
+                    'comment' => $product->comment ?? null,
+                    'purpose' => $product->purpose ?? null,
+                    'door' => $item['product'],
+                    'bitrix24_product_id' => $bitrixProductId,
+                ]);
+
+                if (!is_null($bitrixProductId)) {
 
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
@@ -534,8 +551,8 @@ class CalcController extends Controller
             $deliveryProductData = [
                 'NAME' => 'Доставка комплекта дверей',
                 'CURRENCY_ID' => 'RUB',
-                'PRICE' => (float)($request->input('delivery_price', 0)),
-                'DESCRIPTION' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
+                'PRICE' => $deliveryPrice,
+                'DESCRIPTION' => $deliveryCity . ', ' . $deliveryAddress,
                 'MEASURE' => 0,
                 'QUANTITY' => 1,
             ];
@@ -546,14 +563,14 @@ class CalcController extends Controller
                 if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
-                        'PRICE' => (float)($request->input('delivery_price', 0)),
+                        'PRICE' => $deliveryPrice,
                         'QUANTITY' => 1,
                     ];
 
                     $otherProducts[] = (object)[
                         'title' => 'Доставка комплекта дверей ',
-                        'description' => ($request->input('delivery_city', '') . ', ' . $request->input('delivery_address', '')),
-                        'price' => (float)($request->input('delivery_price', 0)),
+                        'description' => $deliveryCity . ', ' . $deliveryAddress,
+                        'price' => $deliveryPrice,
                         'count' => 1
                     ];
                 }
@@ -571,6 +588,7 @@ class CalcController extends Controller
             }
         }
 
+        $timeFragment = Carbon::now('+3:00')->format('Y-m-d-H-i-s');
         // Generate PDF
         try {
             $mpdf = new Mpdf(['format' => 'A4-P']);
@@ -589,14 +607,13 @@ class CalcController extends Controller
                 'items' => $items,
             ]));
 
-            $file = $mpdf->Output("order-$number.pdf", \Mpdf\Output\Destination::STRING_RETURN);
+            $file = $mpdf->Output("order-$timeFragment.pdf", \Mpdf\Output\Destination::STRING_RETURN);
         } catch (Exception $e) {
             Log::error('PDF generation failed: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to generate PDF'], 500);
         }
 
-        // Generate Excel files
-        $timeFragment = Carbon::now('+3:00')->format('Y-m-d-H-i-s');
+
         $excelFileName1 = "spec-$timeFragment.xls";
         $excelFileName2 = "cp-$timeFragment.xls";
 
@@ -710,13 +727,13 @@ class CalcController extends Controller
                 sleep(1);
                 $telegram->sendDocument([
                     'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents(Storage::get($excelFileName1), "spec-$timeFragment.xls"),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName1), $excelFileName1),
                     'parse_mode' => 'HTML',
                 ]);
                 sleep(1);
                 $telegram->sendDocument([
                     'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents(Storage::get($excelFileName2), "cp-$timeFragment.xls"),
+                    'document' => InputFile::createFromContents(Storage::get($excelFileName2), $excelFileName2),
                     'parse_mode' => 'HTML',
                 ]);
                 sleep(1);

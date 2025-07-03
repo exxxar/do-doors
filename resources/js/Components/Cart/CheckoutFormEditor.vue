@@ -80,7 +80,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                             v-model="clientForm"/>
 
         <CartResultForm
-            :disabled="timer||true"
+            :disabled="timer"
 
             v-model="clientForm">
             <template #loader>
@@ -179,6 +179,7 @@ export default {
                 delivery_city: null,
 
                 delivery_service: null,
+                discount_data: null,
 
             }
         }
@@ -186,11 +187,13 @@ export default {
     mounted() {
         this.loadSelfClients()
 
-        this.clientForm.contract_number = this.order.contract_number || null
+        this.clientForm.id = this.order.id
+        this.clientForm.contract_number = this.order.contract_number || this.order.id
         this.clientForm.name = this.order.contact_person || null
         this.clientForm.phone = this.order.client?.phone || null
         this.clientForm.email = this.order.client?.email || null
         this.clientForm.work_with_nds = this.order.organizational_form === "individual" ? 0 : 1
+
 
     },
     methods: {
@@ -287,11 +290,11 @@ export default {
                         data.append(key, item)
                 });
 
-            data.append("action", this.action)
+            data.append("items", JSON.stringify(this.doors))
             data.append("total_price", this.cartTotalPrice)
             data.append("total_count", this.cartTotalCount)
 
-            this.$store.dispatch("checkoutItems", {
+            this.$store.dispatch("editOrder", {
                 clientForm: data
             }).then((response) => {
 
