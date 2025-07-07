@@ -452,19 +452,19 @@
                         :disabled="disabled"
                         class="btn btn-dark rounded-0 p-3">Отправить
                 </button>
-<!--                <button type="button"
-                        class="btn btn-outline-dark rounded-0 dropdown-toggle dropdown-toggle-split"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                </button>
-                <ul class="dropdown-menu rounded-0">
-                    <li v-for="item in getDictionary.price_type_variants"><a
-                        @click="selectPriceType(item)"
-                        class="dropdown-item"
-                        v-bind:class="{'bg-dark text-white':clientForm.summary_price_type?.title===item.title}"
-                        href="javascript:void(0)">{{ item.title || '-' }}</a></li>
+                <!--                <button type="button"
+                                        class="btn btn-outline-dark rounded-0 dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                                </button>
+                                <ul class="dropdown-menu rounded-0">
+                                    <li v-for="item in getDictionary.price_type_variants"><a
+                                        @click="selectPriceType(item)"
+                                        class="dropdown-item"
+                                        v-bind:class="{'bg-dark text-white':clientForm.summary_price_type?.title===item.title}"
+                                        href="javascript:void(0)">{{ item.title || '-' }}</a></li>
 
-                </ul>-->
+                                </ul>-->
             </div>
         </div>
         <template v-else>
@@ -519,7 +519,7 @@ export default {
 
         this.clientForm = this.modelValue
 
-        this.$nextTick(()=>{
+        this.$nextTick(() => {
             this.discount = this.clientForm.discount_data?.discount_percent || 0
 
         })
@@ -577,29 +577,37 @@ export default {
 
             let detailing_summary_price = 0
             const excluded_prices = ["size", "handle_holes_type", "handle_wrapper_type", "base"]
-            this.doors.forEach(item => {
-                let sum = 0
-                discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>\"" + (item.door.purpose || 'Дверь') + "\" кол-во " + item.count + "ед. </h6><ul style='font-size:10px;' class='list-group'>"
-                item.door.detailing_price.forEach(sub => {
-                    if (excluded_prices.indexOf(sub.type) === -1) {
-                        let price = sub.full_price ? sub.full_price : sub.price
-                        sum += price
 
-                        discountText += "<li class='list-group-item'>" + type_dictionary[sub.type] + " <span class='fw-bold'>" + price + " руб</span> </li>"
+            if ((this.doors || []).length > 0) {
+                this.doors.forEach(item => {
+                    let sum = 0
+                    discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>\"" + (item.door.purpose || 'Дверь') + "\" кол-во " + item.count + "ед. </h6>"
+
+                    if ((item.door.detailing_price || []).length > 0) {
+
+                        discountText += "<ul style='font-size:10px;' class='list-group'>"
+
+                        item.door.detailing_price.forEach(sub => {
+                            if (excluded_prices.indexOf(sub.type) === -1) {
+                                let price = sub.full_price ? sub.full_price : sub.price
+                                sum += price
+
+                                discountText += "<li class='list-group-item'>" + type_dictionary[sub.type] + " <span class='fw-bold'>" + price + " руб</span> </li>"
+                            }
+
+                        })
+                        discountText += "<li class='list-group-item bg-secondary text-white d-flex justify-content-between'>" +
+                            "<span>Итого за дверь <span class='fw-bold'>" + sum + " руб</span></span>" +
+                            "<span class='fw-bold'>" + sum * item.count + " руб (x" + item.count + ")</span>" +
+                            " </li>"
+                        discountText += "</ul>"
+                        detailing_summary_price += sum * (item.count || 0)
                     }
-
                 })
-                discountText += "<li class='list-group-item bg-secondary text-white d-flex justify-content-between'>" +
-                    "<span>Итого за дверь <span class='fw-bold'>" + sum + " руб</span></span>" +
-                    "<span class='fw-bold'>" + sum * item.count + " руб (x" + item.count + ")</span>" +
-                    " </li>"
-                discountText += "</ul>"
-                detailing_summary_price += sum * item.count
-            })
-            discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>Скидку считаем от этого значения " + detailing_summary_price + " руб</h6>"
+                discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>Скидку считаем от этого значения " + detailing_summary_price + " руб</h6>"
 
-            this.discount_text = discountText
-
+                this.discount_text = discountText
+            }
             return detailing_summary_price
         },
         cartTotalCount() {
