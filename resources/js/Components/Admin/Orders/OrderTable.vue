@@ -283,7 +283,9 @@ import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item"
                                    @click="selectItemForEdit(item)"
-                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа</a>
+                                   href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа
+                                    [дверей в заказе {{item.details.length}} ед.]
+                            </a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
