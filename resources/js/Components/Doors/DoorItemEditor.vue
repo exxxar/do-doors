@@ -433,6 +433,11 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
 
                 <div class="col-md-6 col-12 mb-2" v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
                     <HandleSearchModal v-model="doorForm"/>
+
+                    <a
+                        @click="showDetails(doorForm.handle_holes_type)"
+                        href="javascript:void(0)"
+                        class="fst-italic cursor-pointer btn btn-link p-0">Дополнительные параметры ручки</a>
                 </div>
 
                 <div class="col-md-6 offset-md-6 mb-2 col-12"
@@ -440,12 +445,8 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                     <WrapperSearchModal v-model="doorForm"/>
                 </div>
 
-                <div
-                    v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
-                    class="col-12 d-flex align-items-center">
 
 
-                </div>
 
                 <div class="col-12"
                      v-if="(doorForm.handle_holes_type.variants||[]).length>0&&doorForm.need_handle_holes&&doorForm.handle_holes.id!==3">
@@ -463,10 +464,7 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
 
 
                             </p>
-                            <a
-                                @click="showDetails(doorForm.handle_holes_type)"
-                                href="javascript:void(0)"
-                                class="fst-italic cursor-pointer btn btn-link p-0">Дополнительные параметры ручки</a>
+
                         </div>
                         <div class="col-lg-3 col-md-3 col-12 mb-2"
                              v-for="(item, index) in doorForm.handle_holes_type.variants">
@@ -495,6 +493,22 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
 
                     <div class="alert alert-warning rounded-0 mb-2" role="alert">
                         <p>Вариантов изображений ручки нет</p>
+                    </div>
+                </div>
+
+                <div
+                    v-if="doorForm.need_handle_holes&&doorForm.handle_holes.id!==3"
+                    class="col-12 d-flex align-items-center mb-2">
+                    <div class="form-floating w-100">
+                        <select class="form-select"
+                                v-model="doorForm.service_handle"
+                                id="door-service-painting" aria-label="Floating label select example">
+                            <option :value="{title:null}">Не выбрано</option>
+                            <option :value="service" v-for="service in getServiceByType('service_handle')">
+                                {{ service.title || '-' }}
+                            </option>
+                        </select>
+                        <label for="door-service-painting">Услуги по монтажу ручки</label>
                     </div>
                 </div>
 
@@ -666,26 +680,27 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                         </h6>
                         <h6 class="text-black mb-0">
                             <span class="mr-1" v-if="doorForm.box_and_frame_color?.title">({{
-                                    doorForm.box_and_frame_color.title
+                                    doorForm.box_and_frame_color.ral_code ||  doorForm.box_and_frame_color.title
                                 }}),</span>
+
                             <span class="mr-1"
                                   v-if="doorForm.front_side_finish_color?.title">первая сторона {{
                                     doorForm.front_side_finish?.title
                                 }} цвет {{
-                                    doorForm.front_side_finish_color.title
+                                    doorForm.front_side_finish_color.ral_code || doorForm.front_side_finish_color.title
                                 }},</span>
                             <span class="mr-1"
                                   v-if="doorForm.back_side_finish_color?.title">/вторая сторона {{
                                     doorForm.back_side_finish?.title
                                 }} цвет {{
-                                    doorForm.back_side_finish_color.title
+                                    doorForm.back_side_finish_color.ral_code || doorForm.back_side_finish_color.title
                                 }},</span>
                             <span class="mr-1"
                                   v-if="doorForm.loops?.title">петли {{ doorForm.hinge_manufacturer?.title }} {{
                                     doorForm.loops.title
                                 }} ({{ doorForm.loops_count || 0 }} шт.)</span>
                             <span class="mr-1" v-if="doorForm.fittings_color?.title">цвет {{
-                                    doorForm.fittings_color.title
+                                    doorForm.fittings_color.ral_code || doorForm.fittings_color.title
                                 }},</span>
                             <span class="mr-1" v-if="doorForm.opening_type?.title">{{
                                     doorForm.opening_type.title
@@ -701,7 +716,12 @@ import WrapperSearchModal from "@/Components/Admin/Handles/WrapperSearchModal.vu
                             <span class="mr-1"
                                   v-if="doorForm.need_hidden_skirting_board">Скрытый плинтус,</span>
                             <span class="mr-1" v-if="doorForm.need_door_install">Установка двери,</span>
-                            <span class="mr-1" v-if="doorForm.need_handle_holes">Ручка в комплекте</span>
+                            <span class="mr-1" v-if="doorForm.need_handle_holes">
+                                {{doorForm.handle_holes.title}}
+
+                                <span v-if="doorForm.handle_holes_type.title!==null">: ручка в наличии</span>
+                                <span v-if="doorForm.handle_wrapper_type.title!==null">, завертка в наличии</span>
+                            </span>
                         </h6>
                     </div>
                 </div>
@@ -1104,7 +1124,7 @@ export default {
                             let fullPrice = 0
 
                             if (this.doorForm.size)
-                                fullPrice = this.doorForm.size.loops.count * price
+                                fullPrice = (this.doorForm.size.loops?.count || 0) * price
 
                             sum += parseInt(fullPrice || 0)
 
@@ -1128,6 +1148,18 @@ export default {
                         }
 
 
+                        if (["service_doorstep", "service_stopper", "service_door_closer", "service_handle"].indexOf(item) !== -1
+                            && this.doorForm[item].title != null && !find) {
+                            find = true
+                            let price = this.doorForm[item].price[type]
+                            sum += parseInt(price || 0)
+
+                            this.tmp_prices.push({
+                                type: item,
+                                price: price
+                            })
+                        }
+
                         if (item === "service_painting" && this.doorForm[item].title != null && !find) {
                             find = true
 
@@ -1135,7 +1167,7 @@ export default {
                             let fullPrice = 0
 
                             if (this.doorForm.size)
-                                fullPrice = (this.doorForm.size.loops.count + 1) * price
+                                fullPrice = ((this.doorForm.size.loops?.count || 0) + 1) * price
 
                             sum += fullPrice || 0
 
@@ -1697,7 +1729,6 @@ export default {
 
                 if (this.cartTotalCount > 0) {
                     const handle = JSON.parse(localStorage.getItem("dodoors_handle_holes_type_selected"))
-                    console.log("handle for selection", handle)
                     if (handle)
                         this.doorForm.handle_holes_type = handle
                 }
@@ -1867,20 +1898,11 @@ export default {
         submitForm() {
             this.messages = []
 
+            this.doorForm.detailing_price = this.tmp_prices
             if (this.editOrder) {
-                let data = new FormData();
-                Object.keys(this.doorForm)
-                    .forEach(key => {
-                        const item = this.doorForm[key] || ''
-                        if (typeof item === 'object')
-                            data.append(key, JSON.stringify(item))
-                        else
-                            data.append(key, item)
-                    });
-
 
                 this.$store.dispatch("editDoorInOrder", {
-                    doorForm: data
+                    doorForm: this.doorForm,
                 }).then((response) => {
                     this.$notify({
                         title: "DoDoors",
@@ -1888,6 +1910,7 @@ export default {
                         type: "success"
                     });
 
+                    window.location.reload()
                     this.$emit("callback")
                     //this.clearForm()
                 }).catch(() => {

@@ -31,14 +31,6 @@ use Revolution\Google\Sheets\Sheets;
 |
 */
 
-Route::get("/mail", function (){
-    $attachments = [
-        storage_path("app/1a702d7e-6588-48e5-bfb7-4284bad870b2.xls"),
-        storage_path("app/1b25b570-4f94-4596-b319-9dc5319ceb03.xls"),
-    ];
-
-    Mail::to("exxxar@gmail.com")->send(new KPMail("aleks",$attachments ));
-});
 
 Route::any("/webhook", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
 Route::any("/webhook-deal-update", [\App\Http\Controllers\CalcController::class, 'webhookDealHandler']);
@@ -338,6 +330,7 @@ Route::prefix("/orders")
         Route::get("/download-template", "downloadTemplate");
         Route::get("/download-demo", "downloadDemo");
         Route::get('/download-by-contract',  'downloadContract');
+        Route::post('/order-info',  'getOrderInfo');
         Route::post('/send-to-bitrix',  'sendToBitrix');
         Route::post("/", "getOrderList");
         Route::post("/update-contract-templates", "updateContractTemplates");

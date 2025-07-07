@@ -22,11 +22,7 @@
                    placeholder="name@example.com">
             <label for="checkout-email">Выдан</label>
         </div>
-        <div class="form-floating mb-2">
-            <input type="text" class="form-control" v-model="clientForm.delivery_address" id="checkout-email"
-                   placeholder="name@example.com" required>
-            <label for="checkout-email">Адрес доставки</label>
-        </div>
+
         <div class="form-floating mb-2">
             <input type="text" class="form-control" v-model="clientForm.info" id="checkout-email"
                    placeholder="name@example.com">

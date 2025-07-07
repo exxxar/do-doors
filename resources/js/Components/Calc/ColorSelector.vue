@@ -71,9 +71,9 @@ import RalColorSelector from "@/Components/Support/RalColorSelector.vue";
             <button
                 v-if="!material?.config?.is_custom_color"
                 class="btn btn-outline-secondary" type="button"
-                    data-bs-auto-close="true"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                data-bs-auto-close="true"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end rounded-0">
@@ -153,6 +153,7 @@ export default {
                         if (this.colors[key].code === search) {
                             this.color.code = this.colors[key].color.hex
                             this.color.title = this.colors[key].names.en
+                            this.color.ral_color = "RAL "+this.colors[key].code
                         }
 
                     })
@@ -198,8 +199,9 @@ export default {
         },
         callbackSelectColor(item) {
 
-            this.color.title = item.names.en
+            this.color.title = item.code ? 'RAL ' + item.code : item.names.en
             this.color.code = item.color.hex
+            this.color.ral_code = "RAL "+item.code
 
             this.colorModal.hide()
         },
@@ -228,6 +230,7 @@ export default {
 
                 if (item.title.toLowerCase() === "ral") {
                     this.loadRalColors()
+
 
                     color = {
                         title: 'RAL',

@@ -29,51 +29,59 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
     public $buyer;
 
-    public function __construct($data, $otherProducts = null, $sheetTitle = "Спецификация", $buyer = null)
+    public $orderData;
+
+    public function __construct($data, $otherProducts = null, $sheetTitle = "Спецификация", $buyer = null, $orderData = null)
     {
         $this->items = $data ?? [];
         $this->otherProducts = $otherProducts ?? null;
         $this->sheetTitle = $sheetTitle;
         $this->buyer = $buyer;
+        $this->orderData = $orderData;
+
 
     }
 
     public function view(): \Illuminate\Contracts\View\View
     {
         $doc = new DocumentLogic();
+        $nds = $this->orderData["config"]["work_with_nds"] ?? 1;
 
+        $sellerParams = $doc->getAllSellerParameters($nds);
 
         return view('export.cart-part2', [
             'items' => $this->items,
             'other_products' => $this->otherProducts,
             'sheet_title' => $this->sheetTitle,
-            'seller' => $doc->getAllSellerParameters(),
+            'order_data' => $this->orderData,
+            'seller' => $sellerParams,
             'buyer' => $this->buyer
         ]);
     }
 
     public function drawings()
     {
-        $signStartPos = count($this->items) +count($this->otherProducts ?? []) + 3 + 2 + 13;
 
-        $stampStartPos = $signStartPos+7;
+        $signStartPos = count($this->items) + count($this->otherProducts ?? []) + 3 + 2 + 13;
 
-        switch($this->buyer["status"] ?? 'phys'){
+        $nds = $this->orderData["config"]["work_with_nds"] ?? 1;
+        $stampStartPos = $signStartPos + 7;
+
+        switch ($nds) {
             default:
-            case 'individual':
-                    $sign = 'docs/sign_ip.jpg';
-                    $stamp = 'docs/stamp_ip.jpg';
+            case 0:
+                $sign = 'docs/sign_ip.jpg';
+                $stamp = 'docs/stamp_ip.jpg';
                 break;
-            case 'legal_entity':
+            case 1:
                 $sign = 'docs/sign_ooo.jpg';
                 $stamp = 'docs/stamp_ooo.jpg';
                 break;
-            case 'phys':
+            case 2:
                 $sign = 'docs/sign_phys_person.jpg';
                 $stamp = 'docs/stamp_phys_person.jpg';
                 break;
         }
-
 
 
         $drawing1 = new Drawing();
@@ -101,8 +109,8 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
             AfterSheet::class => function (AfterSheet $event) {
 
                 $count = count($this->items) + count($this->otherProducts ?? []) + 3;
-                $startPosTable2 = $count + 2;
-                $endPosTable2 = $startPosTable2 + 11;
+                $startPosTable2 = $count + 2 + 3;
+                $endPosTable2 = $startPosTable2 + 11 + 3;
 
                 $sheet = $event->sheet->getDelegate();
 
@@ -117,14 +125,16 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
                 $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle("F$startPosTable2:J$endPosTable2")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
 
-               // $sheet->getColumnDimension('B')->setWidth(100); // Ширина колонки B
-               // $sheet->getColumnDimension('C')->setWidth(50); // Ширина колонки C
+                // $sheet->getColumnDimension('B')->setWidth(100); // Ширина колонки B
+                // $sheet->getColumnDimension('C')->setWidth(50); // Ширина колонки C
 
-                for ($i = 3; $i < $count; $i++)
+                for ($i = 3; $i < count($this->items) + 3; $i++)
                     $sheet->getRowDimension($i)->setRowHeight(150); // Высота строки 1
                 // Внутри группы (A2:B2 и т.д.) границ нет, только внешние!
                 // Для этого мы не добавляем границы для внутренних ячеек.
 
+                for ($i = count($this->items) + 3; $i < count($this->items) + count($this->otherProducts) + 3; $i++)
+                    $sheet->getRowDimension($i)->setRowHeight(75); // Высота строки 1
 
 
                 $stampEndPos = $endPosTable2 + 25;
@@ -147,7 +157,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents, WithDra
 
     public function styles(Worksheet|\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
     {
-        $count = count($this->items) + count($this->otherProducts ?? []) + 3;
+        $count = count($this->items) + count($this->otherProducts ?? []) + (($this->orderData["discount"]["amount"] ?? 0) > 0 ? 5 : 3);
         $startPosTable2 = $count + 2;
         $endPosTable2 = $startPosTable2 + 11;
         return [

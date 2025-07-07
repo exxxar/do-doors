@@ -83,8 +83,6 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
             </template>
         </CartResultForm>
 
-        <button type="button" class="btn btn-outline-secondary w-100 rounded-0" @click="back">Назад
-        </button>
     </form>
     <div class="card rounded-0" v-else>
         <div class="card-body">
@@ -130,7 +128,7 @@ export default {
 
             clientForm: {
                 id: null,
-                send_to_bitix: true,
+                send_to_bitrix: true,
                 send_to_mail: false,
                 send_to_telegram: true,
                 send_to_self_mail: false,

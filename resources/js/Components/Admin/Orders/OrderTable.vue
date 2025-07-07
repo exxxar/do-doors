@@ -875,7 +875,7 @@ export default {
         },
         removeItem(id) {
             this.$store.dispatch("removeOrder", {
-                materialId: id
+                orderId: id
             }).then(() => {
                 this.sortAndLoad("id")
             })

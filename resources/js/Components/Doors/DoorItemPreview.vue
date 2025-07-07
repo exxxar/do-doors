@@ -18,7 +18,8 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             :disabled="!canEdit"
                             @click="editVariant"
                             type="button"
-                            class="btn btn-dark rounded-0 w-100 p-3"><i class="fa-solid fa-floppy-disk"></i> Редактировать
+                            class="btn btn-dark rounded-0 w-100 p-3"><i class="fa-solid fa-floppy-disk"></i>
+                            Редактировать
                         </button>
                     </div>
 
@@ -98,7 +99,7 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             <div class="card-body px-2 py-1">
                                 <label class="font-size-10"><i class="fa-solid fa-angles-left"></i> Сторона петель
                                 </label>
-                                <p>{{ door.loops_variants?.title || '-' }}</p>
+                                <p>{{ door.loops?.title || '-' }}</p>
                             </div>
                         </div>
 
@@ -271,27 +272,40 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             <div class="card-body px-2 py-1">
                                 <label class="font-size-10">Отверстие под ручку
                                 </label>
-                                <p>{{ door.handle_holes_variants?.title || '-' }}</p>
+
+                                <p>{{ door.handle_holes?.title || '-' }}</p>
                             </div>
                         </div>
 
 
                     </div>
 
-                    <div class="col-md-6 col-12 mb-2" v-if="door.need_handle_holes&&door.handle_holes.id!==3">
-
-                        <div
-                            class="card rounded-0 border-black">
-                            <div class="card-body px-2 py-1">
-                                <label class="font-size-10">Вариант ручки
-                                </label>
-                                <p>{{ door.handle_holes_type.title || '-' }}</p>
+                    <div class="col-md-6 col-12 mb-2" v-if="door.need_handle_holes">
+                        <template v-if="door.handle_holes.id===1||door.handle_holes.id===2">
+                            <div
+                                class="card rounded-0 border-black mb-2">
+                                <div class="card-body px-2 py-1">
+                                    <label class="font-size-10">Вариант ручки
+                                    </label>
+                                    <p>{{ door.handle_holes_type.title || '-' }}</p>
+                                </div>
                             </div>
-                        </div>
+                        </template>
+
+                        <template v-if="door.handle_holes.id===2">
+                            <div
+                                class="card rounded-0 border-black">
+                                <div class="card-body px-2 py-1">
+                                    <label class="font-size-10">Вариант завертки
+                                    </label>
+                                    <p>{{ door.handle_wrapper_type.title || '-' }}</p>
+                                </div>
+                            </div>
+                        </template>
 
                     </div>
 
-                    <div
+<!--                    <div
                         v-if="door.need_handle_holes&&door.handle_holes.id!==3"
                         class="col-12 mb-2">
 
@@ -301,12 +315,12 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                             <div class="card-body px-2 py-1">
                                 <label class="font-size-10">Вариант дополнительного сервиса
                                 </label>
-                                <p>{{ door.service_handle?.title || '-' }}</p>
+                                <p>{{ door.service_handle?.title || 'Не выбран' }}</p>
                             </div>
                         </div>
 
 
-                    </div>
+                    </div>-->
 
                     <div class="col-12"
                          v-if="(door.handle_holes_type.variants||[]).length>0&&door.need_handle_holes&&door.handle_holes.id!==3">
@@ -388,8 +402,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                 <p>{{ door.service_doorstep?.title || '-' }}</p>
                             </div>
                         </div>
-
-
 
 
                     </div>
@@ -604,7 +616,8 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
                                     <button
                                         @click="editVariant"
                                         type="button"
-                                        class="btn btn-dark rounded-0 w-100"><i class="fa-solid fa-floppy-disk"></i> Редактировать
+                                        class="btn btn-dark rounded-0 w-100"><i class="fa-solid fa-floppy-disk"></i>
+                                        Редактировать
                                     </button>
                                 </div>
                             </div>
@@ -643,7 +656,6 @@ import ColorSelector from "@/Components/Calc/ColorSelector.vue";
         </div>
 
 
-
     </template>
     <div class="row" v-else>
         <div class="col-12">
@@ -666,7 +678,7 @@ import {uuid} from 'vue-uuid';
 export default {
 
     name: 'MyComponent',
-    props: ['modelValue','canEdit'],
+    props: ['modelValue', 'canEdit'],
     data() {
         return {
             loaded: false,
@@ -728,8 +740,8 @@ export default {
         this.door = this.modelValue
     },
     methods: {
-        editVariant(){
-          this.$emit("edit")
+        editVariant() {
+            this.$emit("edit")
         },
 
         invertHex(color) {

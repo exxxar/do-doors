@@ -32,7 +32,7 @@ class Order extends Model
         'profit',
         'work_days',
         'bitrix24_lead_id',
-
+        'config',
         'delivery_terms',
         'info',
         'total_price',

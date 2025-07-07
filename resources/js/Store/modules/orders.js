@@ -66,6 +66,21 @@ const actions = {
         })
     },
 
+    async loadOrder(context, payload = { order_id: null }) {
+
+        let link = `${BASE_ORDERS_LINK}/order-info`
+        let method = 'POST'
+
+        let _axios = util.makeAxiosFactory(link, method, payload)
+
+        return _axios.then((response) => {
+            return Promise.resolve(response);
+        }).catch(err => {
+            if (err.response)
+                context.commit("setErrors", err.response.data.errors || [])
+            return Promise.reject(err);
+        })
+    },
 
     async loadOrders(context, payload = { dataObject: null, page: 0, size: 50 }) {
         let page = payload.page || 0

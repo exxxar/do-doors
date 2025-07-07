@@ -50,6 +50,16 @@
         </tr>
 
         @foreach($items as $index=>$item)
+            @php
+                $item = json_decode(json_encode($item));
+
+                if (!is_null($item->product ?? null))
+                    $item = $item->product;
+
+                  if (!is_null($item->door ?? null))
+                    $item = $item->door;
+
+            @endphp
             <tr>
                 <td style="width: 50px;">{{$index+1}}</td>
                 <td style="width: 50px;">{{$item->order->contract_number ?? $item->order->id ?? '-' }}</td>
@@ -97,8 +107,8 @@
                 <td>{{$item->hinge_manufacturer->title ?? 'не указано'}}</td>
                 <td>{{$item->price_type->title ?? 'не указано'}}</td>
                 <td style="width: 150px;">{{$item->price ?? 0}}</td>
-                <td style="width: 150px;">{{$item->quantity ?? 0}}</td>
-                <td style="width: 150px;">{{($item->price ?? 0)*($item->quantity ?? 0)}}</td>
+                <td style="width: 150px;">{{$item->count ?? 0}}</td>
+                <td style="width: 150px;">{{($item->price ?? 0)*($item->count ?? 0)}}</td>
             </tr>
         @endforeach
 

@@ -70,7 +70,7 @@
                     <ul class="list-group">
                     <div v-for="(item, index) in filteredItems" :key="item.title"
                          class="list-group-item cursor-pointer"
-                         :class="{'list-group-item-primary': door.handle_holes_type === item,
+                         :class="{'list-group-item-primary': door.handle_wrapper_type === item,
                              'list-group-item-success':success_added.indexOf(item.title)!=-1&&item.id!=null,
                              'list-group-item-warning':success_added.indexOf(item.title)!=-1&&item.id==null,
 

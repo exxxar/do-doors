@@ -27,8 +27,9 @@
         </tr>
 
         @php
-        $summary = 0;
-        $index = 1;
+            $summary = 0;
+            $index = 1;
+
 
         @endphp
 
@@ -48,32 +49,49 @@
                 <td style="width: 50px;">{{$index}}</td>
 
                 <td style="width: 100px;" colspan="2">
-                    DoDoors: {{$item->door_type->title  ?? 'не указано'}},
+                    {{NamingLogic::query()->setProduct($item)->getName()}}
+                    <!--                    DoDoors: {{$item->door_type->title  ?? 'не указано'}},
                     открывание {{$item->opening_type->title  ?? 'не указано'}},
                     петли {{$item->loops->title ?? 'не указано'}}.
                     Отделка с передней стороны: {{$item->front_side_finish->title  ?? 'Грунт'}}
                     @if (is_null($item->front_side_finish_color->title   ?? null))
-                    ({{$item->front_side_finish_color->title  ?? 'Грунт'}})
+                        ({{$item->front_side_finish_color->title  ?? 'Грунт'}})
+
+
                     @endif
                     .
                     Отделка с задней стороны: {{$item->back_side_finish->title   ?? 'Грунт'}}
                     @if(is_null($item->back_side_finish_color->title    ?? null))
                         ({{$item->back_side_finish_color->title  ?? 'Грунт'}})
+
+
                     @endif
                     .
 
                     @if (!is_null($item->box_and_frame_color->title  ?? null))
                         Цвет короба и полотна: {{$item->box_and_frame_color->title  ?? 'не указано'}}.
+
+
                     @endif
                     @if (!is_null($item->fittings_color->title  ?? null))
                         Цвет фурнитуры: {{$item->fittings_color->title  ?? 'не указано'}}.
-                    @endif
+                    @endif-->
                 </td>
 
-
-                <td style="width: 150px;" >
-                    Каркас полотна: алюминий анодированный, отфрезерованный для монтажа петель и защелки. Короб двери: алюминий анодированный отфрезерованный для монтажа петель, с запилами сверху под 45 градусов, снизу под 90 градусов, для последующего, рассчитанного крепления полотна в коробе и монтажа короба в проёме стены. Отверстие под ручку. В комплект входит: короб двери, полотно, скрытые петли, магнитная защелка, уплотнитель короба, монтажные угловые пластины для сборки короба, монтажные пластины для крепления короба в проёме, метизы, ответная часть под защелку.
-                </td>
+                @if ($index==1)
+                    <td style="width: 150px;" rowspan="{{count($items)}}">
+                        Каркас полотна: алюминий анодированный, отфрезерованный для монтажа петель и защелки. Короб
+                        двери:
+                        алюминий анодированный отфрезерованный для монтажа петель, с запилами сверху под 45 градусов,
+                        снизу
+                        под 90 градусов, для последующего, рассчитанного крепления полотна в коробе и монтажа короба в
+                        проёме стены. Отверстие под ручку. В комплект входит: короб двери, полотно, скрытые петли,
+                        магнитная
+                        защелка, уплотнитель короба, монтажные угловые пластины для сборки короба, монтажные пластины
+                        для
+                        крепления короба в проёме, метизы, ответная часть под защелку.
+                    </td>
+                @endif
 
                 <td style="width: 150px;">{{$item->height ?? 0}}x{{$item->width ?? 0}}</td>
 
@@ -92,16 +110,21 @@
         @endforeach
 
         @if(!is_null($other_products))
-            @foreach($other_products as $index=>$item)
+            @foreach($other_products as $key=>$item)
+
+                @php
+                    $item = (object)$item;
+                @endphp
+
                 <tr>
                     <td style="width: 50px;">{{$index}}</td>
 
                     <td style="width: 100px;" colspan="2">
-                      {{$item->title ?? ''}}
+                        {{$item->title ?? ''}}
                     </td>
 
 
-                    <td style="width: 150px;" >
+                    <td style="width: 150px;">
                         {{$item->description ?? ''}}
                     </td>
 
@@ -122,12 +145,41 @@
         @endif
 
 
+        @php
+
+            $contractAmount  = $order_data["contract_amount"] ?? [];
+            $totalPrice  = $order_data["total_price"] ?? 0;
+            $deliveryPrice  = $order_data["config"]["delivery_price"] ?? 0;
+            $installPrice  = $order_data["config"]["install_price"] ?? 0;
+            $detailingSummaryPrice  = $order_data["config"]["detailing_summary_price"] ?? 0;
+            $fullSummaryPrice  = $order_data["config"]["full_summary_price"] ?? 0;
+            $priceWithDiscount  = $order_data["config"]["price_with_discount"] ?? 0;
+            $discountAmount  = $order_data["discount"]["amount"] ?? 0;
+            $discountPercent = $order_data["discount"]["percent"] ?? 0;
+        @endphp
+
+
         <tr>
             <td></td>
             <td colspan="8">Итого:</td>
-            <td>{{$summary}}</td>
+            <td>{{$summary}} руб.</td>
 
         </tr>
+
+        @if($discountPercent>0)
+            <tr>
+                <td></td>
+                <td colspan="8">Скидка:</td>
+                <td>{{$discountAmount}} руб. ({{$discountPercent}} %)</td>
+
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="8">Цена со скидкой:</td>
+                <td>{{$fullSummaryPrice}} руб.</td>
+
+            </tr>
+        @endif
     </table>
 
 @endif
@@ -138,11 +190,11 @@
         <th colspan="5" style="text-align: left;font-weight: bold;"><h3>ПОКУПАТЕЛЬ:</h3></th>
     </tr>
 
-, , , ,
+    , , , ,
     <tr>
-        <td colspan="2" ><strong>Имя:</strong></td>
+        <td colspan="2"><strong>Имя:</strong></td>
         <td colspan="3" style="text-align: right;">{{$seller["seller_title"]}}</td>
-        <td colspan="1"><strong>Имя:</strong> </td>
+        <td colspan="1"><strong>Имя:</strong></td>
         <td colspan="4" style="text-align: right;">{{$buyer["buyer_title"]}}</td>
     </tr>
     <tr>

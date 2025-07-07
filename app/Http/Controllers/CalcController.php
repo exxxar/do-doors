@@ -7,6 +7,7 @@ use App\Enums\OrderStatusEnum;
 use App\Exports\Cart\MultiSheetsCartExport;
 use App\Exports\CartExport;
 use App\Exports\CommercialProposal\MultiSheetsCart2Export;
+use App\Facades\NamingLogic;
 use App\Mail\KPMail;
 use App\Models\Client;
 use App\Models\Order;
@@ -41,7 +42,7 @@ use nomelodic\NCL\NCLNameCaseRu;
 
 class CalcController extends Controller
 {
-
+    use Utility;
 
     public function webhookDealHandler(Request $request)
     {
@@ -224,6 +225,7 @@ class CalcController extends Controller
         $designerWorkType = isset($designer['is_fix']) && filter_var($designer['is_fix'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
         $designerValue = (float)($designer['value'] ?? 0);
         $designerPrice = (float)($designer['price'] ?? 0);
+
         $installPrice = (float)($installation['price'] ?? 0);
         $installCount = (int)($installation['count'] ?? 0);
         $installRecountType = (int)($installation['recount_type'] ?? 0);
@@ -243,6 +245,11 @@ class CalcController extends Controller
         $info = $request->input('info', 'не указан');
         $totalPrice = (float)$request->input('total_price', 0);
         $totalCount = (int)$request->input('total_count', 1);
+
+        $priceWithDiscount = (int)$request->input('price_with_discount', 0);
+        $detailingSummaryPrice = (int)$request->input('detailing_summary_price', 0);
+        $fullSummaryPrice = (int)$request->input('full_summary_price', 0);
+
 
         $deliveryCity = $request->input('delivery_city', '');
         $deliveryAddress = $request->input('delivery_address', '');
@@ -270,14 +277,14 @@ class CalcController extends Controller
         $buyerData["status"] = ['individual', 'legal_entity', 'phys'][$workWithNds] ?? 'individual';
         // Prepare order data
         $tmpData = [
-            'contract_date' => Carbon::now(),
+            'contract_date' => Carbon::now()->addHours(3),
             'client_id' => $client->id,
             'status' => OrderStatusEnum::NewOrder,
             'source' => $request->input('source', 'crm'),
             'contact_person' => $name,
             'phone' => $phone,
             'organizational_form' => $client->status ?? 'new_client',
-            'contract_amount' => $totalPrice,
+            'contract_amount' => $fullSummaryPrice,
             'work_days' => $workDays,
             'delivery_terms' => $deliveryTerms,
             'info' => $info,
@@ -296,9 +303,14 @@ class CalcController extends Controller
                 "designer_work_type" => $designerWorkType ?? 1,
                 "designer_value" => $designerValue ?? 0,
                 "designer_price" => $designerPrice ?? 0,
+
                 "install_recount_type" => $installRecountType ?? 0,
                 "delivery_price" => $deliveryPrice,
                 "install_price" => $installPrice ?? 0,
+
+                "detailing_summary_price" => $detailingSummaryPrice,
+                "full_summary_price" => $fullSummaryPrice,
+                "price_with_discount" => $priceWithDiscount,
             ],
             'discount' => (object)[
                 'amount' => $discountValue,
@@ -307,7 +319,7 @@ class CalcController extends Controller
         ];
 
         // Create or update order
-        $order = $orderId ? Order::find($orderId) : null;
+        $order = $orderId ? Order::query()->find($orderId) : null;
         if ($order) {
             $order->update($tmpData);
         } else {
@@ -347,12 +359,12 @@ class CalcController extends Controller
                 'UF_CRM_1733302866734' => $request->input('delivery_city', '-'),
                 'UF_CRM_1733302493' => [51, 53, 55, 57][$deliveryType] ?? 51,
                 'UF_CRM_1733302917133' => $currentPayed,
-                'UF_CRM_1733302937139' => $totalPrice,
-                'UF_CRM_1733302958322' => $totalPrice - $currentPayed,
+                'UF_CRM_1733302937139' => $fullSummaryPrice,
+                'UF_CRM_1733302958322' => $fullSummaryPrice - $currentPayed,
                 'UF_CRM_1733302997393' => 0.0,
                 'UF_CRM_1733305761683' => $request->input('delivery_price', 0),
                 'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id,
-                'UF_CRM_1742976788' => [2125, 2125, 2123][$workWithNds] ?? 2123,
+                'UF_CRM_1742976788' => [2125, 2123, 2123][$workWithNds] ?? 2123,
                 'UF_CRM_1733303016351' => 0,
                 'UF_CRM_1733306662836' => 0,
                 'UF_CRM_1733306683779' => $designerWorkType ? $designerValue : $designerPrice,
@@ -384,27 +396,9 @@ class CalcController extends Controller
             $product = (object)$item['product'];
             $priceType = $product->price_type->key ?? 'retail';
 
-            $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
-            $doorDescription = sprintf(
-                'DoDoors: %s %s%dx%d, открывание %s, петли %s. %s %s/%s %s. Цвет короба и полотна: %s. Цвет фурнитуры: %s. Толщина профиля %s мм. %s%s%s%s',
-                $shorts[$product->door_type->title ?? null] ?? ($product->door_type->title ?? 'КДС'),
-                filter_var($product->need_upper_jumper ?? false, FILTER_VALIDATE_BOOLEAN) ? '' : 'без верх. перемычки ',
-                $product->height ?? 0,
-                $product->width ?? 0,
-                $product->opening_type->title ?? 'не указано',
-                $product->loops->title ?? 'не указано',
-                $product->front_side_finish->title ?? 'материал',
-                $product->front_side_finish_color->title ?? 'Грунт',
-                $product->back_side_finish->title ?? 'материал',
-                $product->back_side_finish_color->title ?? 'Грунт',
-                $product->box_and_frame_color->title ?? 'не указано',
-                $product->fittings_color->title ?? 'не указано',
-                $product->depth ?? 'не указано',
-                filter_var($product->need_automatic_doorstep ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Автоматический порог ' : '',
-                filter_var($product->need_hidden_stopper ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый стопор ' : '',
-                filter_var($product->need_hidden_door_closer ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый доводчик ' : '',
-                filter_var($product->need_hidden_skirting_board ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый плинтус ' : ''
-            );
+            $doorDescription = NamingLogic::query()
+                ->setProduct($product)
+                ->getName();
 
             $productData = [
                 'NAME' => $doorDescription,
@@ -417,7 +411,6 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($productData)['result'] ?? null;
-
 
                 OrderDetail::create([
                     'order_id' => $order->id,
@@ -443,7 +436,7 @@ class CalcController extends Controller
             }
 
             // Handle door handles
-            if (!is_null($product->handle_holes_type ?? null)) {
+            if (!is_null($product->handle_holes_type["title"] ?? null)) {
                 $handle = (object)$product->handle_holes_type;
                 $price = (array)($handle->price ?? []);
                 $installDoorsData = [
@@ -478,7 +471,8 @@ class CalcController extends Controller
 
             Log::info("ЕСТЬ ЛИ ЗАВЕРТКА? (РУЧКА)" . print_r($product->handle_wrapper_type ?? null, true));
             // Handle wrappers
-            if (!is_null($product->handle_wrapper_type ?? null)) {
+            if (!is_null($product->handle_wrapper_type["title"] ?? null)) {
+
                 $wrapper = (object)$product->handle_wrapper_type;
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
@@ -489,10 +483,10 @@ class CalcController extends Controller
                     'MEASURE' => 0,
                     'QUANTITY' => (int)($product->count ?? 1),
                 ];
-                Log::info("ДА, ЕСТЬ? (РУЧКА)" . print_r($handleDoorsData, true));
+
                 try {
                     $bitrixProductId = $bitrix->addProduct($handleDoorsData)['result'] ?? null;
-                    Log::info("ЗАВЕРТКА: " . print_r($bitrixProductId, true));
+
                     if (!is_null($bitrixProductId)) {
                         $productsForBitrix[] = [
                             'PRODUCT_ID' => $bitrixProductId,
@@ -526,7 +520,7 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($handleInstallDoorsData)['result'] ?? null;
-                Log::info("УСТАНОВКА: " . print_r($bitrixProductId, true));
+
                 if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
@@ -559,7 +553,7 @@ class CalcController extends Controller
 
             try {
                 $bitrixProductId = $bitrix->addProduct($deliveryProductData)['result'] ?? null;
-                Log::info("ДОСТАВКА: " . print_r($bitrixProductId, true));
+
                 if (!is_null($bitrixProductId)) {
                     $productsForBitrix[] = [
                         'PRODUCT_ID' => $bitrixProductId,
@@ -589,37 +583,18 @@ class CalcController extends Controller
         }
 
         $timeFragment = Carbon::now('+3:00')->format('Y-m-d-H-i-s');
-        // Generate PDF
-        try {
-            $mpdf = new Mpdf(['format' => 'A4-P']);
-            $currentDate = Carbon::now('+3:00')->format('Y-m-d H:i:s');
-            $number = Str::uuid();
-
-            $mpdf->WriteHTML(view('pdf.order-v2', [
-                'name' => $name,
-                'order_id' => $number,
-                'current_date' => $currentDate,
-                'email' => $email,
-                'phone' => $phone,
-                'info' => $info,
-                'total_price' => $totalPrice,
-                'total_count' => $totalCount,
-                'items' => $items,
-            ]));
-
-            $file = $mpdf->Output("order-$timeFragment.pdf", \Mpdf\Output\Destination::STRING_RETURN);
-        } catch (Exception $e) {
-            Log::error('PDF generation failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to generate PDF'], 500);
-        }
-
-
         $excelFileName1 = "spec-$timeFragment.xls";
         $excelFileName2 = "cp-$timeFragment.xls";
 
+        $config = $order->config ?? [];
+        $config["other_products"] = $otherProducts ?? [];
+
+        $order->config = $config;
+        $order->save();
+
         try {
-            Excel::store(new MultiSheetsCartExport($items, $buyerData, $otherProducts, true), $excelFileName1);
-            Excel::store(new MultiSheetsCart2Export($items, $buyerData, $otherProducts, true), $excelFileName2);
+            Excel::store(new MultiSheetsCartExport($items, $buyerData, $otherProducts, true, $order->toArray()), $excelFileName1);
+            Excel::store(new MultiSheetsCart2Export($items, $buyerData, $otherProducts, true, $order->toArray()), $excelFileName2);
         } catch (Exception $e) {
             Log::error('Excel generation failed: ' . $e->getMessage());
         }
@@ -634,10 +609,6 @@ class CalcController extends Controller
                 'name' => "коммерческое предложение от $timeFragment.xls",
                 'path' => base64_encode(Storage::get($excelFileName2)),
             ],
-            [
-                'name' => "информация о заказе от $timeFragment.pdf",
-                'path' => base64_encode($file),
-            ],
         ];
 
         // Handle contract document
@@ -647,7 +618,12 @@ class CalcController extends Controller
         $newName = "/договор с клиентом №{$client->id} {$statusClient} от" . Carbon::now()->format('Y-m-d h-i-s') . '.docx';
         $workDaysString = $workDays . ' (' . (new MessageFormatter('ru-RU', '{n, spellout}'))->format(['n' => $workDays]) . ')';
 
+
+
         if (file_exists("$path/$fileName")) {
+
+
+
             try {
                 $templateProcessor = new TemplateProcessor("$path/$fileName");
                 $templateProcessor->setValue('date_doc', Carbon::now()->format('d-m-Y'));
@@ -665,7 +641,7 @@ class CalcController extends Controller
                 $templateProcessor->setValue('okpo', $client->okpo ?? '-');
                 $templateProcessor->setValue('order_id', $order->id);
                 $templateProcessor->setValue('info', $info);
-                $templateProcessor->setValue('total_price', $totalPrice);
+                $templateProcessor->setValue('total_price', $fullSummaryPrice);
                 $templateProcessor->setValue('total_count', $totalCount);
                 ///delivery и install поля
                 $templateProcessor->setValue('delivery', $deliveryType == 0 ? "входит" : "не входит");
@@ -684,6 +660,7 @@ class CalcController extends Controller
                 $templateProcessor->setValue('passport_issued', $passportIssued);
 
                 $doc = new DocumentLogic();
+
                 foreach ($doc->getAllSellerParameters($workWithNds) as $key => $value) {
                     $templateProcessor->setValue($key, $value);
                 }
@@ -720,7 +697,7 @@ class CalcController extends Controller
                         "Телефон: $phone\n" .
                         "Доп.инфо: $info\n" .
                         "Общее кол-во товара: $totalCount ед.\n" .
-                        "Цена товара: $totalPrice руб.\n",
+                        "Цена товара: $fullSummaryPrice руб.\n",
                     'parse_mode' => 'HTML',
                 ]);
 
@@ -736,12 +713,7 @@ class CalcController extends Controller
                     'document' => InputFile::createFromContents(Storage::get($excelFileName2), $excelFileName2),
                     'parse_mode' => 'HTML',
                 ]);
-                sleep(1);
-                $telegram->sendDocument([
-                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
-                    'parse_mode' => 'HTML',
-                ]);
+
                 sleep(1);
                 if (file_exists($path . $newName)) {
                     $telegram->sendDocument([

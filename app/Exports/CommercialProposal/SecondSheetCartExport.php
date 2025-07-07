@@ -29,12 +29,15 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
 
     public $buyer;
 
-    public function __construct($data,$otherProducts = null, $sheetTitle = "Коммерческое предложение", $buyer = null)
+    public $orderData;
+
+    public function __construct($data,$otherProducts = null, $sheetTitle = "Коммерческое предложение", $buyer = null, $orderData = null)
     {
         $this->items = $data ?? [];
         $this->sheetTitle = $sheetTitle;
         $this->buyer = $buyer;
         $this->otherProducts = $otherProducts ?? null;
+        $this->orderData = $orderData ?? null;
 
     }
 
@@ -47,6 +50,7 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
             'sheet_title' => $this->sheetTitle,
             'seller' => $doc->getAllSellerParameters(),
             'buyer' => $this->buyer,
+            'order_data' => $this->orderData,
             'other_products' => $this->otherProducts,
         ]);
     }
@@ -61,8 +65,8 @@ class SecondSheetCartExport implements FromView, WithStyles, WithEvents
             AfterSheet::class => function (AfterSheet $event) {
 
                 $count = count($this->items) + count($this->otherProducts ?? []) + 3;
-                $startPosTable2 = $count + 2;
-                $endPosTable2 = $startPosTable2 + 11;
+                $startPosTable2 = $count + 2 + 3;
+                $endPosTable2 = $startPosTable2 + 11 + 3;
 
                 $sheet = $event->sheet->getDelegate();
 

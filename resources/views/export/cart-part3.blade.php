@@ -48,7 +48,8 @@
                 <td style="width: 50px;">{{$index}}</td>
 
                 <td style="width: 100px;" colspan="2">
-                    DoDoors: {{$item->door_type->title ?? 'не указано'}},
+                    {{NamingLogic::query()->setProduct($item)->getName()}}
+<!--                    DoDoors: {{$item->door_type->title ?? 'не указано'}},
                     открывание {{$item->opening_type->title ?? 'не указано'}},
                     петли {{$item->loops->title ?? 'не указано'}}.
                     Отделка с передней стороны: {{$item->front_side_finish->title ?? 'не указано'}}
@@ -66,7 +67,7 @@
                     @endif
                     @if (!is_null($item->fittings_color->title ?? null))
                         Цвет фурнитуры: {{$item->fittings_color->title ?? 'не указано'}}.
-                    @endif
+                    @endif-->
                 </td>
 
                 <td style="width: 150px;">
@@ -94,7 +95,11 @@
         @endforeach
 
         @if(!is_null($other_products))
-            @foreach($other_products as $index=>$item)
+            @foreach($other_products as $key=>$item)
+                @php
+                    $item = (object)$item;
+                @endphp
+
                 <tr>
                     <td style="width: 50px;">{{$index}}</td>
 

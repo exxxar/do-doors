@@ -173,6 +173,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
+        \App\Providers\LogicServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -193,6 +194,7 @@ return [
         'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
         'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class,
+        'NamingLogic'=>\App\Facades\NamingLogic::class,
     ])->toArray(),
 
 ];

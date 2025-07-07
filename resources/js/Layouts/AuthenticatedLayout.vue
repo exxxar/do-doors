@@ -253,7 +253,7 @@ const showingNavigationDropdown = ref(false);
             <div class="d-flex justify-center">
                 <img src="/images/logo.jpg" style="width: 100px;" alt="">
             </div>
-            <p class="text-center text-muted">© 2024 DoDoors</p>
+            <p class="text-center text-muted">© 2025 DoDoors</p>
         </footer>
     </div>
 

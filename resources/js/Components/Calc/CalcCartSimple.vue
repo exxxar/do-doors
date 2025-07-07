@@ -40,10 +40,17 @@ import DoorMiniItem from "@/Components/Doors/DoorMiniItem.vue";
                 :action="action"
                 v-if="step===1"></CartCheckoutForm>
         </div>
+
+        <div v-if="tab===1" class="offcanvas-footer p-3">
+            <button type="button" class="btn btn-outline-secondary w-100 rounded-0 p-3"
+                    @click="back">Назад
+            </button>
+        </div>
+
         <div class="offcanvas-footer p-3" v-if="cartProducts.length>0&&tab===0">
 
             <div v-if="step===0">
-                <button class="btn btn-success rounded-0 w-100" @click="checkout(0)">Перейти к оформлению
+                <button class="btn btn-success rounded-0 w-100 p-3" @click="checkout(0)">Перейти к оформлению
                 </button>
 
             </div>

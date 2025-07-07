@@ -5,7 +5,7 @@
         <h6 class="font-bold d-flex justify-content-between align-items-center mb-2">
 
             <span>
-                Итого цена {{ Math.round(cartTotalPrice * (1 - (discount / 100))) }} ₽ <span
+                Итого цена {{ cartTotalPrice - discountPriceAmount }} ₽ <span
                 v-if="discount>0">(скидка {{ discount }}%)</span>
             </span>
 
@@ -36,11 +36,29 @@
             <template v-if="!need_promo">
                 <div class="form-floating mb-2">
                     <input type="text"
-
                            class="form-control" v-model="discount" id="checkout-promo"
                            placeholder="name@example.com">
                     <label for="checkout-promo">Скидка, %</label>
                 </div>
+
+                <p style="font-size: 10px;font-style: italic; text-decoration: underline;">
+                    Ознакомиться с расчетом скидки
+                    <span @click="blocks.discount_detailing=!blocks.discount_detailing">
+                    <i v-if="!blocks.discount_detailing"
+                       class="fa-regular fa-square-plus"></i>
+                    <i v-else class="fa-regular fa-square-minus"></i>
+                </span>
+                </p>
+
+                <template v-if="blocks.discount_detailing">
+                    <p class="alert alert-light mb-2" style="font-size: 10px;">Внимание! В расчете скидки не участвует
+                        фурнитура, ручка (и завертка), доставка и установка</p>
+                    <p
+                        v-if="discount_text"
+                        v-html="discount_text"></p>
+
+                </template>
+
             </template>
 
             <template v-if="need_promo">
@@ -192,7 +210,7 @@
                             style="max-height: 200px; overflow-y: scroll;"
                             aria-labelledby="dropdownMenuButton">
                             <li @click="selectDeliveryVariant(item)" v-for="item in delivery_services"><a
-                                class="dropdown-item" href="#">{{ item.title || '-' }}</a></li>
+                                class="dropdown-item" href="javascript:void(0)">{{ item.title || '-' }}</a></li>
 
                         </ul>
                     </div>
@@ -356,7 +374,7 @@
 
             <div class="form-check form-switch">
                 <input
-                    v-model="modelValue.send_to_bitix"
+                    v-model="modelValue.send_to_bitrix"
                     class="form-check-input" type="checkbox" role="switch" id="send_to_bitix">
                 <label class="form-check-label" for="send_to_bitix">Отправить в Битрикс</label>
             </div>
@@ -400,6 +418,32 @@
                     href="javascript:void(0)">Скрыть и больше не показывать</a>
             </p>
 
+            <div class="alert alert-light">
+                <p class="d-flex justify-content-between">Цена без скидки <span> {{ cartTotalPrice }} руб.</span>
+                </p>
+
+                <p class="d-flex justify-content-between">Сумма скидки<span> {{
+                        discountPriceAmount
+                    }} руб. ({{discount}}%)</span></p>
+                <p class="d-flex justify-content-between">Цена со скидкой <span> {{
+                        cartTotalPrice - discountPriceAmount
+                    }} руб. </span></p>
+                <p class="d-flex justify-content-between" v-if="clientForm.installation.price>0">Цена установки
+                    <span v-if="clientForm.installation.recount_type===0"> {{
+                            clientForm.installation.price
+                        }} руб.</span>
+                    <span v-if="clientForm.installation.recount_type===1"> {{
+                            clientForm.installation.price *  ( clientForm.installation.count === 0? cartTotalCount : clientForm.installation.count)
+                        }} руб.</span>
+                </p>
+                <p class="d-flex justify-content-between" v-if="clientForm.delivery_price>0">Цена доставки
+                    <span> {{ clientForm.delivery_price }} руб.</span></p>
+                <p class="d-flex justify-content-between fw-bold">Итого <span> {{ fullSummaryPrice }} руб.</span></p>
+
+                <p class="d-flex justify-content-between">Клиент должен внести <span class="fw-bold">{{clientForm.current_payed}}руб. ({{clientForm.payed_percent}}%)</span></p>
+
+            </div>
+
             <div class="btn-group w-100 mb-2">
                 <button type="submit"
                         :disabled="disabled"
@@ -439,12 +483,14 @@ export default {
     props: ['modelValue', 'disabled'],
     data() {
         return {
+            discount_text: null,
             blocks: {
                 install: true,
                 designer: true,
                 delivery: true,
                 develop: true,
                 price: true,
+                discount_detailing: false,
                 price_type_attention: true,
             },
             need_promo: false,
@@ -498,14 +544,84 @@ export default {
 
             this.clientForm.designer.price = (price * this.clientForm.designer.value / 100).toFixed(2)
             return this.clientForm.designer.price
+        },
+        discountPriceAmount() {
+
+            return Math.round((this.detailingSummaryPrice * this.discount) / 100)
+        },
+        detailingSummaryPrice() {
+            let discountText = ""
+            const type_dictionary = {
+                size: 'Петли',
+                handle_holes_type: 'Ручка',
+                handle_wrapper_type: 'Завертка',
+                opening_type: 'Тип открытия двери и толщина',
+                box_and_frame_color: 'Цвет короба и каркаса',
+                door_type: 'Тип двери',
+                front_side_finish_color: 'Цвет отделки внешней стороны',
+                back_side_finish_color: 'Цвет отделки внутренней стороны',
+                seal_color: 'Цвет уплотнителя',
+                fittings_color: 'Цвет фурнитуры',
+                hinge_manufacturer: 'Производитель петель',
+                front_side_finish: 'Отделка внешней стороны',
+                back_side_finish: 'Отделка внутренней стороны',
+                base: 'База (под покраску)',
+                service_doorstep: 'Работа с порогом',
+                service_painting: 'Покраска фурнитуры',
+                service_door_closer: 'Работа с доводчиком',
+                service_handle: 'Услуги по монтажу ручки',
+                service_stopper: 'Работа со стопором',
+
+            }
+
+            let detailing_summary_price = 0
+            const excluded_prices = ["size", "handle_holes_type", "handle_wrapper_type", "base"]
+            this.cartProducts.forEach(item => {
+                let sum = 0
+                discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>\"" + (item.product.purpose || 'Дверь') + "\" кол-во " + item.quantity + "ед. </h6><ul style='font-size:10px;' class='list-group'>"
+                item.product.detailing_price.forEach(sub => {
+                    if (excluded_prices.indexOf(sub.type) === -1) {
+                        let price = sub.full_price ? sub.full_price : sub.price
+                        sum += price
+
+                        discountText += "<li class='list-group-item'>" + type_dictionary[sub.type] + " <span class='fw-bold'>" + price + " руб</span> </li>"
+                    }
+
+                })
+                discountText += "<li class='list-group-item bg-secondary text-white d-flex justify-content-between'>" +
+                    "<span>Итого за дверь <span class='fw-bold'>" + sum + " руб</span></span>" +
+                    "<span class='fw-bold'>" + sum * item.quantity + " руб (x" + item.quantity + ")</span>" +
+                    " </li>"
+                discountText += "</ul>"
+                detailing_summary_price += sum * item.quantity
+            })
+            discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>Скидку считаем от этого значения " + detailing_summary_price + " руб</h6>"
+
+            this.discount_text = discountText
+
+            return detailing_summary_price
+        },
+        fullSummaryPrice() {
+
+
+            let installCount = this.clientForm.installation.count === 0? this.cartTotalCount : this.clientForm.installation.count
+
+            let installPrice = this.clientForm.installation.recount_type === 1 ?
+                this.clientForm.installation.price * installCount:
+                this.clientForm.installation.price
+
+            return (this.cartTotalPrice - this.discountPriceAmount) +
+                installPrice +
+                this.clientForm.delivery_price
+
         }
     },
     watch: {
         'discount': {
             handler(val) {
                 this.modelValue.discount_data = {
-                    discount_percent:this.discount,
-                    discount_amount: Math.round((this.cartTotalPrice * this.discount) / 100)
+                    discount_percent: this.discount,
+                    discount_amount: this.discountPriceAmount
                 }
                 this.changeDiscount()
             },
@@ -537,6 +653,10 @@ export default {
                     this.clientForm.designer.value = 30
                 }
 
+
+                this.clientForm.price_with_discount = (this.cartTotalPrice - this.discountPriceAmount)
+                this.clientForm.detailing_summary_price = this.detailingSummaryPrice
+                this.clientForm.full_summary_price = this.fullSummaryPrice
                 this.$emit("update:modelValue", this.clientForm)
             },
             deep: true
@@ -546,10 +666,10 @@ export default {
     methods: {
         changeDiscount() {
 
-            const discount = Math.round((this.cartTotalPrice * this.discount) / 100)
+           // const discount = this.discountPriceAmount
 
             this.clientForm.current_payed = Math.max(0, Math.round((
-                (this.cartTotalPrice - discount )* this.clientForm.payed_percent) / 100))
+                (this.fullSummaryPrice) * this.clientForm.payed_percent) / 100))
         },
         recountPrices() {
 
@@ -761,7 +881,7 @@ export default {
                             let tmpPrice = typeof sub.price === "object" ? sub.price[type] : sub.price
                             price += tmpPrice
 
-                            this.ces.push({
+                            tmp_prices.push({
                                 type: 'front_side_finish',
                                 price: tmpPrice
                             })
@@ -901,7 +1021,7 @@ export default {
         changeCurrentPayed() {
 
             this.clientForm.payed_percent = Math.round((this.clientForm.current_payed /
-                this.cartTotalPrice) * 100)
+                this.fullSummaryPrice) * 100)
 
 
         },

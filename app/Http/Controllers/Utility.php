@@ -53,6 +53,8 @@ trait Utility
             throw new \Exception("Шаблонный файл не найден: $templateName");
         }
 
+        $totalPrice = $data["total_price"] ?? 0;
+
         // Создаем процессор шаблона
         $templateProcessor = new TemplateProcessor("$path/$templateName");
 
@@ -75,7 +77,7 @@ trait Utility
         $templateProcessor->setValue('okpo', $data['okpo'] ?? '-');
         $templateProcessor->setValue('order_id', $data['order_id']);
         $templateProcessor->setValue('info', $data['info']);
-        $templateProcessor->setValue('total_price', $data['total_price']);
+        $templateProcessor->setValue('total_price', $totalPrice);
         $templateProcessor->setValue('total_count', $data['total_count']);
         $templateProcessor->setValue('current_payed', $data['current_payed']);
         $templateProcessor->setValue('payed_percent', $data['payed_percent']);

@@ -95,8 +95,8 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
             </template>
         </CartResultForm>
 
-        <button type="button" class="btn btn-outline-secondary w-100 rounded-0" @click="back">Назад
-        </button>
+
+
     </form>
     <div class="card rounded-0" v-else>
         <div class="card-body">

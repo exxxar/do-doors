@@ -7,6 +7,7 @@ use App\Enums\OrderStatusEnum;
 use App\Exports\Cart\MultiSheetsCartExport;
 use App\Exports\CommercialProposal\MultiSheetsCart2Export;
 use App\Exports\OrderExport;
+use App\Facades\NamingLogic;
 use App\Http\Requests\OrderStoreRequest;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Http\Resources\OrderCollection;
@@ -80,6 +81,10 @@ class OrderController extends Controller
         $deliveryAddress = $order->config["delivery_address"] ?? '';
         $installPrice = $order->config["install_price"] ?? 0;
 
+        $detailingSummaryPrice = $order->config["detailing_summary_price"] ?? 0;
+        $fullSummaryPrice = $order->config["full_summary_price"] ?? 0;
+        $priceWithDiscount = $order->config["price_with_discount"] ?? 0;
+
         $currentPayed = $order->current_payed ?? 0;
         $totalPrice = $order->total_price ?? 0;
         $totalCount = $order->total_count ?? 0;
@@ -121,12 +126,12 @@ class OrderController extends Controller
             'UF_CRM_1733302866734' => $deliveryCity,
             'UF_CRM_1733302493' => [51, 53, 55, 57][$deliveryType] ?? 51,
             'UF_CRM_1733302917133' => $currentPayed,
-            'UF_CRM_1733302937139' => $totalPrice,
-            'UF_CRM_1733302958322' => $totalPrice - $currentPayed,
+            'UF_CRM_1733302937139' => $fullSummaryPrice,
+            'UF_CRM_1733302958322' => $fullSummaryPrice - $currentPayed,
             'UF_CRM_1733302997393' => 0.0,
             'UF_CRM_1733305761683' => $deliveryPrice,
             'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id,
-            'UF_CRM_1742976788' => [2125, 2125, 2123][$workWithNds] ?? 2123,
+            'UF_CRM_1742976788' =>[2125, 2123, 2123][$workWithNds] ?? 2123,
             'UF_CRM_1733303016351' => 0,
             'UF_CRM_1733306662836' => 0,
             'UF_CRM_1733306683779' => $designerWorkType ? $designerValue : $designerPrice,
@@ -161,27 +166,9 @@ class OrderController extends Controller
 
             $priceType = $product->price_type->key ?? 'retail';
 
-            $shorts = ['Комплект двери скрытого монтажа' => 'КДС'];
-            $doorDescription = sprintf(
-                'DoDoors: %s %s%dx%d, открывание %s, петли %s. %s %s/%s %s. Цвет короба и полотна: %s. Цвет фурнитуры: %s. Толщина профиля %s мм. %s%s%s%s',
-                $shorts[$product->door_type->title ?? null] ?? ($product->door_type->title ?? 'КДС'),
-                filter_var($product->need_upper_jumper ?? false, FILTER_VALIDATE_BOOLEAN) ? '' : 'без верх. перемычки ',
-                $product->height ?? 0,
-                $product->width ?? 0,
-                $product->opening_type->title ?? 'не указано',
-                $product->loops->title ?? 'не указано',
-                $product->front_side_finish->title ?? 'материал',
-                $product->front_side_finish_color->title ?? 'Грунт',
-                $product->back_side_finish->title ?? 'материал',
-                $product->back_side_finish_color->title ?? 'Грунт',
-                $product->box_and_frame_color->title ?? 'не указано',
-                $product->fittings_color->title ?? 'не указано',
-                $product->depth ?? 'не указано',
-                filter_var($product->need_automatic_doorstep ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Автоматический порог ' : '',
-                filter_var($product->need_hidden_stopper ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый стопор ' : '',
-                filter_var($product->need_hidden_door_closer ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый доводчик ' : '',
-                filter_var($product->need_hidden_skirting_board ?? false, FILTER_VALIDATE_BOOLEAN) ? 'Скрытый плинтус ' : ''
-            );
+            $doorDescription = NamingLogic::query()
+                ->setProduct($product)
+                ->getName();
 
             $productData = [
                 'NAME' => $doorDescription,
@@ -208,7 +195,7 @@ class OrderController extends Controller
             }
 
             // Handle door handles
-            if (!is_null($product->handle_holes_type ?? null)) try {
+            if (!is_null($product->handle_holes_type["title"] ?? null)) try {
                 $handle = (object)$product->handle_holes_type;
                 $price = (array)($handle->price ?? []);
                 $installDoorsData = [
@@ -239,7 +226,7 @@ class OrderController extends Controller
             }
 
             // Handle wrappers
-            if (!is_null($product->handle_wrapper_type ?? null)) try {
+            if (!is_null($product->handle_wrapper_type["title"] ?? null)) try {
                 $wrapper = (object)$product->handle_wrapper_type;
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
@@ -373,7 +360,8 @@ class OrderController extends Controller
             'kpp' => $client->kpp ?? null, // Может быть null
             'okpo' => $client->okpo ?? null, // Может быть null
             'info' => $order->info ?? null,
-            'total_price' => $order->total_price ?? 0,
+            'discount' => $order->discount["amount"] ?? 0,
+            'total_price' => $fullSummaryPrice ?? 0,
             'total_count' => $order->total_count ?? 0,
             'delivery' => ($order->config["delivery_type"] ?? 1) == 0 ? "входит" : "не входит",
             'install' => ($order->config["need_install"] ?? 1) == 1 ? "входит" : "не входит",
@@ -406,30 +394,6 @@ class OrderController extends Controller
         }
 
         $timeFragment = Carbon::now('+3:00')->format('Y-m-d-H-i-s');
-        // Generate PDF
-        try {
-            $mpdf = new Mpdf(['format' => 'A4-P']);
-            $currentDate = Carbon::now('+3:00')->format('Y-m-d H:i:s');
-
-            $mpdf->WriteHTML(view('pdf.order-v2', [
-                'name' => $name,
-                'order_id' => $order->id,
-                'current_date' => $currentDate,
-                'email' => $email,
-                'phone' => $phone,
-                'info' => $info,
-                'total_price' => $totalPrice,
-                'total_count' => $totalCount,
-                'items' => $items,
-            ]));
-
-            $file = $mpdf->Output("order-$timeFragment.pdf", \Mpdf\Output\Destination::STRING_RETURN);
-        } catch (Exception $e) {
-            Log::error('PDF generation failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to generate PDF'], 500);
-        }
-
-        // Generate Excel files
 
         $excelFileName1 = "spec-$timeFragment.xls";
         $excelFileName2 = "cp-$timeFragment.xls";
@@ -450,10 +414,7 @@ class OrderController extends Controller
                 'name' => "коммерческое предложение от $timeFragment.xls",
                 'path' => base64_encode(Storage::get($excelFileName2)),
             ],
-            [
-                'name' => "информация о заказе от $timeFragment.pdf",
-                'path' => base64_encode($file),
-            ],
+
         ];
 
         if ($leadId && $sendToBitrix) try {
@@ -474,7 +435,7 @@ class OrderController extends Controller
                         "Телефон: $phone\n" .
                         "Доп.инфо: $info\n" .
                         "Общее кол-во товара: $totalCount ед.\n" .
-                        "Цена товара: $totalPrice руб.\n",
+                        "Цена заказа: $fullSummaryPrice руб.\n",
                     'parse_mode' => 'HTML',
                 ]);
 
@@ -490,12 +451,7 @@ class OrderController extends Controller
                     'document' => InputFile::createFromContents(Storage::get($excelFileName2), $excelFileName2),
                     'parse_mode' => 'HTML',
                 ]);
-                sleep(1);
-                $telegram->sendDocument([
-                    'chat_id' => env('TELEGRAM_CHANNEL_ID'),
-                    'document' => InputFile::createFromContents($file, "order-$timeFragment.pdf"),
-                    'parse_mode' => 'HTML',
-                ]);
+
                 sleep(1);
                 if (file_exists($fullPath)) {
                     $telegram->sendDocument([
@@ -531,6 +487,25 @@ class OrderController extends Controller
 
         // Clean up
         Storage::delete([$excelFileName1, $excelFileName2]);
+    }
+
+    /**
+     * @throws \HttpException
+     */
+    public function getOrderInfo(Request $request): OrderResource
+    {
+        $request->validate([
+            "order_id" => "required",
+        ]);
+
+        $order = Order::query()
+            ->with(["details"])
+            ->find($request->order_id);
+
+        if (is_null($order))
+            throw new \HttpException("Заказ не найден", 404);
+
+        return new OrderResource($order);
     }
 
     /**
@@ -581,37 +556,38 @@ class OrderController extends Controller
         $name = $request->name ?? $client->fio ?? null;
         $totalPrice = $request->total_price ?? $order->total_price ?? 0;
         $totalCount = $request->total_count ?? $order->total_count ?? 0;
-        $payedPercent= $request->payed_percent ?? $order->payed_percent ?? 0;
-        $currentPayed= $request->current_payed ?? $order->current_payed ?? 0;
+        $payedPercent = $request->payed_percent ?? $order->payed_percent ?? 0;
+        $currentPayed = $request->current_payed ?? $order->current_payed ?? 0;
 
         $workDays = $request->work_days ?? $order->work_days ?? 1;
         $deliveryTerms = $request->delivery_terms ?? $order->delivery_terms ?? null;
         $info = $request->info ?? $order->info ?? null;
 
-        $deliveryType= $request->delivery_type ?? $order->config["delivery_type"] ?? 0;
-        $deliveryCity= $request->delivery_city ?? $order->config["delivery_city"] ?? '';
-        $deliveryAddress= $request->delivery_address ?? $order->config["delivery_address"] ?? '';
-        $deliveryPrice= $request->delivery_price ?? $order->config["delivery_price"] ?? 0;
-        $ascentFloor= $request->ascent_floor ?? $order->config["ascent_floor"] ?? '';
-        $payedPercentType= $request->payed_percent_type ?? $order->config["payed_percent_type"] ?? 1;
-        $workWithNds= $request->work_with_nds ?? $order->config["work_with_nds"] ?? 0;
+        $deliveryType = $request->delivery_type ?? $config["delivery_type"] ?? 0;
+        $deliveryCity = $request->delivery_city ?? $config["delivery_city"] ?? '';
+        $deliveryAddress = $request->delivery_address ?? $config["delivery_address"] ?? '';
+        $deliveryPrice = $request->delivery_price ?? $config["delivery_price"] ?? 0;
+        $ascentFloor = $request->ascent_floor ?? $config["ascent_floor"] ?? '';
+        $payedPercentType = $request->payed_percent_type ?? $config["payed_percent_type"] ?? 1;
+        $workWithNds = $request->work_with_nds ?? $config["work_with_nds"] ?? 0;
 
-        $installation = json_decode($request->installation??'[]');
-        $needInstall= $installation->need_door_install ?? $order->config["need_install"] ?? false;
-        $installPrice = $installation->price ?? $order->config["install_price"] ?? 0;
-        $installRecountType = $installation->recount_type ?? $order->config["recount_type"] ?? 0;
+        $installation = json_decode($request->installation ?? '[]');
+        $needInstall = $installation->need_door_install ?? $config["need_install"] ?? false;
+        $installPrice = $installation->price ?? $config["install_price"] ?? 0;
+        $installRecountType = $installation->recount_type ?? $config["recount_type"] ?? 0;
 
-        $designer = json_decode($request->designer??'[]');
-        $designerWorkType= $designer->is_fix  ?? $order->config["designer_work_type"] ?? 1;
-        $designerValue= $designer->designer_value ?? $order->config["designer_value"] ?? 0;
-        $designerPrice= $designer->designer_price ?? $order->config["designer_price"] ?? 0;
+        $designer = json_decode($request->designer ?? '[]');
+        $designerWorkType = $designer->is_fix ?? $config["designer_work_type"] ?? 1;
+        $designerValue = $designer->designer_value ?? $config["designer_value"] ?? 0;
+        $designerPrice = $designer->designer_price ?? $config["designer_price"] ?? 0;
 
-        $discountData = json_decode($request->discount_data??'[]');
+        $discountData = json_decode($request->discount_data ?? '[]');
         $discountValue = $discountData->discount_value ?? 0;
         $discountPercent = $discountData->discount_percent ?? 0;
 
+
         $tmpData = [
-            'contract_date' => Carbon::now(),
+            'contract_date' => Carbon::now()->addHours(3),
             'contact_person' => $name,
             'phone' => $phone,
             'organizational_form' => $client->status ?? 'new_client',
@@ -634,13 +610,15 @@ class OrderController extends Controller
                 "designer_work_type" => $designerWorkType ?? 1,
                 "designer_value" => $designerValue ?? 0,
                 "designer_price" => $designerPrice ?? 0,
+
                 "install_recount_type" => $installRecountType ?? 0,
                 "delivery_price" => $deliveryPrice,
                 "install_price" => $installPrice ?? 0,
             ],
             'discount' => (object)[
                 'amount' => $discountValue,
-                'percent' => $discountPercent
+                'percent' => $discountPercent,
+
             ]
         ];
 
@@ -658,14 +636,14 @@ class OrderController extends Controller
                 'price' => (float)($product->price ?? 0),
                 'comment' => $product->comment ?? null,
                 'purpose' => $product->purpose ?? null,
-                'door' => $item['product'],
-                ];
+                'door' => $item->door,
+            ];
 
             $detail = OrderDetail::query()
                 ->find($id);
 
             if (is_null($detail))
-                $detail =  OrderDetail::query()
+                $detail = OrderDetail::query()
                     ->create($detail);
             else
                 $detail->update($tmp);
@@ -787,10 +765,10 @@ class OrderController extends Controller
     /**
      * @throws \HttpException
      */
-    public function editDoorInOrder(Request $request): OrderDetailResource
+    public function editDoorInOrder(Request $request): OrderResource
     {
         $request->validate([
-            "id"=>"required"
+            "id" => "required|int"
         ]);
 
         $detail = OrderDetail::query()
@@ -799,7 +777,10 @@ class OrderController extends Controller
         if (is_null($detail))
             throw new \HttpException("Дверь не найдена в системе!");
 
-        $doorType = json_decode($request->door_type??'[]');
+        $doorType = $request->door_type ?? null;
+
+        $door = $request->all();
+
 
         $tmp = [
             'door_type' => $doorType->title ?? null,
@@ -807,12 +788,27 @@ class OrderController extends Controller
             'price' => (float)($request->price ?? 0),
             'comment' => $request->comment ?? null,
             'purpose' => $request->purpose ?? null,
-            'door' => $request->all(),
+            'door' => $door,
         ];
 
-       $detail->update($tmp);
+        $detail->update($tmp);
 
-       return new OrderDetailResource($detail);
+        $order = Order::query()
+            ->with(["details"])
+            ->find($detail->order_id);
+
+        $newTotalPrice = 0;
+        $newTotalCount = 0;
+        foreach ($order->details as $item) {
+            $newTotalPrice += (($item->price ?? 0) * ($item->count ?? 0));
+            $newTotalCount += $item->count ?? 0;
+        }
+
+        $order->total_price = $newTotalPrice;
+        $order->total_count = $newTotalCount;
+        $order->save();
+
+        return new OrderResource($order);
     }
 
     public function updateContractTemplates(Request $request)
@@ -930,7 +926,9 @@ class OrderController extends Controller
 
         }
 
-        return Excel::download(new MultiSheetsCartExport($items, $buyerData), "заказ $id.xlsx");
+        $otherProducts = $order->config["other_products"] ?? [];
+
+        return Excel::download(new MultiSheetsCartExport($items, $buyerData, $otherProducts, false, $order->toArray()), "заказ $id.xlsx");
 
         /*return Excel::download(new OrderExport(
             $orders,
@@ -1110,7 +1108,7 @@ class OrderController extends Controller
 
         $templateProcessor->setValue('order_id', $order->id);
         $templateProcessor->setValue('info', $order->info ?? '-');
-        $templateProcessor->setValue('total_price', $order->total_price ?? 0);
+        $templateProcessor->setValue('total_price', $order->config["full_summary_price"] ?? 0);
         $templateProcessor->setValue('total_count', $order->total_count ?? 0);
         $templateProcessor->setValue('current_payed', $order->current_payed ?? 0);
         $templateProcessor->setValue('payed_percent', $order->payed_percent ?? 0);
@@ -1211,11 +1209,16 @@ class OrderController extends Controller
 
     public function destroy(Request $request, $id): \Illuminate\Http\Response
     {
-        $order = Order::query()->find($id);
+        $order = Order::query()
+            ->with(["details"])
+            ->find($id);
 
         if (is_null($order))
             return response()->noContent(404);
 
+        if (count($order->details) > 0)
+            foreach ($order->details as $item)
+                $item->delete();
         $order->delete();
 
         return response()->noContent(200);
