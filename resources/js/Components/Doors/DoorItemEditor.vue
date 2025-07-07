@@ -1900,7 +1900,7 @@ export default {
 
             this.doorForm.detailing_price = this.tmp_prices
             if (this.editOrder) {
-
+                console.log("Edit mode")
                 this.$store.dispatch("editDoorInOrder", {
                     doorForm: this.doorForm,
                 }).then((response) => {
@@ -1922,6 +1922,7 @@ export default {
                 })
                 return;
             }
+
 
             this.$store.dispatch("addProductToCart", {
                 product: this.doorForm,

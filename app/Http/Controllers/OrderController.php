@@ -159,6 +159,9 @@ class OrderController extends Controller
         foreach ($items as $item) {
 
             $product = $item->door ?? null;
+
+
+
             if (is_null($product))
                 continue;
 
@@ -194,8 +197,9 @@ class OrderController extends Controller
                 Log::error('Failed to add product to Bitrix: ' . $e->getMessage());
             }
 
+
             // Handle door handles
-            if (!is_null($product->handle_holes_type["title"] ?? null)) try {
+            if (!is_null(((object)$product->handle_holes_type)->title ?? null)) try {
                 $handle = (object)$product->handle_holes_type;
                 $price = (array)($handle->price ?? []);
                 $installDoorsData = [
@@ -226,7 +230,7 @@ class OrderController extends Controller
             }
 
             // Handle wrappers
-            if (!is_null($product->handle_wrapper_type["title"] ?? null)) try {
+            if (!is_null(((object)$product->handle_wrapper_type)->title ?? null)) try {
                 $wrapper = (object)$product->handle_wrapper_type;
                 $price = (array)($wrapper->price ?? []);
                 $handleDoorsData = [
@@ -625,6 +629,7 @@ class OrderController extends Controller
         $order->update($tmpData);
 
         $items = json_decode($request->items ?? '[]');
+
         foreach ($items as $item) {
 
             $id = $item->id ?? null;
@@ -632,10 +637,10 @@ class OrderController extends Controller
             $tmp = [
                 'order_id' => $order->id,
                 'door_type' => $item->door_type ?? null,
-                'count' => (int)($product->count ?? 1),
-                'price' => (float)($product->price ?? 0),
-                'comment' => $product->comment ?? null,
-                'purpose' => $product->purpose ?? null,
+                'count' => (int)($item->count ?? 1),
+                'price' => (float)($item->price ?? 0),
+                'comment' => $item->comment ?? null,
+                'purpose' => $item->purpose ?? null,
                 'door' => $item->door,
             ];
 

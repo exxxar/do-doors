@@ -1,5 +1,6 @@
 <script setup>
 import CartResultForm from "@/Components/Cart/CartResultForm.vue";
+import CartEditorResultForm from "@/Components/Cart/CartEditorResultForm.vue";
 import LawDataForm from "@/Components/Cart/LawDataForm.vue";
 import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
 
@@ -79,9 +80,10 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
         <IndividualDataForm v-if="(type||0)===1"
                             v-model="clientForm"/>
 
-        <CartResultForm
+        <CartEditorResultForm
             :disabled="timer"
-
+            :doors="doors"
+            :order="order"
             v-model="clientForm">
             <template #loader>
                 <div
@@ -93,9 +95,7 @@ import IndividualDataForm from "@/Components/Cart/IndividualDataForm.vue";
                     Отправляем...
                 </div>
             </template>
-        </CartResultForm>
-
-
+        </CartEditorResultForm>
 
     </form>
     <div class="card rounded-0" v-else>
@@ -115,8 +115,7 @@ export default {
     directives: {mask},
     computed: {
         ...mapGetters(['getErrors',
-            'getDictionary',
-            'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
+            'getDictionary']),
         filteredClients() {
             if (!this.search)
                 return this.self_clients || []
@@ -142,6 +141,11 @@ export default {
 
             clientForm: {
                 id: null,
+                send_to_bitrix: true,
+                send_to_mail: false,
+                send_to_telegram: true,
+                send_to_self_mail: false,
+                self_email: null,
                 name: null,
                 phone: null,
                 email: null,
@@ -187,6 +191,8 @@ export default {
     mounted() {
         this.loadSelfClients()
 
+        console.log("ordddddder=>", this.order)
+        console.log("doooors=>", this.doors)
         this.clientForm.id = this.order.id
         this.clientForm.contract_number = this.order.contract_number || this.order.id
         this.clientForm.name = this.order.contact_person || null
@@ -194,6 +200,46 @@ export default {
         this.clientForm.email = this.order.client?.email || null
         this.clientForm.work_with_nds = this.order.organizational_form === "individual" ? 0 : 1
 
+        this.clientForm.info = this.order.info || null
+        this.clientForm.promo = this.order.promo || null
+        this.clientForm.dealer_percent = this.order.dealer_percent || 0
+        this.clientForm.summary_price_type = this.order.summary_price_type || null
+
+        this.clientForm.items = this.order.items || []
+        this.clientForm.current_payed = this.order.current_payed || 0
+        this.clientForm.payed_percent = this.order.payed_percent ?? 70
+        this.clientForm.payed_percent_type = this.order.payed_percent_type ?? 1
+
+        this.clientForm.delivery_terms = this.order.delivery_terms || null
+        this.clientForm.ascent_floor = !!this.order.ascent_floor
+        this.clientForm.work_days = this.order.work_days || 0
+
+        this.clientForm.installation = {
+            need_door_install: !!this.order.config?.installation?.need_door_install,
+            count: this.order.config?.installation?.count || 0,
+            price: this.order.config?.installation?.price || 0,
+            recount_type: this.order.config?.installation?.recount_type || 0,
+        }
+
+        this.clientForm.designer = {
+            is_fix: !!this.order.config?.designer?.is_fix,
+            value: this.order.config?.designer?.value || 0,
+            price: this.order.config?.designer?.price || 0,
+        }
+
+        this.clientForm.passport = this.order.client?.passport || null
+        this.clientForm.passport_issued = this.order.client?.passport_issued || null
+
+        this.clientForm.delivery_type = this.order.config?.delivery_type ?? 1
+        this.clientForm.delivery_address = this.order.config?.delivery_address || null
+        this.clientForm.delivery_price = this.order.config?.delivery_price || null
+        this.clientForm.delivery_city = this.order.config?.delivery_city || null
+
+        this.clientForm.delivery_service = this.order.delivery_service || null
+        this.clientForm.discount_data = {
+            discount_value: this.order.discount?.amount|| 0,
+            discount_percent: this.order.discount?.percent|| 0,
+        }
 
     },
     methods: {
@@ -205,7 +251,6 @@ export default {
 
         },
         back() {
-            console.log("click back")
             this.$emit("callback")
         },
 
@@ -234,22 +279,7 @@ export default {
             this.clientForm.pasport = client.pasport || null
             this.clientForm.pasport_issued = client.pasport_issued || null
         },
-        clearCart() {
-            this.$store.dispatch("clearCart").then((response) => {
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Успешно очищено",
-                    type: 'success'
-                });
 
-            }).catch(error => {
-                this.$notify({
-                    title: "DoDoors",
-                    text: "Ошибочка...",
-                    type: 'error'
-                });
-            })
-        },
         findPromo() {
 
             this.discount = 0
@@ -278,7 +308,7 @@ export default {
                 this.timer++
             }, 1000)
 
-            this.clientForm.items = this.cartProducts
+            this.clientForm.items = this.doors
 
             let data = new FormData();
             Object.keys(this.clientForm)
@@ -291,8 +321,7 @@ export default {
                 });
 
             data.append("items", JSON.stringify(this.doors))
-            data.append("total_price", this.cartTotalPrice)
-            data.append("total_count", this.cartTotalCount)
+
 
             this.$store.dispatch("editOrder", {
                 clientForm: data
@@ -304,18 +333,6 @@ export default {
                 this.step = 0
                 this.tab = 0
 
-                this.$store.dispatch("clearCart");
-
-                this.clientForm = {
-                    name: null,
-                    phone: null,
-                    email: null,
-                    info: null,
-                    passport: null,
-                    passport_issued: null,
-                    delivery_address: null,
-
-                }
 
                 this.$notify({
                     title: "DoDoors",
@@ -324,7 +341,6 @@ export default {
                 });
 
                 this.loadSelfClients()
-
 
 
             }).catch(error => {

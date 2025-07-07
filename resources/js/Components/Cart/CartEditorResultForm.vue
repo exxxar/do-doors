@@ -418,33 +418,33 @@
                     href="javascript:void(0)">Скрыть и больше не показывать</a>
             </p>
 
-            <template v-if="clientForm.id==null">
-                <div class="alert alert-light">
-                    <p class="d-flex justify-content-between">Цена без скидки <span> {{ cartTotalPrice }} руб.</span>
-                    </p>
+            <div class="alert alert-light">
+                <p class="d-flex justify-content-between">Цена без скидки <span> {{ cartTotalPrice }} руб.</span>
+                </p>
 
-                    <p class="d-flex justify-content-between">Сумма скидки<span> {{
-                            discountPriceAmount
-                        }} руб. ({{discount}}%)</span></p>
-                    <p class="d-flex justify-content-between">Цена со скидкой <span> {{
-                            cartTotalPrice - discountPriceAmount
-                        }} руб. </span></p>
-                    <p class="d-flex justify-content-between" v-if="clientForm.installation.price>0">Цена установки
-                        <span v-if="clientForm.installation.recount_type===0"> {{
-                                clientForm.installation.price
-                            }} руб.</span>
-                        <span v-if="clientForm.installation.recount_type===1"> {{
-                                clientForm.installation.price *  ( clientForm.installation.count === 0? cartTotalCount : clientForm.installation.count)
-                            }} руб.</span>
-                    </p>
-                    <p class="d-flex justify-content-between" v-if="clientForm.delivery_price>0">Цена доставки
-                        <span> {{ clientForm.delivery_price }} руб.</span></p>
-                    <p class="d-flex justify-content-between fw-bold">Итого <span> {{ fullSummaryPrice }} руб.</span></p>
+                <p class="d-flex justify-content-between">Сумма скидки<span> {{
+                        discountPriceAmount
+                    }} руб. ({{ discount }}%)</span></p>
+                <p class="d-flex justify-content-between">Цена со скидкой <span> {{
+                        cartTotalPrice - discountPriceAmount
+                    }} руб. </span></p>
+                <p class="d-flex justify-content-between" v-if="clientForm.installation.price>0">Цена установки
+                    <span v-if="clientForm.installation.recount_type===0"> {{
+                            clientForm.installation.price
+                        }} руб.</span>
+                    <span v-if="clientForm.installation.recount_type===1"> {{
+                            clientForm.installation.price * (clientForm.installation.count === 0 ? cartTotalCount : clientForm.installation.count)
+                        }} руб.</span>
+                </p>
+                <p class="d-flex justify-content-between" v-if="clientForm.delivery_price>0">Цена доставки
+                    <span> {{ clientForm.delivery_price }} руб.</span></p>
+                <p class="d-flex justify-content-between fw-bold">Итого <span> {{ fullSummaryPrice }} руб.</span>
+                </p>
 
-                    <p class="d-flex justify-content-between">Клиент должен внести <span class="fw-bold">{{clientForm.current_payed}}руб. ({{clientForm.payed_percent}}%)</span></p>
+                <p class="d-flex justify-content-between">Клиент должен внести <span
+                    class="fw-bold">{{ clientForm.current_payed }}руб. ({{ clientForm.payed_percent }}%)</span></p>
 
-                </div>
-            </template>
+            </div>
 
 
             <div class="btn-group w-100 mb-2">
@@ -452,7 +452,7 @@
                         :disabled="disabled"
                         class="btn btn-dark rounded-0 p-3">Отправить
                 </button>
-                <button type="button"
+<!--                <button type="button"
                         class="btn btn-outline-dark rounded-0 dropdown-toggle dropdown-toggle-split"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-hand-holding-dollar"></i>
@@ -461,10 +461,10 @@
                     <li v-for="item in getDictionary.price_type_variants"><a
                         @click="selectPriceType(item)"
                         class="dropdown-item"
-                        v-bind:class="{'bg-dark text-white':clientForm.summary_price_type.title===item.title}"
+                        v-bind:class="{'bg-dark text-white':clientForm.summary_price_type?.title===item.title}"
                         href="javascript:void(0)">{{ item.title || '-' }}</a></li>
 
-                </ul>
+                </ul>-->
             </div>
         </div>
         <template v-else>
@@ -483,7 +483,7 @@ import {mapGetters} from "vuex";
 
 
 export default {
-    props: ['modelValue', 'disabled'],
+    props: ['modelValue', 'doors', 'order', 'disabled'],
     data() {
         return {
             discount_text: null,
@@ -510,10 +510,6 @@ export default {
             const tmp = JSON.parse(localStorage.getItem("dodoors_cart_checkout_blocks"))
             const keysCountOriginal = Object.keys(this.blocks).length || 0
             const keysCountSaved = Object.keys(tmp).length || 0
-
-            console.log("keysCountOriginal", keysCountOriginal)
-            console.log("keysCountSaved", keysCountSaved)
-
             if (keysCountOriginal === keysCountSaved)
                 this.blocks = tmp
             else
@@ -523,7 +519,11 @@ export default {
 
         this.clientForm = this.modelValue
 
-        console.log("this.clientForm.summary_price_type", this.clientForm.summary_price_type)
+        this.$nextTick(()=>{
+            this.discount = this.clientForm.discount_data?.discount_percent || 0
+
+        })
+
         if (!this.clientForm.summary_price_type)
             this.getDictionary.price_type_variants.forEach(item => {
                 if (item.key === "retail")
@@ -536,20 +536,18 @@ export default {
     },
     computed: {
         ...mapGetters(['getErrors',
-            'getDictionary',
-            'cartTotalCount', 'cartTotalPrice', 'cartProducts',]),
+            'getDictionary']),
         designerPrice() {
             let price = 0
 
-            this.cartProducts.forEach(item => {
-                price += item.product.base_price || 0
+            this.doors.forEach(item => {
+                price += item.door.base_price || 0
             })
 
             this.clientForm.designer.price = (price * this.clientForm.designer.value / 100).toFixed(2)
             return this.clientForm.designer.price
         },
         discountPriceAmount() {
-
             return Math.round((this.detailingSummaryPrice * this.discount) / 100)
         },
         detailingSummaryPrice() {
@@ -579,10 +577,10 @@ export default {
 
             let detailing_summary_price = 0
             const excluded_prices = ["size", "handle_holes_type", "handle_wrapper_type", "base"]
-            this.cartProducts.forEach(item => {
+            this.doors.forEach(item => {
                 let sum = 0
-                discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>\"" + (item.product.purpose || 'Дверь') + "\" кол-во " + item.quantity + "ед. </h6><ul style='font-size:10px;' class='list-group'>"
-                item.product.detailing_price.forEach(sub => {
+                discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>\"" + (item.door.purpose || 'Дверь') + "\" кол-во " + item.count + "ед. </h6><ul style='font-size:10px;' class='list-group'>"
+                item.door.detailing_price.forEach(sub => {
                     if (excluded_prices.indexOf(sub.type) === -1) {
                         let price = sub.full_price ? sub.full_price : sub.price
                         sum += price
@@ -593,10 +591,10 @@ export default {
                 })
                 discountText += "<li class='list-group-item bg-secondary text-white d-flex justify-content-between'>" +
                     "<span>Итого за дверь <span class='fw-bold'>" + sum + " руб</span></span>" +
-                    "<span class='fw-bold'>" + sum * item.quantity + " руб (x" + item.quantity + ")</span>" +
+                    "<span class='fw-bold'>" + sum * item.count + " руб (x" + item.count + ")</span>" +
                     " </li>"
                 discountText += "</ul>"
-                detailing_summary_price += sum * item.quantity
+                detailing_summary_price += sum * item.count
             })
             discountText += "<h6 class='fw-bold my-2' style='font-size: 10px;'>Скидку считаем от этого значения " + detailing_summary_price + " руб</h6>"
 
@@ -604,13 +602,32 @@ export default {
 
             return detailing_summary_price
         },
+        cartTotalCount() {
+            let sum = 0;
+            this.doors.forEach(item => {
+                sum += item.count
+            })
+
+            return sum
+        },
+        cartTotalPrice() {
+            let sum = 0;
+
+
+            this.doors.forEach(item => {
+                sum += (item.price * item.count)
+            })
+
+            return sum
+        },
+        cartProducts() {
+            return this.doors || []
+        },
         fullSummaryPrice() {
-
-
-            let installCount = this.clientForm.installation.count === 0? this.cartTotalCount : this.clientForm.installation.count
+            let installCount = this.clientForm.installation.count === 0 ? (this.order.details || []).length : this.clientForm.installation.count
 
             let installPrice = this.clientForm.installation.recount_type === 1 ?
-                this.clientForm.installation.price * installCount:
+                this.clientForm.installation.price * installCount :
                 this.clientForm.installation.price
 
             return (this.cartTotalPrice - this.discountPriceAmount) +
@@ -669,7 +686,7 @@ export default {
     methods: {
         changeDiscount() {
 
-           // const discount = this.discountPriceAmount
+            // const discount = this.discountPriceAmount
 
             this.clientForm.current_payed = Math.max(0, Math.round((
                 (this.fullSummaryPrice) * this.clientForm.payed_percent) / 100))
@@ -688,6 +705,9 @@ export default {
 
             let tmp_prices = [];
 
+            if (!priceType)
+                return
+
             let type = priceType.key
 
 
@@ -698,7 +718,7 @@ export default {
 
             items.forEach(productItem => {
 
-                const doorForm = productItem.product
+                const doorForm = productItem.door
 
                 let doorTypeFunc = (tmpBasePrice) => {
                     let tmpDoorTypePrice = typeof doorForm["door_type"].price === "object" ?

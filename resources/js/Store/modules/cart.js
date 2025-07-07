@@ -120,7 +120,12 @@ const mutations = {
     pushProductToCart(state, payload) {
         let product = payload.product
         product.price = payload.price
-        let cartItemIndex = state.items.findIndex(item => item.product.id === product.id)
+
+
+
+        let cartItemIndex = state.items.findIndex(item => item.product?.id === product.id)
+
+
 
         if (cartItemIndex===-1)
         {
