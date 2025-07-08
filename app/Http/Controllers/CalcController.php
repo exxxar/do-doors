@@ -373,13 +373,26 @@ class CalcController extends Controller
             ]);
 
             try {
-                $deal = $leadId ? $bitrix->updateDeal($leadId, $leadData) : $bitrix->createDeal($leadData);
+                $deal = null;
+                if (is_null($leadData))
+                    $deal = $bitrix->createDeal($leadData);
+                else
+                    $bitrix->updateDeal($leadId, $leadData);
+
+                if ($deal["error"])
+                    throw new \HttpException($deal["error_description"], 400);
+
                 $leadId = $deal['result'] ?? null;
-                if ($leadId) {
+                if (!is_null($leadId) && !is_null($deal)) {
                     $order->bitrix24_lead_id = $leadId;
                     $order->save();
+                    $bitrix->updateDeal($leadId, [
+                        'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id."lead=$leadId",
+                    ]) ;
+
                 }
             } catch (Exception $e) {
+
                 Log::error('Bitrix deal operation failed: ' . $e->getMessage());
             }
         }

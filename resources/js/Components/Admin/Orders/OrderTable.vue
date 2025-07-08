@@ -284,7 +284,7 @@ import ClientForm from "@/Components/Admin/Clients/ClientForm.vue";
                             <li><a class="dropdown-item"
                                    @click="selectItemForEdit(item)"
                                    href="javascript:void(0)"><i class="fa-solid fa-pen mr-2"></i>Редактор заказа
-                                    [дверей в заказе {{item.details.length}} ед.]
+                                    [дверей в заказе {{item.details?.length||0}} ед.]
                             </a>
                             </li>
                             <li>

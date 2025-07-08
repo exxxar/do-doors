@@ -82,8 +82,9 @@ class OrderController extends Controller
         $installPrice = $order->config["install_price"] ?? 0;
 
         $detailingSummaryPrice = $order->config["detailing_summary_price"] ?? 0;
-        $fullSummaryPrice = $order->config["full_summary_price"] ?? 0;
+        $fullSummaryPrice = $order->contract_amount ?? 0;
         $priceWithDiscount = $order->config["price_with_discount"] ?? 0;
+
 
         $currentPayed = $order->current_payed ?? 0;
         $totalPrice = $order->total_price ?? 0;
@@ -131,7 +132,7 @@ class OrderController extends Controller
             'UF_CRM_1733302997393' => 0.0,
             'UF_CRM_1733305761683' => $deliveryPrice,
             'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id,
-            'UF_CRM_1742976788' =>[2125, 2123, 2123][$workWithNds] ?? 2123,
+            'UF_CRM_1742976788' => [2125, 2123, 2123][$workWithNds] ?? 2123,
             'UF_CRM_1733303016351' => 0,
             'UF_CRM_1733306662836' => 0,
             'UF_CRM_1733306683779' => $designerWorkType ? $designerValue : $designerPrice,
@@ -140,11 +141,25 @@ class OrderController extends Controller
         ]);
 
         if ($sendToBitrix) try {
-            $deal = $leadId ? $bitrix->updateDeal($leadId, $leadData) : $bitrix->createDeal($leadData);
+
+            $deal = null;
+            if (is_null($leadData))
+                $deal = $bitrix->createDeal($leadData);
+            else
+                $bitrix->updateDeal($leadId, $leadData);
+
+            if ($deal["error"])
+                throw new \HttpException($deal["error_description"], 400);
+
             $leadId = $deal['result'] ?? null;
-            if ($leadId) {
+
+            if (!is_null($leadId) && !is_null($deal)) {
                 $order->bitrix24_lead_id = $leadId;
                 $order->save();
+
+                $bitrix->updateDeal($leadId, [
+                    'UF_CRM_1742035413778' => env('APP_URL') . '/link/' . $order->id . "lead=$leadId",
+                ]);
             }
         } catch (Exception $e) {
             Log::error('Bitrix deal operation failed: ' . $e->getMessage());
@@ -159,7 +174,6 @@ class OrderController extends Controller
         foreach ($items as $item) {
 
             $product = $item->door ?? null;
-
 
 
             if (is_null($product))
@@ -387,7 +401,7 @@ class OrderController extends Controller
 
         $fullPath = $this->generateContractDocument($templateName, $data);
 
-        if ($sendToBitrix && $leadId) try {
+        if ($sendToBitrix && !is_null($order->bitrix24_lead_id ?? null)) try {
             $deal["UF_CRM_1733302797738"] = $order->contract_number;
             $bitrix->updateDeal($order->bitrix24_lead_id, $deal);
 
